@@ -15,7 +15,7 @@ class UserService {
     await _userRef.doc(uid).update(data);
   }
 
-  /// 단건 조회
+  /// 유저 조회
   Future<Map<String, dynamic>?> getUserData(String uid) async {
     final doc = await _userRef.doc(uid).get();
     return doc.data() as Map<String, dynamic>?;
