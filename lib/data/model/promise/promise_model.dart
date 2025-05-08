@@ -8,6 +8,7 @@ class PromiseModel {
   final String address;
   final DateTime scheduledAt;
   final String chatRoomId;
+  final bool isOngoing; // 진행 중 여부
 
   const PromiseModel({
     required this.id,
@@ -17,6 +18,7 @@ class PromiseModel {
     required this.address,
     required this.scheduledAt,
     required this.chatRoomId,
+    this.isOngoing = false, // 기본값 false
   });
 
   /// Firestore → Model
@@ -29,6 +31,7 @@ class PromiseModel {
       address: json['address'] as String,
       scheduledAt: (json['scheduledAt'] as Timestamp).toDate(),
       chatRoomId: json['chatRoomId'] as String,
+      isOngoing: json['isOngoing'] as bool? ?? false,
     );
   }
 
@@ -42,6 +45,7 @@ class PromiseModel {
       'address': address,
       'scheduledAt': Timestamp.fromDate(scheduledAt),
       'chatRoomId': chatRoomId,
+      'isOngoing': isOngoing,
     };
   }
 
@@ -54,6 +58,7 @@ class PromiseModel {
     String? address,
     DateTime? scheduledAt,
     String? chatRoomId,
+    bool? isOngoing,
   }) {
     return PromiseModel(
       id: id ?? this.id,
@@ -63,6 +68,7 @@ class PromiseModel {
       address: address ?? this.address,
       scheduledAt: scheduledAt ?? this.scheduledAt,
       chatRoomId: chatRoomId ?? this.chatRoomId,
+      isOngoing: isOngoing ?? this.isOngoing,
     );
   }
 }
