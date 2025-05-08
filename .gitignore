@@ -49,7 +49,7 @@ android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 .env
 .env.*
-
+lib/firebase_options.dart
 # ===== 🧱 Flutter Build & iOS Derived Data (보완용) =====
 .flutter-plugins
 .flutter-plugins-dependencies
