@@ -2,13 +2,14 @@ import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/service/user_service.dart';
 
 abstract class UserRepository {
-  Future<void> createUser(UserModel user);
-  Future<void> updateUser(UserModel user);
+  Future<void> createUser(UserModel user); // 최초 가입시
+  Future<void> updateUser(UserModel user); //항상 사용,채팅이생기든,그룹이생기든
   Future<UserModel?> getUser(String uid);
+  // Future<UserModel?> getUserByUniqueId(String uniqueId); //유저 uniqueId로 검색 친구추가
   Stream<UserModel> streamUser(String uid);
-  Future<void> deleteUser(String uid);
+  Future<void> deleteUser(String uid); // 회원탈퇴
 
-  Future<bool> userExists(String uid);
+  Future<bool> userExists(String uid); // 해당 UID 존재 여부, 회원가입시
   Future<String?> getUidByUniqueId(String uniqueId);
   Future<bool> isUniqueIdAvailable(String uniqueId);
   Future<List<UserModel>> getUsersByUids(List<String> uids);
@@ -34,6 +35,11 @@ class UserRepositoryImpl implements UserRepository {
     final json = await _userService.getUserData(uid);
     return json == null ? null : UserModel.fromJson(json);
   }
+  // @override
+  // Future<UserModel?> getUserByUniqueId(String uniqueId) async {
+  //   final json = await _userService.getUserDataByUniqueId(uniqueId);
+  //   return json == null ? null : UserModel.fromJson(json);
+  // }
 
   @override
   Stream<UserModel> streamUser(String uid) {

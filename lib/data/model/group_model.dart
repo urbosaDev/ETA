@@ -4,7 +4,7 @@ class GroupModel {
   final String id;
   final String title;
   final List<String> memberIds;
-  final String loungeId;
+  final String chatRoomId;
   final List<String> promiseIds;
   final DateTime createdAt;
 
@@ -12,7 +12,7 @@ class GroupModel {
     required this.id,
     required this.title,
     required this.memberIds,
-    required this.loungeId,
+    required this.chatRoomId,
     required this.promiseIds,
     required this.createdAt,
   });
@@ -23,7 +23,7 @@ class GroupModel {
       id: json['id'] as String,
       title: json['title'] as String,
       memberIds: List<String>.from(json['memberIds'] ?? []),
-      loungeId: json['loungeId'] as String,
+      chatRoomId: json['chatRoomId'] as String,
       promiseIds: List<String>.from(json['promiseIds'] ?? []),
       createdAt: (json['createdAt'] as Timestamp).toDate(),
     );
@@ -35,7 +35,7 @@ class GroupModel {
       'id': id,
       'title': title,
       'memberIds': memberIds,
-      'loungeId': loungeId,
+      'chatRoomId': chatRoomId,
       'promiseIds': promiseIds,
       'createdAt': Timestamp.fromDate(createdAt),
     };
@@ -46,7 +46,7 @@ class GroupModel {
     String? id,
     String? title,
     List<String>? memberIds,
-    String? loungeId,
+    String? chatRoomId,
     List<String>? promiseIds,
     DateTime? createdAt,
   }) {
@@ -54,7 +54,7 @@ class GroupModel {
       id: id ?? this.id,
       title: title ?? this.title,
       memberIds: memberIds ?? this.memberIds,
-      loungeId: loungeId ?? this.loungeId,
+      chatRoomId: chatRoomId ?? this.chatRoomId,
       promiseIds: promiseIds ?? this.promiseIds,
       createdAt: createdAt ?? this.createdAt,
     );

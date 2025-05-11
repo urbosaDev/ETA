@@ -1,61 +1,54 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:what_is_your_eta/data/model/location_model/promise_location_model.dart';
 
 class PromiseModel {
   final String id;
   final String title;
   final List<String> memberIds;
-  final GeoPoint location;
-  final String address;
+  final PromiseLocationModel location;
   final DateTime scheduledAt;
   final String chatRoomId;
-  final bool isOngoing; // 진행 중 여부
+  final bool isOngoing;
 
   const PromiseModel({
     required this.id,
     required this.title,
     required this.memberIds,
     required this.location,
-    required this.address,
     required this.scheduledAt,
     required this.chatRoomId,
-    this.isOngoing = false, // 기본값 false
+    this.isOngoing = true,
   });
 
-  /// Firestore → Model
   factory PromiseModel.fromJson(Map<String, dynamic> json) {
     return PromiseModel(
-      id: json['id'] as String,
-      title: json['title'] as String,
+      id: json['id'],
+      title: json['title'],
       memberIds: List<String>.from(json['memberIds'] ?? []),
-      location: json['location'] as GeoPoint,
-      address: json['address'] as String,
+      location: PromiseLocationModel.fromJson(json['location']),
       scheduledAt: (json['scheduledAt'] as Timestamp).toDate(),
-      chatRoomId: json['chatRoomId'] as String,
-      isOngoing: json['isOngoing'] as bool? ?? false,
+      chatRoomId: json['chatRoomId'],
+      isOngoing: json['isOngoing'] ?? false,
     );
   }
 
-  /// Model → Firestore
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'title': title,
       'memberIds': memberIds,
-      'location': location,
-      'address': address,
+      'location': location.toJson(),
       'scheduledAt': Timestamp.fromDate(scheduledAt),
       'chatRoomId': chatRoomId,
       'isOngoing': isOngoing,
     };
   }
 
-  /// 상태 변경을 위한 copyWith
   PromiseModel copyWith({
     String? id,
     String? title,
     List<String>? memberIds,
-    GeoPoint? location,
-    String? address,
+    PromiseLocationModel? location,
     DateTime? scheduledAt,
     String? chatRoomId,
     bool? isOngoing,
@@ -65,7 +58,6 @@ class PromiseModel {
       title: title ?? this.title,
       memberIds: memberIds ?? this.memberIds,
       location: location ?? this.location,
-      address: address ?? this.address,
       scheduledAt: scheduledAt ?? this.scheduledAt,
       chatRoomId: chatRoomId ?? this.chatRoomId,
       isOngoing: isOngoing ?? this.isOngoing,
