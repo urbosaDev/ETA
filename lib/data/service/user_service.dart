@@ -20,6 +20,14 @@ class UserService {
     final doc = await _userRef.doc(uid).get();
     return doc.data() as Map<String, dynamic>?;
   }
+  // 유저 아이디를 통해 유저를 찾는메서드 (친구추가)
+  // Future<Map<String, dynamic>?> getUserDataByUniqueId(String uniqueId) async {
+  //   final query =
+  //       await _userRef.where('uniqueId', isEqualTo: uniqueId).limit(1).get();
+
+  //   if (query.docs.isEmpty) return null;
+  //   return query.docs.first.data() as Map<String, dynamic>;
+  // }
 
   /// 유저 스트리밍
   Stream<Map<String, dynamic>> streamUserData(String uid) {
