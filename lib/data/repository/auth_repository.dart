@@ -10,6 +10,7 @@ abstract class AuthRepository {
   String? getCurrentUid();
   Future<void> deleteAccount();
   bool isSignedIn();
+  Stream<User?> get userStream;
 }
 
 class FirebaseAuthRepository implements AuthRepository {
@@ -44,4 +45,7 @@ class FirebaseAuthRepository implements AuthRepository {
 
   @override
   bool isSignedIn() => _authService.isSignedIn();
+
+  @override
+  Stream<User?> get userStream => _authService.userStream;
 }

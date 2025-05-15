@@ -1,4 +1,4 @@
-import 'package:what_is_your_eta/data/model/group_channel/group_channel_model.dart';
+import 'package:what_is_your_eta/data/model/group_model.dart';
 import 'package:what_is_your_eta/data/service/group_service.dart';
 
 abstract class GroupRepository {
