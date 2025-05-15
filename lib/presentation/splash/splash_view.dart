@@ -15,7 +15,7 @@ class SplashView extends GetView<SplashViewModel> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Future.microtask(() {
           if (controller.isLoggedIn.value) {
-            Get.offNamed('/home');
+            Get.offNamed('/main');
           } else {
             Get.offNamed('/login');
           }

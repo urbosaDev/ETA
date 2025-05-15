@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:what_is_your_eta/presentation/%08home/home_view_model.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/home_view_model.dart';
 
 class HomeView extends GetView<HomeViewModel> {
   const HomeView({super.key});
