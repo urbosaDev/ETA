@@ -8,47 +8,55 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
 
   final textIdController = TextEditingController();
   final textNameController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('아이디 설정')),
-      body: Center(
-        child: Obx(
-          () => Column(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Obx(() {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextField(
                 controller: textIdController,
                 decoration: const InputDecoration(labelText: '아이디 입력'),
               ),
+              const SizedBox(height: 8),
               ElevatedButton(
-                onPressed: () async {
-                  controller.checkUniqueId(textIdController.text);
-                },
-                child: Text('중복확인'),
+                onPressed:
+                    () => controller.checkUniqueId(textIdController.text),
+                child: const Text('중복확인'),
               ),
+              const SizedBox(height: 16),
               TextField(
                 controller: textNameController,
                 decoration: const InputDecoration(labelText: '이름 입력'),
+                onChanged: (val) => controller.name = val, // 수정됨
               ),
+              const SizedBox(height: 8),
               controller.isUniqueIdAvailable
-                  ? const Text('사용 가능한 아이디입니다.')
-                  : const Text(''),
+                  ? const Text('✅ 사용 가능한 아이디입니다.')
+                  : const SizedBox.shrink(),
+              const Spacer(),
               ElevatedButton(
-                onPressed: () async {
-                  controller.createUser(
-                    textIdController.text,
-                    textNameController.text,
-                  );
-                  if (controller.isCreated) {
-                    Get.offNamed('/main');
-                  }
-                },
-                child: Text('아이디 생성하기'),
+                onPressed:
+                    controller.isButtonEnabled
+                        ? () async {
+                          await controller.createUser(textIdController.text);
+                          if (controller.isCreated) {
+                            Get.offNamed('/main');
+                          } else if (controller.errorMessage != null) {
+                            Get.snackbar('오류', controller.errorMessage!);
+                          }
+                        }
+                        : null,
+                child: const Text('아이디 생성하기'),
               ),
-              const SizedBox(height: 20),
             ],
-          ),
-        ),
+          );
+        }),
       ),
     );
   }
