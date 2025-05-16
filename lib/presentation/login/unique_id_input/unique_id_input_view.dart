@@ -40,7 +40,7 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
                     textNameController.text,
                   );
                   if (controller.isCreated) {
-                    Get.offNamed('/home');
+                    Get.offNamed('/main');
                   }
                 },
                 child: Text('아이디 생성하기'),

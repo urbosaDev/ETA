@@ -21,7 +21,7 @@ class LoginView extends GetView<LoginViewModel> {
                 final exist = await controller.signInWithGoogle();
 
                 if (exist) {
-                  Get.offNamed('/home');
+                  Get.offNamed('/main');
                 } else {
                   Get.to(
                     () => UniqueIdInputView(),

@@ -1,6 +1,6 @@
 import 'package:get/get_navigation/src/routes/get_route.dart';
-import 'package:what_is_your_eta/presentation/%08home/home_binding.dart';
-import 'package:what_is_your_eta/presentation/%08home/home_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/bottom_nav_binding.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/bottom_nav_view.dart';
 import 'package:what_is_your_eta/presentation/login/login_binding.dart';
 import 'package:what_is_your_eta/presentation/login/login_view.dart';
 import 'package:what_is_your_eta/presentation/login/unique_id_input/unique_id_input_binding.dart';
@@ -11,8 +11,9 @@ import 'package:what_is_your_eta/presentation/splash/splash_view.dart';
 abstract class Routes {
   static const splash = '/splash';
   static const login = '/login';
-  static const home = '/home';
+
   static const uniqueId = '/uniqueId';
+  static const main = '/main';
 }
 
 final getPages = [
@@ -31,9 +32,10 @@ final getPages = [
     page: () => UniqueIdInputView(),
     binding: UniqueIdInputBinding(),
   ),
+
   GetPage(
-    name: Routes.home,
-    page: () => const HomeView(),
-    binding: HomeBinding(),
+    name: Routes.main,
+    page: () => const BottomNavView(),
+    binding: BottomNavBinding(),
   ),
 ];
