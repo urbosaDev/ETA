@@ -4,7 +4,7 @@ import 'package:what_is_your_eta/data/service/auth_service.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/home_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/bottom_nav_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/notification/notification_view_model.dart';
-import 'package:what_is_your_eta/presentation/setting/setting_view_model.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/setting/setting_view_model.dart';
 
 class BottomNavBinding extends Bindings {
   @override
