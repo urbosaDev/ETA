@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/homeSideNav/home_side_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/home_view_model.dart';
 
 class HomeView extends GetView<HomeViewModel> {
@@ -9,20 +10,25 @@ class HomeView extends GetView<HomeViewModel> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Home')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Home View'),
-            ElevatedButton(
-              onPressed: () {
-                controller.signOut();
-                Get.offNamed('/login');
-              },
-              child: const Text('Logout'),
+      body: Row(
+        children: [
+          SizedBox(width: 72, child: HomeSideView()),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Home View'),
+                ElevatedButton(
+                  onPressed: () {
+                    controller.signOut();
+                    Get.offNamed('/login');
+                  },
+                  child: const Text('Logout'),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

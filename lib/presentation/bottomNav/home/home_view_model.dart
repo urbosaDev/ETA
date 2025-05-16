@@ -9,4 +9,9 @@ class HomeViewModel extends GetxController {
   Future<void> signOut() async {
     await _authRepository.signOut();
   }
+
+  @override
+  void onInit() {
+    super.onInit();
+  }
 }
