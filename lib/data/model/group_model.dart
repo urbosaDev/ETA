@@ -1,5 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// 그룹 모델 또한 최상위
+// 컬렉션으로 chatRoom을 가진다.
+// chatRoom은 message들을 가진 컬렉션,
+// 채팅은 언제나 paging 사용
 class GroupModel {
   final String id;
   final String title;

@@ -1,4 +1,4 @@
-import 'package:what_is_your_eta/data/model/promise/promise_model.dart';
+import 'package:what_is_your_eta/data/model/promise_model.dart';
 import 'package:what_is_your_eta/data/service/promise_service.dart';
 
 abstract class PromiseRepository {

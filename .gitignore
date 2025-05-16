@@ -58,3 +58,4 @@ lib/firebase_options.dart
 ios/Pods/
 ios/Flutter/Flutter.framework/
 flutter_export_environment.sh
+

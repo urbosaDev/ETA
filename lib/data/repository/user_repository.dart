@@ -2,7 +2,7 @@ import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/service/user_service.dart';
 
 abstract class UserRepository {
-  Future<void> createUser(UserModel user); // 최초 가입시
+  Future<void> createUser(UserModel user); // 최초 가입시,
   Future<void> updateUser(UserModel user); //항상 사용,채팅이생기든,그룹이생기든
   Future<UserModel?> getUser(String uid);
   // Future<UserModel?> getUserByUniqueId(String uniqueId); //유저 uniqueId로 검색 친구추가

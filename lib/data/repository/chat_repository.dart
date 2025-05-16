@@ -1,4 +1,4 @@
-import 'package:what_is_your_eta/data/model/message/message_model.dart';
+import 'package:what_is_your_eta/data/model/message_model.dart';
 import 'package:what_is_your_eta/data/service/chat_service.dart';
 
 // 의존성 주입시 어떤 Chat을 사용할지에 따라 ChatService가 다르게 주입
