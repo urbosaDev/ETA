@@ -13,6 +13,7 @@ abstract class UserRepository {
   Future<String?> getUidByUniqueId(String uniqueId);
   Future<bool> isUniqueIdAvailable(String uniqueId);
   Future<List<UserModel>> getUsersByUids(List<String> uids);
+  Future<void> addFriendUid(String currentUid, String friendUid);
 }
 
 class UserRepositoryImpl implements UserRepository {
@@ -28,6 +29,12 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<void> updateUser(UserModel user) async {
     await _userService.updateUserData(user.uid, user.toJson());
+  }
+
+  // 친구추가 로직
+  @override
+  Future<void> addFriendUid(String currentUid, String friendUid) async {
+    await _userService.addFriendUid(currentUid, friendUid);
   }
 
   @override

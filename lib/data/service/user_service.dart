@@ -15,6 +15,12 @@ class UserService {
     await _userRef.doc(uid).update(data);
   }
 
+  Future<void> addFriendUid(String currentUid, String friendUid) async {
+    await _userRef.doc(currentUid).update({
+      'friendsUids': FieldValue.arrayUnion([friendUid]),
+    });
+  }
+
   /// 유저 조회
   Future<Map<String, dynamic>?> getUserData(String uid) async {
     final doc = await _userRef.doc(uid).get();
