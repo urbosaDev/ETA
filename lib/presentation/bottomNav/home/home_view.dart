@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/homeSideNav/home_side_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/home_view_model.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_view.dart';
 
 class HomeView extends GetView<HomeViewModel> {
   const HomeView({super.key});
@@ -12,21 +12,35 @@ class HomeView extends GetView<HomeViewModel> {
       appBar: AppBar(title: const Text('Home')),
       body: Row(
         children: [
-          SizedBox(width: 72, child: HomeSideView()),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Home View'),
-                ElevatedButton(
-                  onPressed: () {
-                    controller.signOut();
-                    Get.offNamed('/login');
-                  },
-                  child: const Text('Logout'),
+          SizedBox(
+            width: 72,
+            child: NavigationRail(
+              selectedIndex: controller.selectedIndex,
+              onDestinationSelected: controller.changeTab,
+              destinations: const [
+                NavigationRailDestination(
+                  icon: Icon(Icons.chat),
+                  label: Text('Chat'),
+                ),
+
+                NavigationRailDestination(
+                  icon: Icon(Icons.add),
+                  label: Text('Settings'),
                 ),
               ],
             ),
+          ),
+          Expanded(
+            child: Obx(() {
+              switch (controller.selectedIndex) {
+                case 0:
+                  return const PrivateChatView(); // ✅ Chat 선택 시
+                // case 1:
+                //   return const SettingView(); // ✅ Settings 선택 시
+                default:
+                  return const Center(child: Text('선택된 뷰가 없습니다'));
+              }
+            }),
           ),
         ],
       ),

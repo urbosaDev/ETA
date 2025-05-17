@@ -14,6 +14,9 @@ abstract class Routes {
 
   static const uniqueId = '/uniqueId';
   static const main = '/main';
+
+  // // in private chat
+  // static const addFriend = '/addFriend';
 }
 
 final getPages = [
