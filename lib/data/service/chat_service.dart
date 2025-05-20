@@ -2,12 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class ChatService {
   // 채팅방 관련
-  Future<String> create(Map<String, dynamic> data);
+  Future<String> create(Map<String, dynamic> data, {String? customId});
   Future<Map<String, dynamic>?> get(String roomId);
   Stream<Map<String, dynamic>> stream(String roomId);
   Future<void> update(String roomId, Map<String, dynamic> data);
   Future<void> delete(String roomId);
-
+  Future<bool> exists(String roomId);
   // ✅ 메시지 관련 (JSON 기준)
   Future<void> sendMessageJson(String roomId, Map<String, dynamic> json);
   Stream<List<Map<String, dynamic>>> streamMessagesJson(String roomId);
@@ -17,10 +17,10 @@ class GroupChatService implements ChatService {
   final _ref = FirebaseFirestore.instance.collection('groupChatRooms');
 
   @override
-  Future<String> create(Map<String, dynamic> data) async {
-    final doc = _ref.doc();
-    await doc.set({...data, 'id': doc.id});
-    return doc.id;
+  Future<String> create(Map<String, dynamic> data, {String? customId}) async {
+    final docRef = _ref.doc(); // ❌ customId 무시
+    await docRef.set({...data, 'id': docRef.id});
+    return docRef.id;
   }
 
   @override
@@ -42,6 +42,11 @@ class GroupChatService implements ChatService {
   @override
   Future<void> delete(String roomId) async {
     await _ref.doc(roomId).delete();
+  }
+
+  @override
+  Future<bool> exists(String roomId) async {
+    return false; // 혹은 throw UnimplementedError();
   }
 
   @override
@@ -66,8 +71,8 @@ class PromiseChatService implements ChatService {
   final _ref = FirebaseFirestore.instance.collection('promiseChatRooms');
 
   @override
-  Future<String> create(Map<String, dynamic> data) async {
-    final docRef = _ref.doc();
+  Future<String> create(Map<String, dynamic> data, {String? customId}) async {
+    final docRef = _ref.doc(); // ❌ customId 무시
     await docRef.set({...data, 'id': docRef.id});
     return docRef.id;
   }
@@ -91,6 +96,11 @@ class PromiseChatService implements ChatService {
   @override
   Future<void> delete(String roomId) async {
     await _ref.doc(roomId).delete();
+  }
+
+  @override
+  Future<bool> exists(String roomId) async {
+    return false; // 혹은 throw UnimplementedError();
   }
 
   @override
@@ -115,8 +125,8 @@ class PrivateChatService implements ChatService {
   final _ref = FirebaseFirestore.instance.collection('privateChatRooms');
 
   @override
-  Future<String> create(Map<String, dynamic> data) async {
-    final docRef = _ref.doc();
+  Future<String> create(Map<String, dynamic> data, {String? customId}) async {
+    final docRef = customId != null ? _ref.doc(customId) : _ref.doc();
     await docRef.set({...data, 'id': docRef.id});
     return docRef.id;
   }
@@ -140,6 +150,12 @@ class PrivateChatService implements ChatService {
   @override
   Future<void> delete(String roomId) async {
     await _ref.doc(roomId).delete();
+  }
+
+  @override
+  Future<bool> exists(String roomId) async {
+    final doc = await _ref.doc(roomId).get();
+    return doc.exists;
   }
 
   @override

@@ -3,16 +3,20 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
+import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 
 class PrivateChatViewModel extends GetxController {
   final UserRepository _userRepository;
   final AuthRepository _authRepository;
+  final ChatRepository _chatRepository;
   PrivateChatViewModel({
     required AuthRepository authRepository,
     required UserRepository userRepository,
+    required ChatRepository chatRepository,
   }) : _authRepository = authRepository,
-       _userRepository = userRepository;
+       _userRepository = userRepository,
+       _chatRepository = chatRepository;
 
   final Rx<UserModel?> _userModel = Rx<UserModel?>(null);
   UserModel? get userModel => _userModel.value;
@@ -29,9 +33,12 @@ class PrivateChatViewModel extends GetxController {
     super.onInit();
     _isLoading.value = true;
     Future.microtask(() => _initUser());
-    if (_userModel != null) {
-      _isLoading.value = false;
-    }
+    ever(_userModel, (UserModel? user) {
+      if (user != null) {
+        getUsersByUids(user.friendsUids);
+      }
+    });
+    _isLoading.value = false;
   }
 
   void _initUser() async {
@@ -76,5 +83,48 @@ class PrivateChatViewModel extends GetxController {
       return;
     }
     // await _userRepository.updateUser(UserModel user);
+  }
+
+  //중복 방지를 위한 , chat room id 생성 , 알파벳순 정렬
+  String generateChatRoomId(String uid1, String uid2) {
+    final sorted = [uid1, uid2]..sort();
+    return '${sorted[0]}_${sorted[1]}';
+  }
+
+  // 채팅방 생성은 채팅시작 버튼
+  //
+  Future<String?> createChatRoom(String friendUid) async {
+    try {
+      final myUid = _userModel.value!.uid;
+      final chatRoomId = generateChatRoomId(myUid, friendUid);
+
+      // ✅ 이미 존재하는 채팅방이 있는지 확인
+      final exists = await _chatRepository.chatRoomExists(chatRoomId);
+      if (exists) {
+        return chatRoomId; // 👉 이미 존재하면 그냥 리턴
+      }
+
+      // ✅ 존재하지 않으면 생성
+      final chatRoomData = {
+        'participantIds': [myUid, friendUid],
+        'lastMessage': '',
+        'lastMessageAt': DateTime.now(),
+      };
+
+      await _chatRepository.createChatRoom(
+        chatId: chatRoomId,
+        data: chatRoomData,
+      );
+
+      // ✅ 양쪽 유저 모델 업데이트
+      await _userRepository.addPrivateChatId(myUid, chatRoomId);
+      await _userRepository.addPrivateChatId(friendUid, chatRoomId);
+
+      return chatRoomId;
+    } catch (e, stack) {
+      print('🔥 채팅방 생성 오류: $e');
+      print(stack);
+      return null;
+    }
   }
 }

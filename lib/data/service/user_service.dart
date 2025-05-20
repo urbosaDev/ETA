@@ -4,6 +4,12 @@ class UserService {
   final CollectionReference _userRef = FirebaseFirestore.instance.collection(
     'users',
   );
+  // 개인톡방이 생길때, 유저 채팅방정보 업데이트
+  Future<void> addPrivateChatId(String uid, String chatRoomId) async {
+    await _userRef.doc(uid).update({
+      'privateChatIds': FieldValue.arrayUnion([chatRoomId]),
+    });
+  }
 
   /// 최초 가입 시 사용
   Future<void> setUserData(String uid, Map<String, dynamic> data) async {

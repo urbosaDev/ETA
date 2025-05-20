@@ -8,7 +8,7 @@ abstract class UserRepository {
   // Future<UserModel?> getUserByUniqueId(String uniqueId); //유저 uniqueId로 검색 친구추가
   Stream<UserModel> streamUser(String uid);
   Future<void> deleteUser(String uid); // 회원탈퇴
-
+  Future<void> addPrivateChatId(String uid, String chatRoomId);
   Future<bool> userExists(String uid); // 해당 UID 존재 여부, 회원가입시
   Future<String?> getUidByUniqueId(String uniqueId);
   Future<bool> isUniqueIdAvailable(String uniqueId);
@@ -29,6 +29,12 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<void> updateUser(UserModel user) async {
     await _userService.updateUserData(user.uid, user.toJson());
+  }
+
+  // 채팅방 생길때 유저정보 업데이트
+  @override
+  Future<void> addPrivateChatId(String uid, String chatRoomId) {
+    return _userService.addPrivateChatId(uid, chatRoomId);
   }
 
   // 친구추가 로직
