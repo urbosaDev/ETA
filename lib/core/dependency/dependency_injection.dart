@@ -1,7 +1,9 @@
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
+import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/data/service/auth_service.dart';
+import 'package:what_is_your_eta/data/service/chat_service.dart';
 import 'package:what_is_your_eta/data/service/user_service.dart';
 
 class DependencyInjection {
@@ -14,5 +16,14 @@ class DependencyInjection {
       permanent: true,
     );
     Get.put<UserRepository>(UserRepositoryImpl(Get.find()), permanent: true);
+
+    Get.put<PrivateChatService>(PrivateChatService(), permanent: true);
+    Get.put<GroupChatService>(GroupChatService(), permanent: true);
+    Get.put<PromiseChatService>(PromiseChatService(), permanent: true);
+
+    Get.put<ChatRepository>(
+      ChatRepositoryImpl(Get.find<PrivateChatService>()),
+      permanent: true,
+    );
   }
 }

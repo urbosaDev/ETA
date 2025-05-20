@@ -4,12 +4,15 @@ import 'package:what_is_your_eta/data/service/chat_service.dart';
 // 의존성 주입시 어떤 Chat을 사용할지에 따라 ChatService가 다르게 주입
 abstract class ChatRepository {
   // 채팅방
-  Future<String> createChatRoom(Map<String, dynamic> data);
+  Future<String> createChatRoom({
+    required String chatId,
+    required Map<String, dynamic> data,
+  });
   Future<Map<String, dynamic>?> getChatRoom(String roomId);
   Stream<Map<String, dynamic>> streamChatRoom(String roomId);
   Future<void> updateChatRoom(String roomId, Map<String, dynamic> data);
   Future<void> deleteChatRoom(String roomId);
-
+  Future<bool> chatRoomExists(String roomId);
   // 메시지
   Future<void> sendMessage(String roomId, MessageModel message);
   Stream<List<MessageModel>> streamMessages(String roomId);
@@ -22,8 +25,11 @@ class ChatRepositoryImpl implements ChatRepository {
 
   // 채팅방 관련
   @override
-  Future<String> createChatRoom(Map<String, dynamic> data) {
-    return _service.create(data);
+  Future<String> createChatRoom({
+    required String chatId,
+    required Map<String, dynamic> data,
+  }) {
+    return _service.create(data, customId: chatId);
   }
 
   @override
@@ -44,6 +50,11 @@ class ChatRepositoryImpl implements ChatRepository {
   @override
   Future<void> deleteChatRoom(String roomId) {
     return _service.delete(roomId);
+  }
+
+  @override
+  Future<bool> chatRoomExists(String roomId) {
+    return _service.exists(roomId); // 어떤 서비스든 연결은 동일
   }
 
   // 메시지 관련
