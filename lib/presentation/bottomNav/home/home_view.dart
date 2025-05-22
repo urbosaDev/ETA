@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/create_group/create_group_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/group_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/home_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_view.dart';
 
@@ -17,16 +18,16 @@ class HomeView extends GetView<HomeViewModel> {
           SizedBox(
             width: 72,
             child: Obx(() {
-              final groupList = controller.groupList;
               return NavigationRail(
                 selectedIndex: controller.selectedIndex,
                 onDestinationSelected: (index) {
                   if (index == 1) {
                     showCreateChannelPopup(context);
                   } else {
-                    controller.changeTab(index);
+                    controller.changeTab(index); // ✅ 그룹도 포함해 selectedIndex만 변경
                   }
                 },
+                labelType: NavigationRailLabelType.all,
                 destinations: [
                   const NavigationRailDestination(
                     icon: Icon(Icons.chat),
@@ -36,10 +37,10 @@ class HomeView extends GetView<HomeViewModel> {
                     icon: Icon(Icons.add),
                     label: Text('Create'),
                   ),
-                  ...groupList.mapIndexed(
-                    (i, group) => NavigationRailDestination(
+                  ...controller.groupList.map(
+                    (group) => NavigationRailDestination(
                       icon: const Icon(Icons.groups),
-                      label: Text('G${i + 1}'),
+                      label: Text(group.title),
                     ),
                   ),
                 ],
@@ -48,11 +49,14 @@ class HomeView extends GetView<HomeViewModel> {
           ),
           Expanded(
             child: Obx(() {
-              switch (controller.selectedIndex) {
-                case 0:
-                  return const PrivateChatView();
-                default:
-                  return const Center(child: Text('선택된 뷰가 없습니다'));
+              if (controller.selectedIndex == 0) {
+                return const PrivateChatView();
+              } else if (controller.selectedIndex >= 2) {
+                final group =
+                    controller.groupList[controller.selectedIndex - 2];
+                return GroupView(group: group); // ✅ 그룹 View로 진입
+              } else {
+                return const Center(child: Text('선택된 뷰가 없습니다'));
               }
             }),
           ),
