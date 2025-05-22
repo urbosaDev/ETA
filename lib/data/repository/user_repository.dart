@@ -14,6 +14,7 @@ abstract class UserRepository {
   Future<bool> isUniqueIdAvailable(String uniqueId);
   Future<List<UserModel>> getUsersByUids(List<String> uids);
   Future<void> addFriendUid(String currentUid, String friendUid);
+  Future<void> addGroupId(String uid, String groupId); // 그룹생성시 유저 업데이트
 }
 
 class UserRepositoryImpl implements UserRepository {
@@ -83,5 +84,10 @@ class UserRepositoryImpl implements UserRepository {
   Future<List<UserModel>> getUsersByUids(List<String> uids) async {
     final jsonList = await _userService.getUsersByUids(uids);
     return jsonList.map(UserModel.fromJson).toList();
+  }
+
+  @override
+  Future<void> addGroupId(String uid, String groupId) async {
+    await _userService.addGroupId(uid, groupId);
   }
 }

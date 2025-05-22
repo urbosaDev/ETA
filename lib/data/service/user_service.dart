@@ -16,6 +16,13 @@ class UserService {
     await _userRef.doc(uid).set(data);
   }
 
+  // 그룹 생성시, 유저 그룹리스트 업데이트용
+  Future<void> addGroupId(String uid, String groupId) async {
+    await _userRef.doc(uid).update({
+      'groupIds': FieldValue.arrayUnion([groupId]),
+    });
+  }
+
   /// 부분 업데이트
   Future<void> updateUserData(String uid, Map<String, dynamic> data) async {
     await _userRef.doc(uid).update(data);

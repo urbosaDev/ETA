@@ -4,10 +4,20 @@ class GroupService {
   final _groupRef = FirebaseFirestore.instance.collection('groups');
 
   /// 그룹 생성
-  Future<String> createGroup(Map<String, dynamic> data) async {
+  Future<String> createGroup(
+    Map<String, dynamic> group,
+    Map<String, dynamic> initMessage,
+  ) async {
     final docRef = _groupRef.doc();
-    await docRef.set({...data, 'id': docRef.id});
-    return docRef.id; // 생성된 ID 리턴
+
+    await docRef.set({...group, 'id': docRef.id, 'chatRoomId': docRef.id});
+
+    final messageRef = docRef.collection('messages'); // ✅ group 내부의 messages
+    // print(initMessage);
+
+    await messageRef.doc('init').set(initMessage);
+
+    return docRef.id;
   }
 
   /// 그룹 일부 필드 업데이트
