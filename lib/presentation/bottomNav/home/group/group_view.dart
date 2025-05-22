@@ -9,9 +9,17 @@ class GroupView extends GetView<GroupViewModel> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(group.title)),
-      body: const Center(child: Text('Group View')),
+    return Column(
+      children: [
+        Text(group.title),
+        Row(
+          children: group.memberIds.map((memberId) => Text(memberId)).toList(),
+        ),
+        const SizedBox(height: 20),
+        GestureDetector(onTap: () {}, child: Text('속닥속닥 라운지')),
+        const SizedBox(height: 20),
+        Text('약속'),
+      ],
     );
   }
 }
