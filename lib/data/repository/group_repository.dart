@@ -1,4 +1,5 @@
 import 'package:what_is_your_eta/data/model/group_model.dart';
+import 'package:what_is_your_eta/data/model/message_model.dart';
 import 'package:what_is_your_eta/data/service/group_service.dart';
 
 abstract class GroupRepository {
@@ -19,7 +20,12 @@ class GroupRepositoryImpl implements GroupRepository {
 
   @override
   Future<String> createGroup(GroupModel group) async {
-    return await _service.createGroup(group.toJson());
+    final initMessage = MessageModel(
+      senderId: 'system',
+      text: '채팅방이 생성되었습니다',
+      sentAt: DateTime.now(),
+    );
+    return await _service.createGroup(group.toJson(), initMessage.toJson());
   }
 
   @override
