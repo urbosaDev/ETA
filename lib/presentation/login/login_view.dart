@@ -18,16 +18,13 @@ class LoginView extends GetView<LoginViewModel> {
             const Text('Login View'),
             ElevatedButton(
               onPressed: () async {
-                final exist = await controller.signInWithGoogle();
-
-                if (exist) {
-                  Get.offNamed('/main');
-                } else {
-                  Get.to(
-                    () => UniqueIdInputView(),
-                    binding: UniqueIdInputBinding(),
-                  );
-                }
+                await controller.signInWithGoogle();
+                controller.idExist
+                    ? Get.offNamed('/main')
+                    : Get.to(
+                      () => UniqueIdInputView(),
+                      binding: UniqueIdInputBinding(),
+                    );
               },
               child: const Text('Login'),
             ),

@@ -18,20 +18,17 @@ class LoginViewModel extends GetxController {
   }) : _userRepository = userRepository,
        _authRepository = authRepository;
 
+  bool idExist = false;
   // 로그인 상태
-  Future<bool> signInWithGoogle() async {
+  Future<void> signInWithGoogle() async {
     try {
       final uid = await _authRepository.signInWithGoogle();
-      if (uid == null) return false;
+      if (uid == null) return;
 
       final user = _authRepository.getCurrentUser();
       if (user == null) throw Exception('User not found');
 
-      final exists = await _userRepository.userExists(uid);
-      return exists;
-    } catch (e) {
-      // Get.snackbar('Error', e.toString());
-      return false;
-    }
+      idExist = await _userRepository.userExists(uid);
+    } catch (e) {}
   }
 }
