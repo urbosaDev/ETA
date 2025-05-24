@@ -21,8 +21,7 @@ class CreateGroupViewModel extends GetxController {
        _userRepository = userRepository;
 
   // init 했을때 내 userModel 가져와야함
-  final Rx<UserModel?> _userModel = Rx<UserModel?>(null);
-  UserModel? get userModel => _userModel.value;
+  final Rx<UserModel?> userModel = Rx<UserModel?>(null);
 
   final RxList<UserModel> _friendList = <UserModel>[].obs;
   List<UserModel> get friendList => _friendList;
@@ -52,11 +51,6 @@ class CreateGroupViewModel extends GetxController {
   void onInit() {
     super.onInit();
     _initUser();
-    ever(_userModel, (UserModel? user) {
-      if (user != null) {
-        getUsersByUids(user.friendsUids);
-      }
-    });
   }
 
   @override
@@ -69,15 +63,16 @@ class CreateGroupViewModel extends GetxController {
     final user = _authRepository.getCurrentUser();
     if (user != null) {
       _startUserStream(user.uid);
-      getUsersByUids(_userModel.value?.friendsUids ?? []);
+      getUsersByUids(userModel.value?.friendsUids ?? []);
     } else {
       // 로그아웃 처리 또는 에러 처리 필요
     }
   }
 
   void _startUserStream(String uid) {
-    _userSub = _userRepository.streamUser(uid).listen((userModel) {
-      _userModel.value = userModel;
+    _userSub = _userRepository.streamUser(uid).listen((user) {
+      userModel.value = user;
+      getUsersByUids(user.friendsUids);
     });
   }
 
@@ -89,12 +84,12 @@ class CreateGroupViewModel extends GetxController {
   // 그룹 만들기 메서드
   Future<void> createGroup() async {
     // isReadyToCreate가 true일때만 실행
-    final currentUser = userModel;
+    final currentUser = userModel.value?.uid;
 
     if (currentUser == null) return;
     if (!isReadyToCreate) return;
     final finalSelectedUid = [
-      currentUser.uid,
+      currentUser,
       ...selectedFriends.map((u) => u.uid),
     ];
     // GroupModel 생성
