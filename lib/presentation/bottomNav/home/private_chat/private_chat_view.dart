@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/%08add_friend/add_friend_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view.dart';
 
@@ -11,17 +12,17 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (controller.isLoading) {
+      if (controller.isLoading.value) {
         return const Center(child: CircularProgressIndicator());
       }
 
       return Column(
         children: [
-          Text('${controller.userModel?.uniqueId}님 ㅎㅇ'),
+          Text('${controller.userModel.value?.uniqueId}님 ㅎㅇ'),
           const Text('메세지'),
           ElevatedButton(
             onPressed: () {
-              Get.to(() => AddFriendView(user: controller.userModel!));
+              Get.to(() => AddFriendView(user: controller.userModel.value!));
             },
             child: const Text("친구 추가하기"),
           ),
@@ -55,7 +56,10 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                                               Get.to(
                                                 () => PrivateChatRoomView(
                                                   chatRoomId: chatRoomId,
-                                                  my: controller.userModel!,
+                                                  my:
+                                                      controller
+                                                          .userModel
+                                                          .value!,
                                                   friend: e,
                                                 ),
                                               );
@@ -91,7 +95,46 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                           .toList(),
             ),
           ),
-          Container(height: 300, color: Colors.blue),
+          Container(
+            height: 300,
+            width: 400,
+            color: Colors.blue,
+            child: Column(
+              children:
+                  controller.chatRoomList.map((chatRoom) {
+                    return FutureBuilder<UserModel?>(
+                      future: controller.getOpponentInfo(chatRoom),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const SizedBox(height: 50); // 로딩중 placeholder
+                        }
+
+                        final opponent = snapshot.data!;
+                        final my = controller.userModel.value!;
+
+                        return GestureDetector(
+                          onTap: () {
+                            Get.to(
+                              () => PrivateChatRoomView(
+                                chatRoomId: chatRoom.id,
+                                my: my,
+                                friend: opponent,
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: 400,
+                            color: Colors.red,
+                            child: Column(
+                              children: [Text('${opponent.uniqueId}님과의 채팅방')],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }).toList(),
+            ),
+          ),
         ],
       );
     });
