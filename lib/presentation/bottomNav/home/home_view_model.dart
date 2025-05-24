@@ -7,6 +7,8 @@ import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 
+enum HomeTab { chat, create, group }
+
 class HomeViewModel extends GetxController {
   final UserRepository _userRepository;
   final AuthRepository _authRepository;
@@ -20,18 +22,18 @@ class HomeViewModel extends GetxController {
        _userRepository = userRepository,
        _groupRepository = groupRepository;
 
-  final RxInt _selectedIndex = 0.obs;
-  int get selectedIndex => _selectedIndex.value;
-
-  void changeTab(int index) {
-    _selectedIndex.value = index;
-  }
-
-  final Rx<UserModel?> _userModel = Rx<UserModel?>(null);
-  UserModel? get userModel => _userModel.value;
-
   final RxList<GroupModel> _groupList = <GroupModel>[].obs;
   List<GroupModel> get groupList => _groupList;
+
+  final selectedIndex = 0.obs; // 0: Chat, 1: Create, 2~: Groups
+
+  GroupModel? get selectedGroup {
+    final index = selectedIndex.value - 2;
+    if (index >= 0 && index < groupList.length) {
+      return groupList[index];
+    }
+    return null;
+  }
 
   StreamSubscription<UserModel>? _userSub;
 
@@ -39,11 +41,6 @@ class HomeViewModel extends GetxController {
   void onInit() {
     super.onInit();
     _initUser();
-    ever(_userModel, (user) {
-      if (user != null && user.groupIds.isNotEmpty) {
-        _fetchGroups(user.groupIds);
-      }
-    });
   }
 
   @override
@@ -61,11 +58,15 @@ class HomeViewModel extends GetxController {
 
   void _startUserStream(String uid) {
     _userSub = _userRepository.streamUser(uid).listen((userModel) {
-      _userModel.value = userModel;
+      if (userModel.groupIds.isNotEmpty) {
+        _fetchGroups(userModel.groupIds);
+      } else {
+        _groupList.clear();
+      }
     });
   }
 
-  void _fetchGroups(List<String> groupIds) async {
+  Future<void> _fetchGroups(List<String> groupIds) async {
     final groups = await _groupRepository.getGroupsByIds(groupIds);
     _groupList.value = groups;
   }
