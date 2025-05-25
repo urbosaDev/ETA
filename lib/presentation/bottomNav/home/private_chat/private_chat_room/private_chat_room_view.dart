@@ -1,33 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:what_is_your_eta/data/model/user_model.dart';
-import 'package:what_is_your_eta/data/repository/chat_repository.dart';
+
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view_model.dart';
 
-class PrivateChatRoomView extends StatelessWidget {
-  final String chatRoomId;
-  final UserModel my;
-  final UserModel friend;
-
-  const PrivateChatRoomView({
-    super.key,
-    required this.chatRoomId,
-    required this.my,
-    required this.friend,
-  });
+class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
+  const PrivateChatRoomView({super.key});
 
   @override
   Widget build(BuildContext context) {
     final messageController = TextEditingController();
-
-    final controller = Get.put(
-      PrivateChatRoomViewModel(
-        chatRepository: Get.find<ChatRepository>(),
-        chatRoomId: chatRoomId,
-        my: my,
-        friend: friend,
-      ),
-    );
+    final String chatRoomId = Get.arguments as String;
+    final controller = Get.find<PrivateChatRoomViewModel>(tag: chatRoomId);
+    final my = controller.my;
+    final friend = controller.friend;
 
     return Scaffold(
       appBar: AppBar(

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
+import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/%08add_friend/add_friend_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view_model.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_view_model.dart';
 
@@ -54,14 +56,27 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                                                 .createChatRoom(e.uid);
                                             if (chatRoomId != null) {
                                               Get.to(
-                                                () => PrivateChatRoomView(
-                                                  chatRoomId: chatRoomId,
-                                                  my:
-                                                      controller
-                                                          .userModel
-                                                          .value!,
-                                                  friend: e,
-                                                ),
+                                                () =>
+                                                    const PrivateChatRoomView(),
+                                                arguments:
+                                                    chatRoomId, // ✅ View에서 tag로 사용
+                                                binding: BindingsBuilder(() {
+                                                  Get.put(
+                                                    PrivateChatRoomViewModel(
+                                                      chatRepository:
+                                                          Get.find<
+                                                            ChatRepository
+                                                          >(),
+                                                      chatRoomId: chatRoomId,
+                                                      my:
+                                                          controller
+                                                              .userModel
+                                                              .value!,
+                                                      friend: e,
+                                                    ),
+                                                    tag: chatRoomId,
+                                                  );
+                                                }),
                                               );
                                             } else {
                                               Get.snackbar(
@@ -115,11 +130,19 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                         return GestureDetector(
                           onTap: () {
                             Get.to(
-                              () => PrivateChatRoomView(
-                                chatRoomId: chatRoom.id,
-                                my: my,
-                                friend: opponent,
-                              ),
+                              () => const PrivateChatRoomView(),
+                              arguments: chatRoom.id,
+                              binding: BindingsBuilder(() {
+                                Get.put(
+                                  PrivateChatRoomViewModel(
+                                    chatRepository: Get.find<ChatRepository>(),
+                                    chatRoomId: chatRoom.id,
+                                    my: my,
+                                    friend: opponent,
+                                  ),
+                                  tag: chatRoom.id,
+                                );
+                              }),
                             );
                           },
                           child: Container(

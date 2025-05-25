@@ -17,6 +17,7 @@ class GroupView extends StatelessWidget {
         group: group,
       ),
       tag: group.id,
+      permanent: false,
     );
 
     return Column(
