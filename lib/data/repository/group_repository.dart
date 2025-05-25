@@ -11,6 +11,7 @@ abstract class GroupRepository {
 
   Future<List<GroupModel>> getGroupsByIds(List<String> groupIds);
   Stream<List<GroupModel>> streamGroupsByIds(List<String> groupIds);
+  Future<void> updateGroupMembers(String groupId, List<String> memberIds);
 }
 
 class GroupRepositoryImpl implements GroupRepository {
@@ -60,5 +61,13 @@ class GroupRepositoryImpl implements GroupRepository {
     return _service
         .streamGroupsByIds(groupIds)
         .map((list) => list.map(GroupModel.fromJson).toList());
+  }
+
+  @override
+  Future<void> updateGroupMembers(
+    String groupId,
+    List<String> memberIds,
+  ) async {
+    await _service.updateGroupMembers(groupId, memberIds);
   }
 }
