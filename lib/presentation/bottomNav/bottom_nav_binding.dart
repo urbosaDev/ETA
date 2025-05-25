@@ -4,7 +4,7 @@ import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/create_group/create_group_view_model.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/group_view_model.dart';
+
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/home_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/%08add_friend/add_friend_view_model.dart';
 
@@ -42,6 +42,5 @@ class BottomNavBinding extends Bindings {
         groupRepository: Get.find<GroupRepository>(),
       ),
     );
-    Get.put(GroupViewModel());
   }
 }
