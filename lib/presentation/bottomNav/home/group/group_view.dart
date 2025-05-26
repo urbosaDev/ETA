@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/group_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
+
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/group_view_model.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/lounge_in_group/lounge_in_group_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/lounge_in_group/lounge_in_group_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/widget/select_friend_dialog.dart';
 
 class GroupView extends StatelessWidget {
@@ -24,11 +27,11 @@ class GroupView extends StatelessWidget {
       tag: group.id,
       permanent: false,
     );
-    ever<String?>(controller.snackbarMessage, (msg) {
-      if (msg != null) {
-        Get.snackbar('알림', msg);
-      }
-    });
+    // ever<String?>(controller.snackbarMessage, (msg) {
+    //   if (msg != null) {
+    //     Get.snackbar('알림', msg);
+    //   }
+    // });
 
     return Obx(() {
       if (controller.isLoading.value) {
@@ -74,7 +77,23 @@ class GroupView extends StatelessWidget {
 
           const SizedBox(height: 20),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Get.to(
+                () => const LoungeInGroupView(),
+                arguments: group.id,
+                binding: BindingsBuilder(() {
+                  Get.put(
+                    LoungeInGroupViewModel(
+                      authRepository: Get.find<AuthRepository>(),
+                      userRepository: Get.find<UserRepository>(),
+                      groupRepository: Get.find<GroupRepository>(),
+                      groupId: group.id,
+                    ),
+                    tag: group.id,
+                  );
+                }),
+              );
+            },
             child: Container(
               height: 50,
               color: Colors.amber,
