@@ -8,28 +8,32 @@ class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<PrivateChatRoomViewModel>(
+      tag: Get.arguments as String, // chatRoomId
+    );
     final messageController = TextEditingController();
-    final String chatRoomId = Get.arguments as String;
-    final controller = Get.find<PrivateChatRoomViewModel>(tag: chatRoomId);
-    final my = controller.my;
-    final friend = controller.friend;
 
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            CircleAvatar(backgroundImage: NetworkImage(friend.photoUrl)),
-            const SizedBox(width: 8),
-            Text(friend.uniqueId),
-          ],
-        ),
+        title: Obx(() {
+          final friend = controller.friendModel.value;
+          if (friend == null) return const Text('로딩 중...');
+
+          return Row(
+            children: [
+              CircleAvatar(backgroundImage: NetworkImage(friend.photoUrl)),
+              const SizedBox(width: 8),
+              Text(friend.name),
+            ],
+          );
+        }),
       ),
       body: Column(
         children: [
-          // ✅ 메시지 리스트: AppBar 아래부터 위→아래로 쌓임
           Expanded(
             child: Obx(() {
               final msgs = controller.messages;
+
               return ListView.builder(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -38,43 +42,54 @@ class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
                 itemCount: msgs.length,
                 itemBuilder: (context, index) {
                   final msg = msgs[index];
-                  final isMe = msg.senderId == my.uid;
+                  final isMe = msg.senderId == controller.my.uid;
+                  final friend = controller.friendModel.value;
 
                   return Align(
                     alignment:
                         isMe ? Alignment.centerRight : Alignment.centerLeft,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: isMe ? Colors.blueAccent : Colors.grey.shade300,
-                        borderRadius: BorderRadius.only(
-                          topLeft: const Radius.circular(12),
-                          topRight: const Radius.circular(12),
-                          bottomLeft:
-                              isMe
-                                  ? const Radius.circular(12)
-                                  : const Radius.circular(0),
-                          bottomRight:
-                              isMe
-                                  ? const Radius.circular(0)
-                                  : const Radius.circular(12),
+                    child: Column(
+                      crossAxisAlignment:
+                          isMe
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
+                      children: [
+                        if (!isMe && friend != null)
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 12,
+                                backgroundImage: NetworkImage(friend.photoUrl),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                friend.name,
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color:
+                                isMe ? Colors.blueAccent : Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            msg.text,
+                            style: TextStyle(
+                              color: isMe ? Colors.white : Colors.black87,
+                            ),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        msg.text,
-                        style: TextStyle(
-                          color: isMe ? Colors.white : Colors.black87,
-                        ),
-                      ),
+                      ],
                     ),
                   );
                 },
               );
             }),
           ),
-
-          // ✅ 하단 고정 입력창
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
@@ -91,7 +106,7 @@ class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
                         }
                       },
                       decoration: InputDecoration(
-                        hintText: '${friend.uniqueId}에게 메세지',
+                        hintText: '메세지를 입력하세요',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

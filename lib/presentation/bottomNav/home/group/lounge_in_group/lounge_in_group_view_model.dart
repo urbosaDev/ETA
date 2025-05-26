@@ -66,8 +66,8 @@ class LoungeInGroupViewModel extends GetxController {
     }
     groupModel.value = fetchedGroup;
 
-    await _fetchMember(fetchedGroup.memberIds); // ✅ 먼저 memberMap 초기화
-    listenToMessages(); // ✅ 그 후 메시지 받기 시작
+    await _fetchMember(fetchedGroup.memberIds); // 먼저 memberMap 초기화
+    listenToMessages(); //그 후 메시지 받기 시작
     _startGroupStream();
 
     isLoading.value = false;
