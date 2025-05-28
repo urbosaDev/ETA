@@ -9,6 +9,8 @@ import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/group_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/lounge_in_group/lounge_in_group_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/lounge_in_group/lounge_in_group_view_model.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/widget/select_friend_dialog.dart';
 
 class GroupView extends StatelessWidget {
@@ -123,7 +125,24 @@ class GroupView extends StatelessWidget {
                   );
                 },
               ),
-          ElevatedButton(onPressed: () {}, child: Text('약속 추가하기')),
+          ElevatedButton(
+            onPressed: () {
+              Get.to(
+                () => const CreatePromiseView(),
+                binding: BindingsBuilder(() {
+                  Get.put(
+                    CreatePromiseViewModel(
+                      groupId: controller.group.id,
+                      groupRepository: Get.find<GroupRepository>(),
+                      userRepository: Get.find<UserRepository>(),
+                    ),
+                  );
+                }),
+              );
+            },
+
+            child: Text('약속 추가하기'),
+          ),
         ],
       );
     });
