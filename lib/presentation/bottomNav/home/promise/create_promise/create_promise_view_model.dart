@@ -19,13 +19,18 @@ class CreatePromiseViewModel extends GetxController {
        _userRepository = userRepository;
 
   final Rx<GroupModel?> groupModel = Rx<GroupModel?>(null);
-  StreamSubscription<GroupModel>? _groupSub;
   final RxList<UserModel> memberList = <UserModel>[].obs;
+  final RxList<UserModel> selectedMembers = <UserModel>[].obs;
+
   final RxBool isLoading = true.obs;
+  final RxBool isMemberFetchLoading = false.obs;
+  final RxString promiseName = ''.obs;
+
+  StreamSubscription<GroupModel>? _groupSub;
+
   @override
   void onInit() {
     super.onInit();
-    // 초기화 로직이 필요하다면 여기에 작성
     _initialize();
   }
 
@@ -37,7 +42,6 @@ class CreatePromiseViewModel extends GetxController {
 
   Future<void> _initialize() async {
     isLoading.value = true;
-    // 시작시에 그룹을 fetch, 이후는 stream
     groupModel.value = await _groupRepository.getGroup(groupId);
     if (groupModel.value != null) {
       _startGroupStream();
@@ -46,7 +50,6 @@ class CreatePromiseViewModel extends GetxController {
     isLoading.value = false;
   }
 
-  // 그룹을 stream,
   void _startGroupStream() {
     _groupSub = _groupRepository.streamGroup(groupId).listen((group) {
       groupModel.value = group;
@@ -54,9 +57,20 @@ class CreatePromiseViewModel extends GetxController {
     });
   }
 
-  // 그룹 내의 멤버를 fetch 하기 위함
   Future<void> fetchMembers(List<String> memberIds) async {
+    isMemberFetchLoading.value = true;
     final members = await _userRepository.getUsersByUids(memberIds);
     memberList.value = members;
+    isMemberFetchLoading.value = false;
+  }
+
+  void toggleMember(UserModel member) {
+    final exists = selectedMembers.any((e) => e.uid == member.uid);
+    if (exists) {
+      selectedMembers.removeWhere((e) => e.uid == member.uid);
+    } else {
+      selectedMembers.add(member);
+    }
+    // print(selectedMembers.length);
   }
 }
