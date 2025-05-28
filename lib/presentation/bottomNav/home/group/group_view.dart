@@ -123,6 +123,7 @@ class GroupView extends StatelessWidget {
                   );
                 },
               ),
+          ElevatedButton(onPressed: () {}, child: Text('약속 추가하기')),
         ],
       );
     });
