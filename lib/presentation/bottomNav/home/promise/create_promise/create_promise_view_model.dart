@@ -20,13 +20,19 @@ class CreatePromiseViewModel extends GetxController {
 
   final Rx<GroupModel?> groupModel = Rx<GroupModel?>(null);
   final RxList<UserModel> memberList = <UserModel>[].obs;
-  final RxList<UserModel> selectedMembers = <UserModel>[].obs;
+
+  final RxSet<String> selectedMemberIds = <String>{}.obs;
 
   final RxBool isLoading = true.obs;
   final RxBool isMemberFetchLoading = false.obs;
   final RxString promiseName = ''.obs;
 
   StreamSubscription<GroupModel>? _groupSub;
+  final Rx<DateTime?> promiseTime = Rx<DateTime?>(null);
+
+  void setPromiseTime(DateTime time) {
+    promiseTime.value = time;
+  }
 
   @override
   void onInit() {
@@ -62,15 +68,18 @@ class CreatePromiseViewModel extends GetxController {
     final members = await _userRepository.getUsersByUids(memberIds);
     memberList.value = members;
     isMemberFetchLoading.value = false;
+    selectedMemberIds.clear();
   }
 
   void toggleMember(UserModel member) {
-    final exists = selectedMembers.any((e) => e.uid == member.uid);
-    if (exists) {
-      selectedMembers.removeWhere((e) => e.uid == member.uid);
+    if (selectedMemberIds.contains(member.uid)) {
+      selectedMemberIds.remove(member.uid);
     } else {
-      selectedMembers.add(member);
+      selectedMemberIds.add(member.uid);
     }
-    // print(selectedMembers.length);
+  }
+
+  bool isMemberSelected(UserModel member) {
+    return selectedMemberIds.contains(member.uid);
   }
 }

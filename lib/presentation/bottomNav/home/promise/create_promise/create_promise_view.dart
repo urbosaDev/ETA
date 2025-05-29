@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:what_is_your_eta/data/model/user_model.dart';
+
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view_model.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/select_location/select_location_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/select_location/select_location_view_model.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/select_time/select_time_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/select_time/select_time_view_model.dart';
 
 class CreatePromiseView extends GetView<CreatePromiseViewModel> {
   const CreatePromiseView({super.key});
@@ -50,10 +54,7 @@ class CreatePromiseView extends GetView<CreatePromiseViewModel> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  return SizedBox(
-                    height: 200,
-                    child: buildAddMemberField(controller.memberList),
-                  );
+                  return SizedBox(height: 200, child: buildAddMemberField());
                 }),
                 const SizedBox(height: 24),
 
@@ -111,40 +112,48 @@ class CreatePromiseView extends GetView<CreatePromiseViewModel> {
     );
   }
 
-  Widget buildAddMemberField(List<UserModel> memberList) {
-    return ListView.builder(
-      itemCount: memberList.length,
-      itemBuilder: (context, index) {
-        final member = memberList[index];
+  Widget buildAddMemberField() {
+    return Obx(
+      () => ListView.builder(
+        itemCount: controller.memberList.length,
+        itemBuilder: (context, index) {
+          final member = controller.memberList[index];
 
-        return Obx(() {
-          final isSelected = controller.selectedMembers.any(
-            (e) => e.uid == member.uid,
-          );
-          return GestureDetector(
-            onTap: () => controller.toggleMember(member),
-            child: Container(
-              color:
-                  isSelected ? Colors.lightBlue.shade100 : Colors.transparent,
-              child: ListTile(
-                title: Text(member.name),
-                subtitle: Text(member.uniqueId),
-                trailing: Icon(
-                  isSelected ? Icons.check_circle : Icons.circle_outlined,
-                  color: isSelected ? Colors.blue : Colors.grey,
+          return Obx(() {
+            final isSelected = controller.selectedMemberIds.contains(
+              member.uid,
+            );
+
+            return GestureDetector(
+              onTap: () => controller.toggleMember(member),
+              child: Container(
+                color:
+                    isSelected ? Colors.lightBlue.shade100 : Colors.transparent,
+                child: ListTile(
+                  title: Text(member.name),
+                  subtitle: Text(member.uniqueId),
+                  trailing: Icon(
+                    isSelected ? Icons.check_circle : Icons.circle_outlined,
+                    color: isSelected ? Colors.blue : Colors.grey,
+                  ),
                 ),
               ),
-            ),
-          );
-        });
-      },
+            );
+          });
+        },
+      ),
     );
   }
 
   Widget buildSelectLocationField() {
     return GestureDetector(
       onTap: () {
-        // TODO: 위치 선택 기능 구현 예정
+        Get.to(
+          () => const SelectLocationView(),
+          binding: BindingsBuilder(() {
+            Get.put(SelectLocationViewModel());
+          }),
+        );
       },
       child: Container(
         height: 100,
@@ -157,15 +166,32 @@ class CreatePromiseView extends GetView<CreatePromiseViewModel> {
 
   Widget buildSelectTimeField() {
     return GestureDetector(
-      onTap: () {
-        // TODO: 시간 선택 기능 구현 예정
+      onTap: () async {
+        final selectedTime = await Get.to<DateTime?>(
+          () => const SelectTimeView(),
+          binding: BindingsBuilder(() {
+            Get.put(SelectTimeViewModel());
+          }),
+        );
+
+        if (selectedTime != null) {
+          controller.setPromiseTime(selectedTime);
+        }
       },
-      child: Container(
-        height: 100,
-        width: double.infinity,
-        color: Colors.amber,
-        child: const Center(child: Text('약속 시간을 선택하세요')),
-      ),
+      child: Obx(() {
+        final time = controller.promiseTime.value;
+        final displayText =
+            time != null
+                ? '${time.year}년 ${time.month}월 ${time.day}일 ${time.hour}시 ${time.minute}분'
+                : '약속 시간을 선택하세요';
+
+        return Container(
+          height: 100,
+          width: double.infinity,
+          color: Colors.amber,
+          child: Center(child: Text(displayText)),
+        );
+      }),
     );
   }
 }
