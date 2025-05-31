@@ -4,6 +4,7 @@ import 'package:what_is_your_eta/data/model/group_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
+import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/group_view_model.dart';
@@ -135,6 +136,7 @@ class GroupView extends StatelessWidget {
                       groupId: controller.group.id,
                       groupRepository: Get.find<GroupRepository>(),
                       userRepository: Get.find<UserRepository>(),
+                      promiseRepository: Get.find<PromiseRepository>(),
                     ),
                   );
                 }),

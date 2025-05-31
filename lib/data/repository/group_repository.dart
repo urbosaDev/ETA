@@ -14,6 +14,10 @@ abstract class GroupRepository {
   Future<void> updateGroupMembers(String groupId, List<String> memberIds);
   Future<void> sendGroupMessage(String groupId, MessageModel message);
   Stream<List<MessageModel>> streamGroupMessages(String groupId);
+  Future<void> addPromiseIdToGroup({
+    required String groupId,
+    required String promiseId,
+  });
 }
 
 class GroupRepositoryImpl implements GroupRepository {
@@ -83,5 +87,13 @@ class GroupRepositoryImpl implements GroupRepository {
     List<String> memberIds,
   ) async {
     await _service.updateGroupMembers(groupId, memberIds);
+  }
+
+  @override
+  Future<void> addPromiseIdToGroup({
+    required String groupId,
+    required String promiseId,
+  }) async {
+    await _service.addPromiseIdToGroup(groupId: groupId, promiseId: promiseId);
   }
 }

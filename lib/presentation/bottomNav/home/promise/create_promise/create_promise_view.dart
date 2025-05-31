@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:what_is_your_eta/data/model/location_model/promise_location_model.dart';
+import 'package:what_is_your_eta/data/repository/location_repository.dart';
+import 'package:what_is_your_eta/domain/usecase/%08geo_current_location_usecase.dart';
+import 'package:what_is_your_eta/domain/usecase/search_location_usecase.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/select_location/select_location_view.dart';
@@ -17,70 +21,127 @@ class CreatePromiseView extends GetView<CreatePromiseViewModel> {
     return Stack(
       children: [
         Scaffold(
-          appBar: AppBar(title: const Text('약속 생성')),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('약속 이름을 정해요'),
-                const SizedBox(height: 8),
-                buildTextField(
-                  controller: nameController,
-                  label: '약속 이름을 입력해주세요',
-                  onChanged: (value) => controller.promiseName.value = value,
-                ),
-                const SizedBox(height: 24),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('구성원을 모집해요'),
-                    IconButton(
-                      onPressed: () {
-                        final group = controller.groupModel.value;
-                        if (group != null) {
-                          controller.fetchMembers(group.memberIds);
-                        }
-                      },
-                      icon: const Text('↻'),
+          appBar: AppBar(
+            title: const Text('약속 생성'),
+            actions: [
+              Obx(
+                () => TextButton(
+                  onPressed:
+                      controller.isFormValid.value
+                          ? () async {
+                            final success = await controller.createPromise();
+                            if (success) {
+                              Get.back(); // 성공 시 화면 종료
+                            } else {
+                              Get.snackbar('실패', '약속 생성에 실패했습니다. 다시 시도해주세요.');
+                            }
+                          }
+                          : null,
+                  child: Text(
+                    '완료',
+                    style: TextStyle(
+                      color:
+                          controller.isFormValid.value
+                              ? Colors.red
+                              : Colors.grey,
                     ),
-                  ],
+                  ),
                 ),
-                const SizedBox(height: 8),
+              ),
+            ],
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(16),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('약속 이름을 정해요'),
+                      Obx(
+                        () => Checkbox(
+                          value: controller.isNameValid.value,
+                          onChanged: null,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  buildTextField(
+                    controller: nameController,
+                    label: '약속 이름을 입력해주세요',
+                    onChanged: (value) => controller.promiseName.value = value,
+                  ),
+                  const SizedBox(height: 24),
 
-                Obx(() {
-                  if (controller.isMemberFetchLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('구성원을 모집해요'),
+                      Obx(
+                        () => Checkbox(
+                          value: controller.isMembersValid.value,
+                          onChanged: null,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          final group = controller.groupModel.value;
+                          if (group != null) {
+                            controller.fetchMembers(group.memberIds);
+                          }
+                        },
+                        icon: const Text('↻'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Obx(() {
+                    if (controller.isMemberFetchLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    return buildAddMemberField();
+                  }),
+                  const SizedBox(height: 24),
 
-                  return SizedBox(height: 200, child: buildAddMemberField());
-                }),
-                const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('약속 위치를 정해봐요'),
+                      Obx(
+                        () => Checkbox(
+                          value: controller.isLocationValid.value,
+                          onChanged: null,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  buildSelectLocationField(),
+                  const SizedBox(height: 24),
 
-                const Text('약속 위치를 정해봐요'),
-                const SizedBox(height: 8),
-                buildSelectLocationField(),
-
-                const SizedBox(height: 24),
-
-                const Text('약속 시간을 정해요'),
-                const SizedBox(height: 8),
-                buildSelectTimeField(),
-
-                const SizedBox(height: 32),
-                ElevatedButton(
-                  onPressed: () {
-                    // TODO: 생성 조건 확인 후 구현
-                  },
-                  child: const Text('약속 생성하기'),
-                ),
-              ],
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('약속 시간을 정해요'),
+                      Obx(
+                        () => Checkbox(
+                          value: controller.isTimeValid.value,
+                          onChanged: null,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  buildSelectTimeField(),
+                ],
+              ),
             ),
           ),
         ),
 
-        // 로딩 오버레이
         Obx(() {
           if (controller.isLoading.value) {
             return const ColoredBox(
@@ -102,9 +163,7 @@ class CreatePromiseView extends GetView<CreatePromiseViewModel> {
   }) {
     return TextField(
       controller: controller,
-      onChanged: (value) {
-        print('입력된 약속 이름: $value');
-      },
+      onChanged: onChanged,
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
@@ -115,6 +174,8 @@ class CreatePromiseView extends GetView<CreatePromiseViewModel> {
   Widget buildAddMemberField() {
     return Obx(
       () => ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         itemCount: controller.memberList.length,
         itemBuilder: (context, index) {
           final member = controller.memberList[index];
@@ -146,21 +207,63 @@ class CreatePromiseView extends GetView<CreatePromiseViewModel> {
   }
 
   Widget buildSelectLocationField() {
+    final controller = Get.find<CreatePromiseViewModel>();
+
     return GestureDetector(
-      onTap: () {
-        Get.to(
+      onTap: () async {
+        final selectedLocation = await Get.to<PromiseLocationModel>(
           () => const SelectLocationView(),
           binding: BindingsBuilder(() {
-            Get.put(SelectLocationViewModel());
+            Get.lazyPut(() => GetCurrentLocationUseCase());
+            Get.lazyPut(
+              () => SearchLocationUseCase(
+                locationRepository: Get.find<LocationRepository>(),
+              ),
+            );
+            Get.lazyPut(
+              () => SelectLocationViewModel(
+                getCurrentLocationUseCase:
+                    Get.find<GetCurrentLocationUseCase>(),
+                searchLocationUseCase: Get.find<SearchLocationUseCase>(),
+              ),
+              fenix: false,
+            );
           }),
         );
+
+        if (selectedLocation != null) {
+          controller.setSelectedLocation(selectedLocation);
+        }
       },
-      child: Container(
-        height: 100,
-        width: double.infinity,
-        color: Colors.amber,
-        child: const Center(child: Text('약속 위치를 선택하세요')),
-      ),
+      child: Obx(() {
+        final location = controller.selectedLocation.value;
+        return Container(
+          height: 100,
+          width: double.infinity,
+          color: Colors.amber,
+          child: Center(
+            child:
+                location != null
+                    ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          location.placeName,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          location.address,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    )
+                    : const Text('약속 위치를 선택하세요'),
+          ),
+        );
+      }),
     );
   }
 
