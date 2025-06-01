@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/group_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
@@ -57,6 +58,7 @@ class CreateGroupViewModel extends GetxController {
   void onClose() {
     _userSub?.cancel(); // 꼭 해줘야 메모리 누수 방지됨
     super.onClose();
+    debugPrint('🗑️ LoungeInGroupViewModel deleted');
   }
 
   void _initUser() async {

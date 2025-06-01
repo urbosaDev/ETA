@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:what_is_your_eta/data/repository/auth_repository.dart';
+import 'package:what_is_your_eta/data/repository/group_repository.dart';
+import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/create_group/create_group_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/create_group/create_group_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/group_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/home_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_view.dart';
@@ -102,8 +106,18 @@ class HomeView extends GetView<HomeViewModel> {
                   backgroundColor: Colors.grey[800],
                 ),
                 onPressed: () {
-                  Get.back();
-                  Get.to(() => const CreateGroupView());
+                  Get.to(
+                    () => const CreateGroupView(),
+                    binding: BindingsBuilder(() {
+                      Get.put(
+                        CreateGroupViewModel(
+                          userRepository: Get.find<UserRepository>(),
+                          authRepository: Get.find<AuthRepository>(),
+                          groupRepository: Get.find<GroupRepository>(),
+                        ),
+                      );
+                    }),
+                  );
                 },
                 child: const Text('⭐채널 생성하기'),
               ),
