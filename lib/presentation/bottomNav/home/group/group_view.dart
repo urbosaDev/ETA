@@ -86,6 +86,7 @@ class GroupView extends StatelessWidget {
           const SizedBox(height: 20),
           GestureDetector(
             onTap: () {
+              Get.delete<LoungeInGroupViewModel>(force: true);
               Get.to(
                 () => const LoungeInGroupView(),
                 arguments: group.id,
