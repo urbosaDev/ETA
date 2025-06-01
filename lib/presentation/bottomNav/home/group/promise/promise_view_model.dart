@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/message_model.dart';
 import 'package:what_is_your_eta/data/model/promise_model.dart';
@@ -116,5 +117,6 @@ class PromiseViewModel extends GetxController {
     _promiseSub?.cancel();
     _messageSub?.cancel();
     super.onClose();
+    debugPrint('🗑️ PromiseViewModel deleted');
   }
 }

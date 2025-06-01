@@ -98,7 +98,7 @@ class GroupView extends StatelessWidget {
                       groupRepository: Get.find<GroupRepository>(),
                       groupId: group.id,
                     ),
-                    tag: group.id,
+                    // tag: group.id,
                   );
                 }),
               );

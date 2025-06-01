@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/group_model.dart';
 import 'package:what_is_your_eta/data/model/message_model.dart';
@@ -46,7 +45,7 @@ class LoungeInGroupViewModel extends GetxController {
     _userSub?.cancel();
     _groupSub?.cancel();
     super.onClose();
-    debugPrint('🗑️ LoungeInGroupViewModel deleted');
+    // debugPrint('🗑️ LoungeInGroupViewModel deleted');
   }
 
   Future<void> _initialize() async {

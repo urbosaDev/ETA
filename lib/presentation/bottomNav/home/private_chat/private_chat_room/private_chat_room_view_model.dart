@@ -49,6 +49,7 @@ class PrivateChatRoomViewModel extends GetxController {
   void onClose() {
     _friendSub?.cancel();
     super.onClose();
+    // debugPrint('🗑️ PrivateChatRoomViewModel deleted');
   }
 
   Future<void> sendMessage(String content) async {

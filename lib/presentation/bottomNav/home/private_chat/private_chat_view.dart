@@ -54,9 +54,6 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                                         final chatRoomId = await controller
                                             .createChatRoom(e.uid);
                                         if (chatRoomId != null) {
-                                          Get.delete<PrivateChatRoomViewModel>(
-                                            force: true,
-                                          ); // 💥 ViewModel 삭제
                                           Get.to(
                                             () => const PrivateChatRoomView(),
                                             arguments: chatRoomId,
@@ -130,9 +127,6 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
 
                         return GestureDetector(
                           onTap: () {
-                            Get.delete<PrivateChatRoomViewModel>(
-                              force: true,
-                            ); // 💥 삭제
                             Get.to(
                               () => const PrivateChatRoomView(),
                               arguments: chatRoom.id,
