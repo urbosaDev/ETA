@@ -10,6 +10,8 @@ import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/group_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/lounge_in_group/lounge_in_group_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/lounge_in_group/lounge_in_group_view_model.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/widget/select_friend_dialog.dart';
@@ -22,6 +24,7 @@ class GroupView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(
       GroupViewModel(
+        promiseRepository: Get.find<PromiseRepository>(),
         groupRepository: Get.find<GroupRepository>(),
         userRepository: Get.find<UserRepository>(),
         authRepository: Get.find<AuthRepository>(),
@@ -105,27 +108,97 @@ class GroupView extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           const Text('약속'),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
 
-          data.promiseIds.isEmpty
-              ? const Text('약속이 없습니다.')
-              : ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: data.promiseIds.length,
-                itemBuilder: (context, index) {
-                  final promiseId = data.promiseIds[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Get.toNamed('/promise/$promiseId');
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Text('약속 $promiseId'),
+          Obx(() {
+            final promises = controller.promiseList;
+
+            if (promises.isEmpty) {
+              return const Text('약속이 없습니다.');
+            }
+
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: promises.length,
+              itemBuilder: (context, index) {
+                final promise = promises[index];
+                return GestureDetector(
+                  onTap: () {
+                    Get.to(
+                      () => PromiseView(),
+                      binding: BindingsBuilder(() {
+                        Get.put(
+                          PromiseViewModel(
+                            promiseId: promise.id,
+                            promiseRepository: Get.find<PromiseRepository>(),
+                            authRepository: Get.find<AuthRepository>(),
+                            userRepository: Get.find<UserRepository>(),
+                          ),
+                        );
+                      }),
+                    );
+                  },
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  );
-                },
-              ),
+                    elevation: 2,
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 6,
+                      horizontal: 4,
+                    ),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              promise.name,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              promise.time.toLocal().toString(),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    promise.location.address,
+                                    style: const TextStyle(fontSize: 13),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  promise.location.placeName,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          }),
           ElevatedButton(
             onPressed: () {
               Get.to(

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/group_model.dart';
+import 'package:what_is_your_eta/data/model/promise_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
+import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 
 class GroupViewModel extends GetxController {
@@ -11,15 +13,18 @@ class GroupViewModel extends GetxController {
   final GroupRepository _groupRepository;
   final UserRepository _userRepository;
   final AuthRepository _authRepository;
+  final PromiseRepository _promiseRepository;
 
   GroupViewModel({
     required GroupRepository groupRepository,
     required UserRepository userRepository,
     required AuthRepository authRepository,
+    required PromiseRepository promiseRepository,
     required this.group,
   }) : _groupRepository = groupRepository,
        _userRepository = userRepository,
-       _authRepository = authRepository;
+       _authRepository = authRepository,
+       _promiseRepository = promiseRepository;
 
   final Rx<GroupModel?> groupModel = Rx<GroupModel?>(null);
   final RxBool isLoading = true.obs;
@@ -30,7 +35,7 @@ class GroupViewModel extends GetxController {
   final RxList<UserModel> friendList = <UserModel>[].obs;
 
   final Rx<String?> snackbarMessage = Rx<String?>(null);
-
+  final RxList<PromiseModel> promiseList = <PromiseModel>[].obs;
   @override
   void onInit() {
     super.onInit();
@@ -55,7 +60,7 @@ class GroupViewModel extends GetxController {
 
     groupModel.value = fetchedGroup;
     await _fetchMember(fetchedGroup.memberIds);
-
+    await _fetchPromise(fetchedGroup);
     // ✅ 유저 가져오고 친구 리스트 받아오기
     final currentUser = _authRepository.getCurrentUser();
     if (currentUser != null) {
@@ -77,7 +82,9 @@ class GroupViewModel extends GetxController {
   void _startGroupStream() {
     _groupSub = _groupRepository.streamGroup(group.id).listen((group) {
       groupModel.value = group;
+
       _fetchMember(group.memberIds);
+      _fetchPromise(group);
     });
   }
 
@@ -121,5 +128,18 @@ class GroupViewModel extends GetxController {
     Future.delayed(Duration(milliseconds: 70), () {
       snackbarMessage.value = null; // ❗ ViewModel 내부에서 직접 초기화
     });
+  }
+
+  Future<void> _fetchPromise([GroupModel? paramGroup]) async {
+    final group = paramGroup ?? groupModel.value;
+    if (group == null || group.promiseIds.isEmpty) {
+      promiseList.clear();
+      return;
+    }
+
+    final promises = await _promiseRepository.getPromisesByIds(
+      group.promiseIds,
+    );
+    promiseList.value = promises;
   }
 }

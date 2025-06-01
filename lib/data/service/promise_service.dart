@@ -33,4 +33,22 @@ class PromiseService {
   Future<void> deletePromise(String promiseId) async {
     await _promiseRef.doc(promiseId).delete();
   }
+
+  Future<void> sendPromiseMessage(
+    String promiseId,
+    Map<String, dynamic> json,
+  ) async {
+    final ref = _promiseRef.doc(promiseId).collection('messages');
+    final doc = ref.doc();
+    await doc.set({...json, 'id': doc.id});
+  }
+
+  Stream<List<Map<String, dynamic>>> streamPromiseMessages(String promiseId) {
+    return _promiseRef
+        .doc(promiseId)
+        .collection('messages')
+        .orderBy('sentAt')
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => doc.data()).toList());
+  }
 }
