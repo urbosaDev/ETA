@@ -115,11 +115,9 @@ class GroupViewModel extends GetxController {
         {...group.memberIds, ...selectedFriends.map((u) => u.uid)}.toList();
 
     await _groupRepository.updateGroupMembers(groupId, updatedMemberIds);
-    await Future.wait(
-      selectedFriends.map(
-        (user) => _userRepository.addGroupId(user.uid, groupId),
-      ),
-    );
+    for (final user in selectedFriends) {
+      await _userRepository.addGroupId(user.uid, groupId);
+    }
 
     selectedFriends.clear();
 
