@@ -22,17 +22,19 @@ class GroupView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.delete<GroupViewModel>();
+
+    // 새 ViewModel 주입 (tag 없이)
     final controller = Get.put(
       GroupViewModel(
-        promiseRepository: Get.find<PromiseRepository>(),
-        groupRepository: Get.find<GroupRepository>(),
-        userRepository: Get.find<UserRepository>(),
-        authRepository: Get.find<AuthRepository>(),
+        promiseRepository: Get.find(),
+        groupRepository: Get.find(),
+        userRepository: Get.find(),
+        authRepository: Get.find(),
         group: group,
       ),
-      tag: group.id,
-      permanent: false,
     );
+
     // ever<String?>(controller.snackbarMessage, (msg) {
     //   if (msg != null) {
     //     Get.snackbar('알림', msg);

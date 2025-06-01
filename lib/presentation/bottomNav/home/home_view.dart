@@ -24,6 +24,7 @@ class HomeView extends GetView<HomeViewModel> {
                   if (index == 1) {
                     showCreateGroupDialog(context);
                   } else {
+                    // 이제 ViewModel 삭제는 GroupView 내부에서 처리됨. 여긴 index만 바꾸면 됨.
                     controller.selectedIndex.value = index;
                   }
                 },
@@ -57,7 +58,7 @@ class HomeView extends GetView<HomeViewModel> {
               } else if (index >= 2) {
                 final group = controller.selectedGroup;
                 if (group != null) {
-                  return GroupView(group: group);
+                  return GroupView(group: group); // 여기서 ViewModel을 새로 생성함
                 }
                 return const Center(child: Text('존재하지 않는 그룹입니다.'));
               } else {
