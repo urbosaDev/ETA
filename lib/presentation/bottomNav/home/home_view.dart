@@ -14,16 +14,17 @@ class HomeView extends GetView<HomeViewModel> {
       appBar: AppBar(title: const Text('Home')),
       body: Row(
         children: [
+          // 사이드바
           SizedBox(
             width: 72,
             child: Obx(() {
               return NavigationRail(
-                selectedIndex: controller.selectedIndex,
+                selectedIndex: controller.selectedIndex.value,
                 onDestinationSelected: (index) {
                   if (index == 1) {
-                    showCreateChannelPopup(context);
+                    showCreateGroupDialog(context);
                   } else {
-                    controller.changeTab(index); // ✅ 그룹도 포함해 selectedIndex만 변경
+                    controller.selectedIndex.value = index;
                   }
                 },
                 labelType: NavigationRailLabelType.all,
@@ -46,16 +47,21 @@ class HomeView extends GetView<HomeViewModel> {
               );
             }),
           ),
+
+          // 본문
           Expanded(
             child: Obx(() {
-              if (controller.selectedIndex == 0) {
+              final index = controller.selectedIndex.value;
+              if (index == 0) {
                 return const PrivateChatView();
-              } else if (controller.selectedIndex >= 2) {
-                final group =
-                    controller.groupList[controller.selectedIndex - 2];
-                return GroupView(group: group); // ✅ 그룹 View로 진입
+              } else if (index >= 2) {
+                final group = controller.selectedGroup;
+                if (group != null) {
+                  return GroupView(group: group);
+                }
+                return const Center(child: Text('존재하지 않는 그룹입니다.'));
               } else {
-                return const Center(child: Text('선택된 뷰가 없습니다'));
+                return const Center(child: Text('선택된 뷰가 없습니다.'));
               }
             }),
           ),
@@ -64,7 +70,7 @@ class HomeView extends GetView<HomeViewModel> {
     );
   }
 
-  void showCreateChannelPopup(BuildContext context) {
+  void showCreateGroupDialog(BuildContext context) {
     Get.dialog(
       Dialog(
         backgroundColor: Colors.black87,
@@ -81,11 +87,7 @@ class HomeView extends GetView<HomeViewModel> {
               const SizedBox(height: 16),
               const Text(
                 '그룹 채널을 만들어봐요',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 18),
               ),
               const SizedBox(height: 8),
               const Text(
@@ -97,10 +99,6 @@ class HomeView extends GetView<HomeViewModel> {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey[800],
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
                 ),
                 onPressed: () {
                   Get.back();

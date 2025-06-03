@@ -3,78 +3,80 @@ import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 
+enum UniqueIdCheck { none, available, notAvailable, blank }
+
 class UniqueIdInputViewModel extends GetxController {
   final AuthRepository _authRepository;
   final UserRepository _userRepository;
+
   UniqueIdInputViewModel({
-    required UserRepository userRepository,
     required AuthRepository authRepository,
+    required UserRepository userRepository,
   }) : _authRepository = authRepository,
        _userRepository = userRepository;
 
-  final RxBool _isUniqueIdAvailable = false.obs;
-  final RxBool _isCreated = false.obs;
-  final RxString _name = ''.obs;
-  final RxBool _isButtonEnabled = false.obs;
+  final uniqueId = ''.obs;
+  final name = ''.obs;
+  final uniqueIdCheck = UniqueIdCheck.none.obs;
+  final selectedId = ''.obs;
+  final isCreated = false.obs;
+  final errorMessage = ''.obs;
+  final isConfirmEnabled = false.obs;
 
-  bool get isUniqueIdAvailable => _isUniqueIdAvailable.value;
-  bool get isCreated => _isCreated.value;
-  bool get isButtonEnabled => _isButtonEnabled.value;
-  String get name => _name.value;
+  bool get isFormValid =>
+      selectedId.value.isNotEmpty && name.value.trim().isNotEmpty;
 
-  set name(String value) {
-    _name.value = value;
-    _updateButtonState();
+  void onUniqueIdChanged(String value) {
+    uniqueId.value = value;
+    uniqueIdCheck.value = UniqueIdCheck.none;
+    selectedId.value = '';
+    isConfirmEnabled.value = false;
   }
 
-  String? errorMessage;
-
-  void _updateButtonState() {
-    _isButtonEnabled.value =
-        _isUniqueIdAvailable.value && _name.value.trim().isNotEmpty;
-  }
-
-  Future<void> checkUniqueId(String uniqueId) async {
-    _isUniqueIdAvailable.value = false;
-
-    if (uniqueId.trim().isEmpty) {
-      errorMessage = '아이디를 입력해주세요';
-      _updateButtonState();
+  Future<void> checkUniqueId(String id) async {
+    if (id.trim().isEmpty) {
+      uniqueIdCheck.value = UniqueIdCheck.blank;
+      isConfirmEnabled.value = false;
       return;
     }
 
     try {
-      _isUniqueIdAvailable.value = await _userRepository.isUniqueIdAvailable(
-        uniqueId,
-      );
-      errorMessage = null;
-    } catch (e) {
-      _isUniqueIdAvailable.value = false;
-      errorMessage = '중복 확인 중 오류 발생';
+      final available = await _userRepository.isUniqueIdAvailable(id);
+      uniqueIdCheck.value =
+          available ? UniqueIdCheck.available : UniqueIdCheck.notAvailable;
+      isConfirmEnabled.value = available;
+      if (!available) selectedId.value = '';
+    } catch (_) {
+      uniqueIdCheck.value = UniqueIdCheck.none;
+      isConfirmEnabled.value = false;
+      selectedId.value = '';
     }
-    _updateButtonState();
   }
 
-  Future<void> createUser(String uniqueId) async {
+  void confirmSelectedId() {
+    selectedId.value = uniqueId.value;
+  }
+
+  Future<void> createUser() async {
     final user = _authRepository.getCurrentUser();
     if (user == null) {
-      errorMessage = '로그인 상태가 아닙니다';
+      errorMessage.value = '로그인 상태가 아닙니다';
       return;
     }
 
     final userModel = UserModel(
       uid: user.uid,
-      uniqueId: uniqueId,
-      name: _name.value,
+      uniqueId: selectedId.value,
+      name: name.value,
       photoUrl: user.photoURL ?? '',
     );
 
     try {
       await _userRepository.createUser(userModel);
-      _isCreated.value = await _userRepository.userExists(userModel.uid);
+      isCreated.value = await _userRepository.userExists(userModel.uid);
     } catch (e) {
-      _isCreated.value = false;
-      errorMessage = '사용자 생성에 실패했습니다';
+      isCreated.value = false;
+      errorMessage.value = '사용자 생성에 실패했습니다';
     }
   }
 }
