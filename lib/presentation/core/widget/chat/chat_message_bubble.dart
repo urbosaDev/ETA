@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class ChatMessageBubble extends StatelessWidget {
   final bool isMe;
+  final bool isSystem;
   final String message;
   final String? senderName;
   final String? senderPhotoUrl;
@@ -9,6 +10,7 @@ class ChatMessageBubble extends StatelessWidget {
   const ChatMessageBubble({
     super.key,
     required this.isMe,
+    required this.isSystem,
     required this.message,
     this.senderName,
     this.senderPhotoUrl,
@@ -16,6 +18,29 @@ class ChatMessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (isSystem) {
+      // 📌 시스템 메시지 스타일
+      return Center(
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade400,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            message,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ),
+      );
+    }
+
+    // 🧍 일반 유저 메시지 스타일
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Column(

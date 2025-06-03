@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/location_model/promise_location_model.dart';
 import 'package:what_is_your_eta/data/model/promise_model.dart';
@@ -24,6 +23,7 @@ class PromiseInfoViewModel extends GetxController {
   final RxBool isLoading = true.obs;
   final RxList<UserModel> memberList = <UserModel>[].obs;
   final Rxn<PromiseLocationModel> location = Rxn();
+
   @override
   void onInit() {
     super.onInit();
@@ -35,7 +35,7 @@ class PromiseInfoViewModel extends GetxController {
   void onClose() {
     // Clean up any resources or streams if necessary
     super.onClose();
-    debugPrint('🗑️ PromiseInfoViewModel deleted');
+    // debugPrint('🗑️ PromiseInfoViewModel deleted');
   }
 
   Future<void> _initialize() async {

@@ -117,6 +117,6 @@ class PromiseViewModel extends GetxController {
     _promiseSub?.cancel();
     _messageSub?.cancel();
     super.onClose();
-    debugPrint('🗑️ PromiseViewModel deleted');
+    debugPrint('🗑️ 약속 뷰모델 deleted');
   }
 }
