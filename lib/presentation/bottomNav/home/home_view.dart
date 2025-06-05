@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:what_is_your_eta/data/model/group_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
@@ -60,7 +61,7 @@ class HomeView extends GetView<HomeViewModel> {
               if (index == 0) {
                 return const PrivateChatView();
               } else if (index >= 2) {
-                final group = controller.selectedGroup;
+                final GroupModel? group = controller.selectedGroup;
                 if (group != null) {
                   return GroupView(group: group); // 여기서 ViewModel을 새로 생성함
                 }
