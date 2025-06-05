@@ -133,6 +133,8 @@ class CreatePromiseViewModel extends GetxController {
         penalty: '',
         lateUserIds: [],
         userLocations: null,
+        penaltySuggestions: {},
+        selectedPenalty: null,
       );
 
       final createdId = await _promiseRepository.createPromise(promise);

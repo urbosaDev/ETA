@@ -30,6 +30,12 @@ class PromisePaymentViewModel extends GetxController {
 
   StreamSubscription<PromiseModel>? _promiseSub;
 
+//패널 관리
+  final RxBool showPenaltyPanel = false.obs;
+//
+
+
+
   @override
   void onInit() {
     super.onInit();

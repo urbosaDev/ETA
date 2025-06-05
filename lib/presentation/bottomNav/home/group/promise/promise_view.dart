@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:what_is_your_eta/data/repository/auth_repository.dart';
+import 'package:what_is_your_eta/data/repository/promise_repository.dart';
+import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/penalty_container_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/penalty_container_view_model.dart';
+
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/components/promise_tab_bar.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/widget/chat/chat_input_box.dart';
@@ -34,13 +40,42 @@ class PromiseView extends GetView<PromiseViewModel> {
                     myUid: controller.userModel.value?.uid ?? '',
                   ),
                 ),
-                ChatInputBox(
-                  controller: textController,
-                  onSend: (msg) async {
-                    await controller.sendMessage(msg);
-                    textController.clear();
-                    FocusScope.of(context).unfocus();
-                  },
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Get.to(
+                          () => const PenaltyContainerView(),
+                          transition: Transition.downToUp,
+                          opaque: false,
+                          duration: const Duration(milliseconds: 300),
+                          fullscreenDialog: true,
+                          binding: BindingsBuilder(() {
+                            Get.put(
+                              PenaltyContainerViewModel(
+                                promiseId: controller.promiseId,
+                                promiseRepository:
+                                    Get.find<PromiseRepository>(),
+                                userRepository: Get.find<UserRepository>(),
+                                authRepository: Get.find<AuthRepository>(),
+                              ),
+                            );
+                          }),
+                        );
+                      },
+                      child: const Text('벌칙생성'),
+                    ),
+                    Expanded(
+                      child: ChatInputBox(
+                        controller: textController,
+                        onSend: (msg) async {
+                          await controller.sendMessage(msg);
+                          textController.clear();
+                          FocusScope.of(context).unfocus();
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );

@@ -51,4 +51,79 @@ class PromiseService {
         .snapshots()
         .map((snap) => snap.docs.map((doc) => doc.data()).toList());
   }
+
+  Future<void> setPenaltySuggestion({
+    required String promiseId,
+    required String uid,
+    required Map<String, dynamic> suggestionJson,
+  }) async {
+    await _promiseRef.doc(promiseId).update({
+      'penaltySuggestions.$uid': suggestionJson,
+    });
+  }
+
+  // penaltySuggestions 전체 조회
+  Future<Map<String, dynamic>?> getPenaltySuggestions(String promiseId) async {
+    final doc = await _promiseRef.doc(promiseId).get();
+    return doc.data()?['penaltySuggestions'] as Map<String, dynamic>?;
+  }
+
+  // 특정 항목의 voteUids 업데이트
+  Future<void> setVoteUids({
+    required String promiseId,
+    required String targetUid,
+    required List<String> voteUids,
+  }) async {
+    await _promiseRef.doc(promiseId).update({
+      'penaltySuggestions.$targetUid.userIds': voteUids,
+    });
+  }
+
+  Future<Map<String, dynamic>?> getPenaltySuggestionByUid({
+    required String promiseId,
+    required String targetUid,
+  }) async {
+    final doc = await _promiseRef.doc(promiseId).get();
+    final suggestions =
+        doc.data()?['penaltySuggestions'] as Map<String, dynamic>?;
+    if (suggestions == null) return null;
+
+    final data = suggestions[targetUid];
+    if (data is! Map<String, dynamic>) return null;
+
+    return data;
+  }
+
+  Future<void> updateVoteUids({
+    required String promiseId,
+    required String targetUid,
+    required List<String> voteUids,
+  }) async {
+    await _promiseRef.doc(promiseId).update({
+      'penaltySuggestions.$targetUid.userIds': voteUids,
+    });
+  }
+
+  Future<void> setSelectedPenalty({
+    required String promiseId,
+    required Map<String, dynamic> penaltyJson,
+  }) async {
+    await _promiseRef.doc(promiseId).update({'selectedPenalty': penaltyJson});
+  }
+
+  // Future<void> updatePenaltyVoters({
+  //   required String promiseId,
+  //   required List<String> voterUids,
+  // }) async {
+  //   await _promiseRef.doc(promiseId).update({'penaltyVoterUids': voterUids});
+  // }
+
+  // Future<void> updatePenaltySuggesters({
+  //   required String promiseId,
+  //   required List<String> suggesterUids,
+  // }) async {
+  //   await _promiseRef.doc(promiseId).update({
+  //     'penaltySuggesterUids': suggesterUids,
+  //   });
+  // }
 }

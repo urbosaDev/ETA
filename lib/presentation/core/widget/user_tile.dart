@@ -5,12 +5,14 @@ class UserTile extends StatelessWidget {
   final UserModel user;
   final bool isSelected;
   final VoidCallback? onTap;
+  final Widget? trailing; // ✅ 추가
 
   const UserTile({
     super.key,
     required this.user,
     this.isSelected = false,
     this.onTap,
+    this.trailing, // ✅ 추가
   });
 
   @override
@@ -28,33 +30,38 @@ class UserTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween, // ✅ 핵심
           children: [
-            // 프로필 이미지
-            CircleAvatar(
-              radius: 20,
-              backgroundImage: NetworkImage(user.photoUrl),
-            ),
-            const SizedBox(width: 12),
-            // 텍스트 정보
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
               children: [
-                Text(
-                  user.uniqueId,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
+                CircleAvatar(
+                  radius: 20,
+                  backgroundImage: NetworkImage(user.photoUrl),
                 ),
-                Text(
-                  user.name,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Colors.pinkAccent,
-                  ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      user.uniqueId,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.pinkAccent,
+                      ),
+                    ),
+                    Text(
+                      user.name,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.pinkAccent,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
+            if (trailing != null) trailing!, // ✅ 우측 위젯
           ],
         ),
       ),
