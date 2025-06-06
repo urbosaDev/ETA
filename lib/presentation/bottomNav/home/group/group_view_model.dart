@@ -47,7 +47,7 @@ class GroupViewModel extends GetxController {
   @override
   void onClose() {
     _groupSub?.cancel();
-    // debugPrint('🗑️ GroupViewModel deleted');
+
     super.onClose();
   }
 
