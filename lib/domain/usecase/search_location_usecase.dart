@@ -1,52 +1,88 @@
 import 'package:what_is_your_eta/data/model/location_model/promise_location_model.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
 
+enum SearchType { keyword, address }
+
 class SearchLocationUseCase {
   final LocationRepository _locationRepository;
+
+  int _currentPage = 1;
+  bool _isLastPage = false;
+  bool _isFetching = false;
+
+  final List<PromiseLocationModel> _accumulatedResults = [];
+
+  SearchType _currentSearchType = SearchType.keyword;
+  String _currentKeyword = '';
 
   SearchLocationUseCase({required LocationRepository locationRepository})
     : _locationRepository = locationRepository;
 
-  Future<List<PromiseLocationModel>> execute({
-    required String keyword,
-    required double latitude,
-    required double longitude,
-    required bool isNearby,
-    required int page,
-  }) async {
-    if (isNearby) {
-      final categoryCode = _getCategoryCodeFromKeyword(keyword);
-      if (categoryCode == null) return [];
+  List<PromiseLocationModel> get accumulatedResults =>
+      List.unmodifiable(_accumulatedResults);
+  bool get isLastPage => _isLastPage;
 
-      return await _locationRepository.searchPlaceByCategoryNearby(
-        categoryGroupCode: categoryCode,
-        latitude: latitude,
-        longitude: longitude,
-        page: page, // 추가
-      );
+  Future<void> searchFirstPage({
+    required String keyword,
+    required SearchType searchType,
+  }) async {
+    if (_isFetching) return;
+    _isFetching = true;
+
+    _currentSearchType = searchType;
+    _currentKeyword = keyword.trim();
+
+    _currentPage = 1;
+    _isLastPage = false;
+    _accumulatedResults.clear();
+
+    if (_currentKeyword.isEmpty) {
+      _isFetching = false;
+      return;
     }
 
-    final addressResults = await _locationRepository.searchLocationByKeyword(
-      keyword: keyword,
-      page: page, // 추가
-    );
+    if (searchType == SearchType.keyword) {
+      final results = await _locationRepository.searchPlaceByKeyword(
+        keyword: _currentKeyword,
+        page: _currentPage,
+      );
 
-    final placeResults = await _locationRepository.searchPlaceByKeyword(
-      keyword: keyword,
-      page: page, // 추가
-    );
+      _accumulatedResults.addAll(results);
 
-    return {...addressResults, ...placeResults}.toList();
+      if (results.length < 10) {
+        _isLastPage = true;
+      }
+    } else {
+      final results = await _locationRepository.searchLocationByKeyword(
+        keyword: _currentKeyword,
+      );
+
+      _accumulatedResults.addAll(results);
+      _isLastPage = true;
+    }
+
+    _isFetching = false;
   }
 
-  String? _getCategoryCodeFromKeyword(String keyword) {
-    final lower = keyword.toLowerCase();
-    if (lower.contains('카페')) return 'CE7';
-    if (lower.contains('편의점')) return 'CS2';
-    if (lower.contains('은행')) return 'BK9';
-    if (lower.contains('음식') || lower.contains('식당')) return 'FD6';
-    if (lower.contains('병원')) return 'HP8';
-    if (lower.contains('주유소')) return 'OL7';
-    return null;
+  Future<void> loadNextPage() async {
+    if (_isFetching || _isLastPage || _currentSearchType != SearchType.keyword)
+      return;
+
+    _isFetching = true;
+
+    _currentPage++;
+
+    final results = await _locationRepository.searchPlaceByKeyword(
+      keyword: _currentKeyword,
+      page: _currentPage,
+    );
+
+    _accumulatedResults.addAll(results);
+
+    if (results.length < 10) {
+      _isLastPage = true;
+    }
+
+    _isFetching = false;
   }
 }

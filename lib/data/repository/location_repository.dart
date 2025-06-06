@@ -1,10 +1,9 @@
 import 'package:what_is_your_eta/data/model/location_model/promise_location_model.dart';
-import 'package:what_is_your_eta/data/service/kakao_map_local_api_service.dart';
+import 'package:what_is_your_eta/data/service/local_map_api_service.dart';
 
 abstract class LocationRepository {
   Future<List<PromiseLocationModel>> searchLocationByKeyword({
     required String keyword,
-    int page,
   });
 
   Future<List<PromiseLocationModel>> searchPlaceByKeyword({
@@ -12,12 +11,12 @@ abstract class LocationRepository {
     int page,
   });
 
-  Future<List<PromiseLocationModel>> searchPlaceByCategoryNearby({
-    required String categoryGroupCode,
-    required double latitude,
-    required double longitude,
-    int page,
-  });
+  // Future<List<PromiseLocationModel>> searchPlaceByCategoryNearby({
+  //   required String categoryGroupCode,
+  //   required double latitude,
+  //   required double longitude,
+  //   int page,
+  // });
 
   // Future<PromiseLocationModel?> getAddressFromCoordinates({
   //   required double latitude,
@@ -40,13 +39,9 @@ class LocationRepositoryImpl implements LocationRepository {
   @override
   Future<List<PromiseLocationModel>> searchLocationByKeyword({
     required String keyword,
-    int page = 1,
   }) async {
     try {
-      final data = await _apiService.addressToCoordinate(
-        query: keyword,
-        page: page,
-      );
+      final data = await _apiService.addressToCoordinate(query: keyword);
       final documents = data['documents'] as List<dynamic>?;
 
       if (documents == null || documents.isEmpty) return [];
@@ -94,37 +89,37 @@ class LocationRepositoryImpl implements LocationRepository {
   }
 
   /// 카테고리로 장소 검색 (category.json)
-  @override
-  Future<List<PromiseLocationModel>> searchPlaceByCategoryNearby({
-    required String categoryGroupCode,
-    required double latitude,
-    required double longitude,
-    int page = 1,
-  }) async {
-    try {
-      final data = await _apiService.categoryToPlace(
-        categoryGroupCode: categoryGroupCode,
-        x: longitude.toString(),
-        y: latitude.toString(),
-        page: page,
-      );
-      final documents = data['documents'] as List<dynamic>?;
+  // @override
+  // Future<List<PromiseLocationModel>> searchPlaceByCategoryNearby({
+  //   required String categoryGroupCode,
+  //   required double latitude,
+  //   required double longitude,
+  //   int page = 1,
+  // }) async {
+  //   try {
+  //     final data = await _apiService.categoryToPlace(
+  //       categoryGroupCode: categoryGroupCode,
+  //       x: longitude.toString(),
+  //       y: latitude.toString(),
+  //       page: page,
+  //     );
+  //     final documents = data['documents'] as List<dynamic>?;
 
-      if (documents == null || documents.isEmpty) return [];
+  //     if (documents == null || documents.isEmpty) return [];
 
-      return documents.map((doc) {
-        return PromiseLocationModel(
-          latitude: double.parse(doc['y']),
-          longitude: double.parse(doc['x']),
-          placeName: doc['place_name'] ?? 'Unknown',
-          address: doc['road_address_name'] ?? doc['address_name'] ?? 'Unknown',
-        );
-      }).toList();
-    } catch (e) {
-      print('searchPlaceByCategoryNearby 실패: $e');
-      return [];
-    }
-  }
+  //     return documents.map((doc) {
+  //       return PromiseLocationModel(
+  //         latitude: double.parse(doc['y']),
+  //         longitude: double.parse(doc['x']),
+  //         placeName: doc['place_name'] ?? 'Unknown',
+  //         address: doc['road_address_name'] ?? doc['address_name'] ?? 'Unknown',
+  //       );
+  //     }).toList();
+  //   } catch (e) {
+  //     print('searchPlaceByCategoryNearby 실패: $e');
+  //     return [];
+  //   }
+  // }
 
   // @override
   // Future<PromiseLocationModel?> getAddressFromCoordinates({

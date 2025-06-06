@@ -10,7 +10,7 @@ import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/data/service/auth_service.dart';
 import 'package:what_is_your_eta/data/service/chat_service.dart';
 import 'package:what_is_your_eta/data/service/group_service.dart';
-import 'package:what_is_your_eta/data/service/kakao_map_local_api_service.dart';
+import 'package:what_is_your_eta/data/service/local_map_api_service.dart';
 
 import 'package:what_is_your_eta/data/service/promise_service.dart';
 import 'package:what_is_your_eta/data/service/user_service.dart';

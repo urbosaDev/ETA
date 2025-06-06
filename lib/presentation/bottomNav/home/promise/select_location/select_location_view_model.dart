@@ -14,26 +14,23 @@ class SelectLocationViewModel extends GetxController {
   }) : _getCurrentLocationUseCase = getCurrentLocationUseCase,
        _searchLocationUseCase = searchLocationUseCase;
 
+  final Rx<PromiseLocationModel?> currentLocation = Rx<PromiseLocationModel?>(
+    null,
+  );
+  final RxBool isLoading = false.obs;
+  final RxBool hasSearched = false.obs;
+
+  late NaverMapController _mapController;
+  bool _mapReady = false;
+
   final Rx<PromiseLocationModel?> selectedLocation = Rx<PromiseLocationModel?>(
     null,
   );
   final RxList<PromiseLocationModel> searchResults =
       <PromiseLocationModel>[].obs;
-  final Rx<PromiseLocationModel?> currentLocation = Rx<PromiseLocationModel?>(
-    null,
-  );
-  final RxBool isLoading = false.obs;
-  final RxBool isNearbySearch = false.obs;
 
-  late NaverMapController _mapController;
-  bool _mapReady = false;
-
-  int _currentPage = 1;
-  bool _isLastPage = false;
-  bool _isFetching = false;
-  String lastKeyword = '';
-
-  bool get isLastPage => _isLastPage;
+  final RxBool isLastPage = false.obs;
+  final Rx<SearchType> searchType = SearchType.keyword.obs;
 
   @override
   void onInit() {
@@ -66,7 +63,7 @@ class SelectLocationViewModel extends GetxController {
         _moveCameraTo(location);
       }
     } catch (e) {
-      print('현재 위치 가져오기 실패: $e');
+      // print('현재 위치 가져오기 실패: $e');
     } finally {
       isLoading.value = false;
     }
@@ -105,41 +102,31 @@ class SelectLocationViewModel extends GetxController {
     }
   }
 
-  Future<void> searchLocation(String keyword, {bool isFirst = false}) async {
-    if (_isFetching || _isLastPage) return;
-    _isFetching = true;
+  Future<void> searchFirstPage(String keyword) async {
     isLoading.value = true;
+    hasSearched.value = true;
 
-    if (isFirst) {
-      _currentPage = 1;
-      _isLastPage = false;
-      searchResults.clear();
-      lastKeyword = keyword;
-    }
-
-    final loc = currentLocation.value;
-    if (loc == null) {
-      _isFetching = false;
-      isLoading.value = false;
-      return;
-    }
-
-    final results = await _searchLocationUseCase.execute(
+    await _searchLocationUseCase.searchFirstPage(
       keyword: keyword,
-      latitude: loc.latitude,
-      longitude: loc.longitude,
-      isNearby: isNearbySearch.value,
-      page: _currentPage,
+      searchType: searchType.value,
     );
 
-    if (results.isEmpty) {
-      _isLastPage = true;
-    } else {
-      _currentPage++;
-      searchResults.addAll(results);
-    }
+    searchResults.value = _searchLocationUseCase.accumulatedResults;
+    isLastPage.value = _searchLocationUseCase.isLastPage;
 
-    _isFetching = false;
+    isLoading.value = false;
+  }
+
+  Future<void> loadNextPage() async {
+    if (isLastPage.value || isLoading.value) return;
+
+    isLoading.value = true;
+
+    await _searchLocationUseCase.loadNextPage();
+
+    searchResults.value = _searchLocationUseCase.accumulatedResults;
+    isLastPage.value = _searchLocationUseCase.isLastPage;
+
     isLoading.value = false;
   }
 }
