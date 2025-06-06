@@ -36,81 +36,76 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
               children:
                   controller.friendList.isEmpty
                       ? [const Text('친구가 없습니다.')]
-                      : controller.friendList
-                          .map(
-                            (e) => GestureDetector(
-                              onTap: () {
-                                Get.dialog(
-                                  AlertDialog(
-                                    title: Text('${e.name}님 정보'),
-                                    content: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text('이름: ${e.name}'),
-                                        Text('ID: ${e.uniqueId}'),
-                                        ElevatedButton(
-                                          onPressed: () async {
-                                            Get.back();
-                                            final chatRoomId = await controller
-                                                .createChatRoom(e.uid);
-                                            if (chatRoomId != null) {
-                                              Get.to(
-                                                () =>
-                                                    const PrivateChatRoomView(),
-                                                arguments: chatRoomId,
-                                                binding: BindingsBuilder(() {
-                                                  Get.put(
-                                                    PrivateChatRoomViewModel(
-                                                      chatRepository:
-                                                          Get.find<
-                                                            ChatRepository
-                                                          >(),
-                                                      userRepository:
-                                                          Get.find<
-                                                            UserRepository
-                                                          >(),
-                                                      chatRoomId: chatRoomId,
-                                                      my:
-                                                          controller
-                                                              .userModel
-                                                              .value!,
-                                                      friendUid: e.uid,
-                                                    ),
-                                                    tag: chatRoomId,
-                                                  );
-                                                }),
+                      : controller.friendList.map((e) {
+                        return GestureDetector(
+                          onTap: () {
+                            Get.dialog(
+                              AlertDialog(
+                                title: Text('${e.name}님 정보'),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('이름: ${e.name}'),
+                                    Text('ID: ${e.uniqueId}'),
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        Get.back();
+                                        final chatRoomId = await controller
+                                            .createChatRoom(e.uid);
+                                        if (chatRoomId != null) {
+                                          Get.to(
+                                            () => const PrivateChatRoomView(),
+                                            arguments: chatRoomId,
+                                            binding: BindingsBuilder(() {
+                                              Get.put(
+                                                PrivateChatRoomViewModel(
+                                                  chatRepository:
+                                                      Get.find<
+                                                        ChatRepository
+                                                      >(),
+                                                  userRepository:
+                                                      Get.find<
+                                                        UserRepository
+                                                      >(),
+                                                  chatRoomId: chatRoomId,
+                                                  my:
+                                                      controller
+                                                          .userModel
+                                                          .value!,
+                                                  friendUid: e.uid,
+                                                ),
                                               );
-                                            } else {
-                                              Get.snackbar(
-                                                "에러",
-                                                "채팅방을 생성할 수 없습니다.",
-                                              );
-                                            }
-                                          },
-                                          child: const Text('채팅 시작'),
-                                        ),
-                                      ],
+                                            }),
+                                          );
+                                        } else {
+                                          Get.snackbar(
+                                            "에러",
+                                            "채팅방을 생성할 수 없습니다.",
+                                          );
+                                        }
+                                      },
+                                      child: const Text('채팅 시작'),
                                     ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Get.back(),
-                                        child: const Text('닫기'),
-                                      ),
-                                    ],
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Get.back(),
+                                    child: const Text('닫기'),
                                   ),
-                                );
-                              },
-                              child: Container(
-                                width: 60,
-                                height: 60,
-                                color: Colors.yellow,
-                                child: Text(e.name),
+                                ],
                               ),
-                            ),
-                          )
-                          .toList(),
+                            );
+                          },
+                          child: Container(
+                            width: 60,
+                            height: 60,
+                            color: Colors.yellow,
+                            child: Text(e.name),
+                          ),
+                        );
+                      }).toList(),
             ),
           ),
           Container(
@@ -144,7 +139,6 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                                     my: my,
                                     friendUid: opponent.uid,
                                   ),
-                                  tag: chatRoom.id,
                                 );
                               }),
                             );

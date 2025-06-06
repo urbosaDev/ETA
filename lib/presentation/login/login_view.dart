@@ -18,7 +18,9 @@ class LoginView extends GetView<LoginViewModel> {
             const Text('Login View'),
             ElevatedButton(
               onPressed: () async {
-                await controller.signInWithGoogle();
+                final success = await controller.signInWithGoogle();
+                if (!success) return; // 실패했으면 아무 화면 이동도 하지 않음
+
                 controller.idExist
                     ? Get.offNamed('/main')
                     : Get.to(

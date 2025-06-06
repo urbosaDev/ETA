@@ -93,4 +93,13 @@ class GroupService {
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
+
+  Future<void> addPromiseIdToGroup({
+    required String groupId,
+    required String promiseId,
+  }) async {
+    await _groupRef.doc(groupId).update({
+      'promiseIds': FieldValue.arrayUnion([promiseId]), // 중복 방지됨
+    });
+  }
 }

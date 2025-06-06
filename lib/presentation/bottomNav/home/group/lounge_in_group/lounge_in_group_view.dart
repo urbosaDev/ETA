@@ -7,9 +7,6 @@ class LoungeInGroupView extends GetView<LoungeInGroupViewModel> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<LoungeInGroupViewModel>(
-      tag: Get.arguments as String, // groupId를 tag로
-    );
     final messageController = TextEditingController();
 
     return Scaffold(

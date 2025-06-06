@@ -8,9 +8,6 @@ class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<PrivateChatRoomViewModel>(
-      tag: Get.arguments as String, // chatRoomId
-    );
     final messageController = TextEditingController();
 
     return Scaffold(
