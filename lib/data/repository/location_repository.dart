@@ -31,9 +31,9 @@ abstract class LocationRepository {
 }
 
 class LocationRepositoryImpl implements LocationRepository {
-  final KakaoMapLocalApiService _apiService;
+  final LocalMapApiService _apiService;
 
-  LocationRepositoryImpl({required KakaoMapLocalApiService apiService})
+  LocationRepositoryImpl({required LocalMapApiService apiService})
     : _apiService = apiService;
 
   /// 주소 → 좌표 변환 (address.json)

@@ -1,7 +1,28 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 
-class KakaoMapLocalApiService {
+abstract class LocalMapApiService {
+  Future<Map<String, dynamic>> addressToCoordinate({
+    required String query,
+    int page,
+  });
+
+  Future<Map<String, dynamic>> keywordToPlace({
+    required String query,
+    int page,
+  });
+
+  Future<Map<String, dynamic>> categoryToPlace({
+    required String categoryGroupCode,
+    required String x,
+    required String y,
+    int radius,
+    int page,
+  });
+}
+
+class KakaoMapLocalApiService implements LocalMapApiService {
   final http.Client _client;
   final String _baseUrl;
   final String _apiKey;
@@ -15,7 +36,7 @@ class KakaoMapLocalApiService {
        _baseUrl = baseUrl,
        _apiKey = apiKey;
 
-  /// 주소 → 좌표 변환
+  @override
   Future<Map<String, dynamic>> addressToCoordinate({
     required String query,
     int page = 1,
@@ -40,20 +61,14 @@ class KakaoMapLocalApiService {
     }
   }
 
-  /// 키워드로 장소 검색
+  @override
   Future<Map<String, dynamic>> keywordToPlace({
     required String query,
-    // required String x,
-    // required String y,
-    // int radius = 10000,
     int page = 1,
   }) async {
     final uri = Uri.parse('$_baseUrl/v2/local/search/keyword.json').replace(
       queryParameters: {
         'query': query,
-        // 'x': x,
-        // 'y': y,
-        // 'radius': radius.toString(),
         'page': page.toString(),
         'size': _fixedSize.toString(),
       },
@@ -71,7 +86,7 @@ class KakaoMapLocalApiService {
     }
   }
 
-  /// 카테고리로 장소 검색
+  @override
   Future<Map<String, dynamic>> categoryToPlace({
     required String categoryGroupCode,
     required String x,
