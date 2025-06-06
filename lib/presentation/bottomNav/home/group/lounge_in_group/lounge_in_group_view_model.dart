@@ -45,7 +45,6 @@ class LoungeInGroupViewModel extends GetxController {
     _userSub?.cancel();
     _groupSub?.cancel();
     super.onClose();
-    // debugPrint('🗑️ LoungeInGroupViewModel deleted');
   }
 
   Future<void> _initialize() async {

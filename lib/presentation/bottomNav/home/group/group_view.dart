@@ -66,7 +66,6 @@ class GroupView extends GetView<GroupViewModel> {
           const SizedBox(height: 20),
           GestureDetector(
             onTap: () {
-              Get.delete<LoungeInGroupViewModel>(force: true);
               Get.to(
                 () => const LoungeInGroupView(),
                 arguments: controller.group.id,
@@ -78,7 +77,6 @@ class GroupView extends GetView<GroupViewModel> {
                       groupRepository: Get.find<GroupRepository>(),
                       groupId: controller.group.id,
                     ),
-                    // tag: group.id,
                   );
                 }),
               );
