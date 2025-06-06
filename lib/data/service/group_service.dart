@@ -25,6 +25,32 @@ class GroupService {
     await _groupRef.doc(groupId).update(json);
   }
 
+  Future<void> sendGroupMessage(
+    String groupId,
+    Map<String, dynamic> json,
+  ) async {
+    final ref = _groupRef.doc(groupId).collection('messages');
+    final doc = ref.doc();
+    await doc.set({...json, 'id': doc.id});
+  }
+
+  Stream<List<Map<String, dynamic>>> streamGroupMessages(String groupId) {
+    return _groupRef
+        .doc(groupId)
+        .collection('messages')
+        .orderBy('sentAt')
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => doc.data()).toList());
+  }
+
+  // 멤버만 업데이트
+  Future<void> updateGroupMembers(
+    String groupId,
+    List<String> memberIds,
+  ) async {
+    await updateGroup(groupId, {'memberIds': memberIds});
+  }
+
   /// 그룹 조회
   Future<Map<String, dynamic>?> getGroup(String groupId) async {
     final doc = await _groupRef.doc(groupId).get();

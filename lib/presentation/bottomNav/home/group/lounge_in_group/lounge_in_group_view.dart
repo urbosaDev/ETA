@@ -1,49 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/lounge_in_group/lounge_in_group_view_model.dart';
 
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view_model.dart';
-
-class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
-  const PrivateChatRoomView({super.key});
+class LoungeInGroupView extends GetView<LoungeInGroupViewModel> {
+  const LoungeInGroupView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<PrivateChatRoomViewModel>(
-      tag: Get.arguments as String, // chatRoomId
+    final controller = Get.find<LoungeInGroupViewModel>(
+      tag: Get.arguments as String, // groupId를 tag로
     );
     final messageController = TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Obx(() {
-          final friend = controller.friendModel.value;
-          if (friend == null) return const Text('로딩 중...');
-
-          return Row(
-            children: [
-              CircleAvatar(backgroundImage: NetworkImage(friend.photoUrl)),
-              const SizedBox(width: 8),
-              Text(friend.name),
-            ],
-          );
-        }),
-      ),
+      appBar: AppBar(title: const Text("속닥속닥 라운지")),
       body: Column(
         children: [
           Expanded(
             child: Obx(() {
-              final msgs = controller.messages;
+              if (controller.memberMap.isEmpty) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
+              final msgs = controller.messages;
               return ListView.builder(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
                 itemCount: msgs.length,
                 itemBuilder: (context, index) {
                   final msg = msgs[index];
-                  final isMe = msg.senderId == controller.my.uid;
-                  final friend = controller.friendModel.value;
+                  final sender = controller.memberMap[msg.senderId];
+                  if (sender == null) return const SizedBox(); // fallback 처리
+
+                  final isMe = msg.senderId == controller.userModel.value?.uid;
 
                   return Align(
                     alignment:
@@ -54,16 +41,16 @@ class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
                               ? CrossAxisAlignment.end
                               : CrossAxisAlignment.start,
                       children: [
-                        if (!isMe && friend != null)
+                        if (!isMe)
                           Row(
                             children: [
                               CircleAvatar(
                                 radius: 12,
-                                backgroundImage: NetworkImage(friend.photoUrl),
+                                backgroundImage: NetworkImage(sender.photoUrl),
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                friend.name,
+                                sender.name,
                                 style: const TextStyle(fontSize: 12),
                               ),
                             ],
@@ -105,15 +92,12 @@ class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
                           messageController.clear();
                         }
                       },
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: '메세지를 입력하세요',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        border: OutlineInputBorder(),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
                   IconButton(
                     icon: const Icon(Icons.send),
                     onPressed: () {

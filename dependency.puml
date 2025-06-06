@@ -1,0 +1,88 @@
+@startuml
+
+package Service {
+  class AuthService
+  class UserService
+  class GroupService
+  class PrivateChatService
+  class GroupChatService
+  class PromiseChatService
+}
+
+package Repository {
+  class AuthRepository
+  class UserRepository
+  class GroupRepository
+  class ChatRepository
+}
+
+package ViewModel {
+  class SplashViewModel
+  class LoginViewModel
+  class UniqueIdInputViewModel
+  class BottomNavViewModel
+  class HomeViewModel
+  class PrivateChatViewModel
+  class GroupViewModel
+  class CreateGroupViewModel
+  class AddFriendViewModel
+  class SettingViewModel
+  class NotificationViewModel
+}
+
+package View {
+  class SplashView
+  class LoginView
+  class UniqueIdInputView
+  class BottomNav
+  class HomeView
+  class PrivateChatView
+  class GroupView
+  class CreateGroupView
+  class AddFriendView
+}
+
+'--- Service to Repository ---'
+AuthService --> AuthRepository
+UserService --> UserRepository
+GroupService --> GroupRepository
+PrivateChatService --> ChatRepository
+GroupChatService --> ChatRepository
+PromiseChatService --> ChatRepository
+
+'--- ViewModel to Repository ---'
+AuthRepository <.. SplashViewModel
+AuthRepository <.. LoginViewModel
+UserRepository <.. LoginViewModel
+UserRepository <.. UniqueIdInputViewModel
+
+AuthRepository <.. HomeViewModel
+UserRepository <.. HomeViewModel
+GroupRepository <.. HomeViewModel
+
+UserRepository <.. PrivateChatViewModel
+AuthRepository <.. PrivateChatViewModel
+ChatRepository <.. PrivateChatViewModel
+
+GroupRepository <.. GroupViewModel
+
+UserRepository <.. AddFriendViewModel
+UserRepository <.. CreateGroupViewModel
+GroupRepository <.. CreateGroupViewModel
+AuthRepository <.. CreateGroupViewModel
+
+AuthRepository <.. SettingViewModel
+
+'--- ViewModel to View ---'
+SplashView --> SplashViewModel
+LoginView --> LoginViewModel
+UniqueIdInputView --> UniqueIdInputViewModel
+BottomNav --> BottomNavViewModel
+HomeView --> HomeViewModel
+PrivateChatView --> PrivateChatViewModel
+GroupView --> GroupViewModel
+CreateGroupView --> CreateGroupViewModel
+AddFriendView --> AddFriendViewModel
+SettingView --> SettingViewModel
+
+@enduml

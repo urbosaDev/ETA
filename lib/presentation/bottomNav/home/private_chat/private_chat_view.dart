@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
+import 'package:what_is_your_eta/data/repository/chat_repository.dart';
+import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/%08add_friend/add_friend_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view_model.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_view_model.dart';
 
@@ -54,14 +57,30 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                                                 .createChatRoom(e.uid);
                                             if (chatRoomId != null) {
                                               Get.to(
-                                                () => PrivateChatRoomView(
-                                                  chatRoomId: chatRoomId,
-                                                  my:
-                                                      controller
-                                                          .userModel
-                                                          .value!,
-                                                  friend: e,
-                                                ),
+                                                () =>
+                                                    const PrivateChatRoomView(),
+                                                arguments: chatRoomId,
+                                                binding: BindingsBuilder(() {
+                                                  Get.put(
+                                                    PrivateChatRoomViewModel(
+                                                      chatRepository:
+                                                          Get.find<
+                                                            ChatRepository
+                                                          >(),
+                                                      userRepository:
+                                                          Get.find<
+                                                            UserRepository
+                                                          >(),
+                                                      chatRoomId: chatRoomId,
+                                                      my:
+                                                          controller
+                                                              .userModel
+                                                              .value!,
+                                                      friendUid: e.uid,
+                                                    ),
+                                                    tag: chatRoomId,
+                                                  );
+                                                }),
                                               );
                                             } else {
                                               Get.snackbar(
@@ -70,9 +89,8 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                                               );
                                             }
                                           },
-                                          child: Text('채팅시작'),
+                                          child: const Text('채팅 시작'),
                                         ),
-                                        // 필요한 다른 정보 추가 가능
                                       ],
                                     ),
                                     actions: [
@@ -106,7 +124,7 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                       future: controller.getOpponentInfo(chatRoom),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
-                          return const SizedBox(height: 50); // 로딩중 placeholder
+                          return const SizedBox(height: 50);
                         }
 
                         final opponent = snapshot.data!;
@@ -115,18 +133,36 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                         return GestureDetector(
                           onTap: () {
                             Get.to(
-                              () => PrivateChatRoomView(
-                                chatRoomId: chatRoom.id,
-                                my: my,
-                                friend: opponent,
-                              ),
+                              () => const PrivateChatRoomView(),
+                              arguments: chatRoom.id,
+                              binding: BindingsBuilder(() {
+                                Get.put(
+                                  PrivateChatRoomViewModel(
+                                    chatRepository: Get.find<ChatRepository>(),
+                                    userRepository: Get.find<UserRepository>(),
+                                    chatRoomId: chatRoom.id,
+                                    my: my,
+                                    friendUid: opponent.uid,
+                                  ),
+                                  tag: chatRoom.id,
+                                );
+                              }),
                             );
                           },
                           child: Container(
                             width: 400,
                             color: Colors.red,
-                            child: Column(
-                              children: [Text('${opponent.uniqueId}님과의 채팅방')],
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                    opponent.photoUrl,
+                                  ),
+                                  radius: 16,
+                                ),
+                                const SizedBox(width: 8),
+                                Text('${opponent.name}님과의 채팅방'),
+                              ],
                             ),
                           ),
                         );

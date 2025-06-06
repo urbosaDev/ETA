@@ -21,7 +21,7 @@ class AddFriendView extends GetView<AddFriendViewModel> {
             const Text('Add Friend View'),
             Row(
               children: [
-                Text('내 ID: ${user.uniqueId}'),
+                Text('내 ID: ${controller.currentUser.value?.uniqueId ?? ''}'),
                 SizedBox(
                   width: 200,
                   child: TextField(

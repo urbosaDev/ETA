@@ -13,16 +13,23 @@ class DependencyInjection {
     Get.put<AuthService>(AuthService(), permanent: true);
     Get.put<UserService>(UserService(), permanent: true);
     Get.put<GroupService>(GroupService(), permanent: true);
-    Get.put<GroupRepository>(GroupRepositoryImpl(Get.find()), permanent: true);
-    Get.put<AuthRepository>(
-      FirebaseAuthRepository(Get.find()),
-      permanent: true,
-    );
-    Get.put<UserRepository>(UserRepositoryImpl(Get.find()), permanent: true);
 
     Get.put<PrivateChatService>(PrivateChatService(), permanent: true);
     Get.put<GroupChatService>(GroupChatService(), permanent: true);
     Get.put<PromiseChatService>(PromiseChatService(), permanent: true);
+
+    Get.put<GroupRepository>(
+      GroupRepositoryImpl(Get.find<GroupService>()),
+      permanent: true,
+    );
+    Get.put<AuthRepository>(
+      FirebaseAuthRepository(Get.find<AuthService>()),
+      permanent: true,
+    );
+    Get.put<UserRepository>(
+      UserRepositoryImpl(Get.find<UserService>()),
+      permanent: true,
+    );
 
     Get.put<ChatRepository>(
       ChatRepositoryImpl(Get.find<PrivateChatService>()),
