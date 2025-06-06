@@ -11,6 +11,13 @@ abstract class GroupRepository {
 
   Future<List<GroupModel>> getGroupsByIds(List<String> groupIds);
   Stream<List<GroupModel>> streamGroupsByIds(List<String> groupIds);
+  Future<void> updateGroupMembers(String groupId, List<String> memberIds);
+  Future<void> sendGroupMessage(String groupId, MessageModel message);
+  Stream<List<MessageModel>> streamGroupMessages(String groupId);
+  Future<void> addPromiseIdToGroup({
+    required String groupId,
+    required String promiseId,
+  });
 }
 
 class GroupRepositoryImpl implements GroupRepository {
@@ -60,5 +67,33 @@ class GroupRepositoryImpl implements GroupRepository {
     return _service
         .streamGroupsByIds(groupIds)
         .map((list) => list.map(GroupModel.fromJson).toList());
+  }
+
+  @override
+  Future<void> sendGroupMessage(String groupId, MessageModel message) {
+    return _service.sendGroupMessage(groupId, message.toJson());
+  }
+
+  @override
+  Stream<List<MessageModel>> streamGroupMessages(String groupId) {
+    return _service
+        .streamGroupMessages(groupId)
+        .map((list) => list.map(MessageModel.fromJson).toList());
+  }
+
+  @override
+  Future<void> updateGroupMembers(
+    String groupId,
+    List<String> memberIds,
+  ) async {
+    await _service.updateGroupMembers(groupId, memberIds);
+  }
+
+  @override
+  Future<void> addPromiseIdToGroup({
+    required String groupId,
+    required String promiseId,
+  }) async {
+    await _service.addPromiseIdToGroup(groupId: groupId, promiseId: promiseId);
   }
 }

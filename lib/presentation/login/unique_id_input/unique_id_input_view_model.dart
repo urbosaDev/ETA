@@ -34,14 +34,24 @@ class UniqueIdInputViewModel extends GetxController {
   }
 
   Future<void> checkUniqueId(String id) async {
-    if (id.trim().isEmpty) {
+    final trimmedId = id.trim();
+
+    if (trimmedId.isEmpty) {
       uniqueIdCheck.value = UniqueIdCheck.blank;
       isConfirmEnabled.value = false;
       return;
     }
 
+    // 금지 아이디 체크
+    if (trimmedId.toLowerCase() == 'system') {
+      uniqueIdCheck.value = UniqueIdCheck.notAvailable;
+      isConfirmEnabled.value = false;
+      selectedId.value = '';
+      return;
+    }
+
     try {
-      final available = await _userRepository.isUniqueIdAvailable(id);
+      final available = await _userRepository.isUniqueIdAvailable(trimmedId);
       uniqueIdCheck.value =
           available ? UniqueIdCheck.available : UniqueIdCheck.notAvailable;
       isConfirmEnabled.value = available;

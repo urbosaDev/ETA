@@ -20,15 +20,18 @@ class LoginViewModel extends GetxController {
 
   bool idExist = false;
   // 로그인 상태
-  Future<void> signInWithGoogle() async {
+  Future<bool> signInWithGoogle() async {
     try {
       final uid = await _authRepository.signInWithGoogle();
-      if (uid == null) return;
+      if (uid == null) return false; // <- 여기!
 
       final user = _authRepository.getCurrentUser();
       if (user == null) throw Exception('User not found');
 
       idExist = await _userRepository.userExists(uid);
-    } catch (e) {}
+      return true;
+    } catch (e) {
+      return false; // 실패 시 false 반환
+    }
   }
 }

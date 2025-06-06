@@ -8,9 +8,10 @@ class AddFriendViewModel extends GetxController {
   AddFriendViewModel({required UserRepository userRepository})
     : _userRepository = userRepository;
 
-  late final UserModel currentUser;
+  final Rxn<UserModel> currentUser = Rxn<UserModel>();
+
   void init(UserModel user) {
-    currentUser = user;
+    currentUser.value = user;
   }
 
   final RxBool isUserNotFound = false.obs;
@@ -26,16 +27,16 @@ class AddFriendViewModel extends GetxController {
   }
 
   Future<void> searchAddFriend(String uniqueId) async {
-    // 초기화
     isUserNotFound.value = false;
     isFriend.value = false;
     isMe.value = false;
     searchedUser.value = null;
 
     final trimmed = uniqueId.trim();
+    final my = currentUser.value;
+    if (my == null) return;
 
-    // 나 자신 체크
-    if (trimmed == currentUser.uniqueId) {
+    if (trimmed == my.uniqueId) {
       isMe.value = true;
       return;
     }
@@ -49,13 +50,12 @@ class AddFriendViewModel extends GetxController {
       return;
     }
 
-    if (_isAlreadyFriend(friendUid)) {
+    if (my.friendsUids.contains(friendUid)) {
       isFriend.value = true;
       isLoading.value = false;
       return;
     }
 
-    // 친구 정보 가져오기
     final friend = await _userRepository.getUser(friendUid);
     if (friend == null) {
       isUserNotFound.value = true;
@@ -67,17 +67,11 @@ class AddFriendViewModel extends GetxController {
     isLoading.value = false;
   }
 
-  bool _isAlreadyFriend(String friendUid) {
-    return currentUser.friendsUids.contains(friendUid);
-  }
-
   Future<void> addFriend() async {
+    final my = currentUser.value;
     final friend = searchedUser.value;
-    if (friend == null) return;
+    if (my == null || friend == null) return;
 
-    await _userRepository.addFriendUid(currentUser.uid, friend.uid);
+    await _userRepository.addFriendUid(my.uid, friend.uid);
   }
 }
-//보다 보충해야 하는 것, 
-//1. 나 자신은 포함하면 안됌 , 
-//2. 흠 일단 바로 친구 추가하면 안됌 . 해당 정보를 띄워야함 그리고 새로운 버튼이 생겨야함 

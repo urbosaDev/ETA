@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:what_is_your_eta/data/repository/auth_repository.dart';
+import 'package:what_is_your_eta/data/repository/group_repository.dart';
+import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/create_group/create_group_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/create_group/create_group_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/group_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/home_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_view.dart';
@@ -24,6 +28,7 @@ class HomeView extends GetView<HomeViewModel> {
                   if (index == 1) {
                     showCreateGroupDialog(context);
                   } else {
+                    // 이제 ViewModel 삭제는 GroupView 내부에서 처리됨. 여긴 index만 바꾸면 됨.
                     controller.selectedIndex.value = index;
                   }
                 },
@@ -57,7 +62,7 @@ class HomeView extends GetView<HomeViewModel> {
               } else if (index >= 2) {
                 final group = controller.selectedGroup;
                 if (group != null) {
-                  return GroupView(group: group);
+                  return GroupView(group: group); // 여기서 ViewModel을 새로 생성함
                 }
                 return const Center(child: Text('존재하지 않는 그룹입니다.'));
               } else {
@@ -101,8 +106,18 @@ class HomeView extends GetView<HomeViewModel> {
                   backgroundColor: Colors.grey[800],
                 ),
                 onPressed: () {
-                  Get.back();
-                  Get.to(() => const CreateGroupView());
+                  Get.to(
+                    () => const CreateGroupView(),
+                    binding: BindingsBuilder(() {
+                      Get.put(
+                        CreateGroupViewModel(
+                          userRepository: Get.find<UserRepository>(),
+                          authRepository: Get.find<AuthRepository>(),
+                          groupRepository: Get.find<GroupRepository>(),
+                        ),
+                      );
+                    }),
+                  );
                 },
                 child: const Text('⭐채널 생성하기'),
               ),
