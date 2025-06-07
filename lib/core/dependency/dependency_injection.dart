@@ -10,15 +10,13 @@ import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/data/service/auth_service.dart';
 import 'package:what_is_your_eta/data/service/chat_service.dart';
 import 'package:what_is_your_eta/data/service/group_service.dart';
-import 'package:what_is_your_eta/data/service/kakao_map_local_api_service.dart';
-import 'package:what_is_your_eta/data/service/naver_map_api_service.dart';
+import 'package:what_is_your_eta/data/service/local_map_api_service.dart';
+
 import 'package:what_is_your_eta/data/service/promise_service.dart';
 import 'package:what_is_your_eta/data/service/user_service.dart';
 
 class DependencyInjection {
   static void init() {
-    final clientId = dotenv.env['NAVER_CLIENT_ID']!;
-    final clientSecret = dotenv.env['NAVER_CLIENT_SECRET']!;
     final kakaoApiKey = dotenv.env['KAKAO_REST_API_KEY']!;
     final kakaoBaseUrl = dotenv.env['KAKAO_BASE_URL']!;
 
@@ -29,11 +27,8 @@ class DependencyInjection {
     Get.put<PrivateChatService>(PrivateChatService(), permanent: true);
     Get.put<GroupChatService>(GroupChatService(), permanent: true);
     Get.put<PromiseChatService>(PromiseChatService(), permanent: true);
-    Get.put<NaverMapApiService>(
-      NaverMapApiService(clientId: clientId, clientSecret: clientSecret),
-      permanent: true,
-    );
-    Get.put<KakaoMapLocalApiService>(
+
+    Get.put<LocalMapApiService>(
       KakaoMapLocalApiService(
         client: http.Client(),
         baseUrl: kakaoBaseUrl,
@@ -60,7 +55,7 @@ class DependencyInjection {
       permanent: true,
     );
     Get.put<LocationRepository>(
-      LocationRepositoryImpl(apiService: Get.find<KakaoMapLocalApiService>()),
+      LocationRepositoryImpl(apiService: Get.find<LocalMapApiService>()),
       permanent: true,
     );
     Get.put<PromiseRepository>(
