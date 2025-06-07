@@ -63,7 +63,7 @@ class PromiseViewModel extends GetxController {
     if (initialUser != null) {
       userModel.value = initialUser;
     }
-    _userSub?.cancel();
+
     _userSub = _userRepository.streamUser(currentUser.uid).listen((user) {
       userModel.value = user;
     });
@@ -76,7 +76,6 @@ class PromiseViewModel extends GetxController {
       await _fetchMembers(fetchedPromise.memberIds);
     }
 
-    _promiseSub?.cancel();
     _promiseSub = _promiseRepository.streamPromise(promiseId).listen((p) async {
       // 추후 memberIds 변경 감지 로직 추가 가능
       promise.value = p;
