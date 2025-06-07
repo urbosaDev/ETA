@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:what_is_your_eta/data/model/group_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/create_group/create_group_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/create_group/create_group_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/group_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/group_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/home_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_view.dart';
 
@@ -60,9 +62,19 @@ class HomeView extends GetView<HomeViewModel> {
               if (index == 0) {
                 return const PrivateChatView();
               } else if (index >= 2) {
-                final group = controller.selectedGroup;
+                final GroupModel? group = controller.selectedGroup;
                 if (group != null) {
-                  return GroupView(group: group); // 여기서 ViewModel을 새로 생성함
+                  return GetBuilder(
+                    init: GroupViewModel(
+                      group: group,
+                      groupRepository: Get.find(),
+                      userRepository: Get.find(),
+                      authRepository: Get.find(),
+                      promiseRepository: Get.find(),
+                    ),
+                    autoRemove: true,
+                    builder: (controller) => GroupView(),
+                  );
                 }
                 return const Center(child: Text('존재하지 않는 그룹입니다.'));
               } else {

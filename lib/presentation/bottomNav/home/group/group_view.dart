@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:what_is_your_eta/data/model/group_model.dart';
+
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
@@ -16,31 +16,11 @@ import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_p
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/widget/select_friend_dialog.dart';
 
-class GroupView extends StatelessWidget {
-  final GroupModel group;
-  const GroupView({super.key, required this.group});
+class GroupView extends GetView<GroupViewModel> {
+  const GroupView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Get.delete<GroupViewModel>();
-
-    // 새 ViewModel 주입 (tag 없이)
-    final controller = Get.put(
-      GroupViewModel(
-        promiseRepository: Get.find(),
-        groupRepository: Get.find(),
-        userRepository: Get.find(),
-        authRepository: Get.find(),
-        group: group,
-      ),
-    );
-
-    // ever<String?>(controller.snackbarMessage, (msg) {
-    //   if (msg != null) {
-    //     Get.snackbar('알림', msg);
-    //   }
-    // });
-
     return Obx(() {
       if (controller.isLoading.value) {
         return const Center(child: CircularProgressIndicator());
@@ -86,19 +66,17 @@ class GroupView extends StatelessWidget {
           const SizedBox(height: 20),
           GestureDetector(
             onTap: () {
-              Get.delete<LoungeInGroupViewModel>(force: true);
               Get.to(
                 () => const LoungeInGroupView(),
-                arguments: group.id,
+                arguments: controller.group.id,
                 binding: BindingsBuilder(() {
                   Get.put(
                     LoungeInGroupViewModel(
                       authRepository: Get.find<AuthRepository>(),
                       userRepository: Get.find<UserRepository>(),
                       groupRepository: Get.find<GroupRepository>(),
-                      groupId: group.id,
+                      groupId: controller.group.id,
                     ),
-                    // tag: group.id,
                   );
                 }),
               );
@@ -225,33 +203,33 @@ class GroupView extends StatelessWidget {
       );
     });
   }
+}
 
-  Widget groupMemberList(GroupViewModel controller) {
-    return Obx(() {
-      final members = controller.memberList;
-      if (members.isEmpty) {
-        return const Text('구성원이 없습니다.');
-      }
+Widget groupMemberList(GroupViewModel controller) {
+  return Obx(() {
+    final members = controller.memberList;
+    if (members.isEmpty) {
+      return const Text('구성원이 없습니다.');
+    }
 
-      return SizedBox(
-        height: 80,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: members.length,
-          itemBuilder: (context, index) {
-            final user = members[index];
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Column(
-                children: [
-                  CircleAvatar(backgroundImage: NetworkImage(user.photoUrl)),
-                  Text(user.name, style: const TextStyle(fontSize: 12)),
-                ],
-              ),
-            );
-          },
-        ),
-      );
-    });
-  }
+    return SizedBox(
+      height: 80,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: members.length,
+        itemBuilder: (context, index) {
+          final user = members[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Column(
+              children: [
+                CircleAvatar(backgroundImage: NetworkImage(user.photoUrl)),
+                Text(user.name, style: const TextStyle(fontSize: 12)),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  });
 }
