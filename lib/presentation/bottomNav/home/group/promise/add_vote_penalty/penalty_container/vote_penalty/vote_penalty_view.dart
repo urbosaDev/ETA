@@ -1,36 +1,91 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/components/swipe_hint.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/penalty_container_view_model.dart';
+
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/vote_penalty/vote_penalty_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/widget/user_tile.dart';
 
-class VotePenaltyView extends GetView<PenaltyContainerViewModel> {
+class VotePenaltyView extends GetView<VotePenaltyViewModel> {
   const VotePenaltyView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const Text(
-            '벌칙 투표 화면',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 20),
-          buildPenaltyVotingBox(),
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Text(
+                '벌칙 투표 화면',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 20),
+              buildPenaltyVotingBox(),
 
-          _buildVoteProgressBar(),
-          _buildFinalPenaltyResult(),
-          const SizedBox(height: 16),
-          _buildPenaltyVotingStatus(),
-          SwipeHint(icon: Icons.arrow_back_ios, label: '벌칙 생성'),
-        ],
-      ),
+              _buildVoteProgressBar(),
+              _buildFinalPenaltyResult(),
+              const SizedBox(height: 16),
+              _buildPenaltyVotingStatus(),
+              SwipeHint(icon: Icons.arrow_back_ios, label: '벌칙 생성'),
+            ],
+          ),
+        ),
+        Obx(() {
+          final successMsg = controller.successMessage.value;
+          final errorMsg = controller.errorMessage.value;
+          final voteCompleted = controller.voteCompleted.value;
+
+          if (successMsg != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Get.snackbar(
+                '완료',
+                successMsg,
+                backgroundColor: Colors.green,
+                colorText: Colors.white,
+                snackPosition: SnackPosition.BOTTOM,
+                duration: const Duration(seconds: 2),
+              );
+              controller.clearMessages();
+            });
+          }
+
+          if (errorMsg != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Get.snackbar(
+                '오류',
+                errorMsg,
+                backgroundColor: Colors.redAccent,
+                colorText: Colors.white,
+                snackPosition: SnackPosition.BOTTOM,
+                duration: const Duration(seconds: 2),
+              );
+              controller.clearMessages();
+            });
+          }
+
+          if (voteCompleted) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Get.snackbar(
+                '투표 완료',
+                '모든 참여자가 투표를 완료했습니다.',
+                backgroundColor: Colors.blueAccent,
+                colorText: Colors.white,
+                snackPosition: SnackPosition.BOTTOM,
+                duration: const Duration(seconds: 2),
+              );
+              // voteCompleted는 필요하면 리셋
+              controller.voteCompleted.value = false;
+            });
+          }
+
+          return const SizedBox.shrink();
+        }),
+      ],
     );
   }
 
@@ -137,16 +192,9 @@ class VotePenaltyView extends GetView<PenaltyContainerViewModel> {
           ElevatedButton(
             onPressed:
                 controller.hasCurrentUserVoted || controller.isSubmitting.value
-                    ? null
+                    ? () {}
                     : () async {
-                      final success = await controller.votePenalty();
-                      if (!success) return;
-
-                      final isLast = await controller.isLastVote();
-                      if (isLast) {
-                        await controller.finalizeSelectedPenalty();
-                        await controller.notifyPenalty(); // 메시지 전송까지
-                      }
+                      await controller.votePenaltyFlow();
                     },
             style: ElevatedButton.styleFrom(
               backgroundColor:
