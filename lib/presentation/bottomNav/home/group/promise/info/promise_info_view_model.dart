@@ -55,7 +55,7 @@ class PromiseInfoViewModel extends GetxController {
       location.value = fetchedPromise.location;
       await _fetchMembers(fetchedPromise.memberIds);
     }
-    _promiseSub?.cancel();
+
     _promiseSub = _promiseRepository.streamPromise(promiseId).listen((p) async {
       // 추후 memberIds 변경 감지 로직 추가 가능
       promise.value = p;
