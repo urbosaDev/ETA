@@ -1,7 +1,7 @@
 import 'package:geolocator/geolocator.dart';
 
 class GetCurrentLocationUseCase {
-  Future<Position> call() async {
+  Future<Position> fetchCurrentPosition() async {
     // 위치 권한 체크 및 요청
     final permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {

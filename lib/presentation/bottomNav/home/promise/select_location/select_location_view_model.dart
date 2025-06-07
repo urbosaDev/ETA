@@ -50,7 +50,7 @@ class SelectLocationViewModel extends GetxController {
     try {
       isLoading.value = true;
 
-      final pos = await _getCurrentLocationUseCase.call();
+      final pos = await _getCurrentLocationUseCase.fetchCurrentPosition();
       final location = PromiseLocationModel(
         placeName: '현재 위치',
         latitude: pos.latitude,
