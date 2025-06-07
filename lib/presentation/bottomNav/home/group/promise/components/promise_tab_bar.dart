@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/penalty_container_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/penalty_container_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/info/promise_info_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/info/promise_info_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/pay/promise_payment_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/pay/promise_payment_view_model.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/penalty/promise_penalty_view.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/penalty/promise_penalty_view_model.dart';
 
 class PromiseTabBar extends StatelessWidget {
   final String promiseId;
@@ -52,15 +52,14 @@ class PromiseTabBar extends StatelessWidget {
           }),
           _TabButton('벌칙', () {
             Get.to(
-              () => const PromisePenaltyView(),
+              () => const PenaltyContainerView(),
               arguments: promiseId,
+              transition: Transition.downToUp,
+              opaque: false,
+              duration: const Duration(milliseconds: 300),
+              fullscreenDialog: true,
               binding: BindingsBuilder(() {
-                Get.put(
-                  PromisePenaltyViewModel(
-                    promiseId: promiseId,
-                    promiseRepository: Get.find<PromiseRepository>(),
-                  ),
-                );
+                Get.put(PenaltyContainerViewModel(promiseId: promiseId));
               }),
             );
           }),
