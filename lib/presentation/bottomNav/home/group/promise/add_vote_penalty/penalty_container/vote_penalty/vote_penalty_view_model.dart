@@ -41,7 +41,7 @@ class VotePenaltyViewModel extends GetxController {
   // 버튼에 처리하지말고 외부에 처리
   final RxnString errorMessage = RxnString();
   final RxnString successMessage = RxnString();
-
+  final RxBool voteCompleted = false.obs;
   // 선택된 멤버 ()
   final Rxn<MemberWithSuggestionVoteStatus> selectedMember =
       Rxn<MemberWithSuggestionVoteStatus>();
@@ -147,6 +147,18 @@ class VotePenaltyViewModel extends GetxController {
     final descriptions = suggestions.map((e) => e.description).toSet().toList();
     if (descriptions.isEmpty) return ["아직 정해지지 않음"];
     return descriptions;
+  }
+
+  Future<void> votePenaltyFlow() async {
+    final success = await votePenalty();
+    if (!success) return;
+
+    final isLast = await isLastVote();
+    if (isLast) {
+      await finalizeSelectedPenalty();
+      await notifyPenalty();
+      voteCompleted.value = true;
+    }
   }
 
   // Vote Penalty ----------------------
