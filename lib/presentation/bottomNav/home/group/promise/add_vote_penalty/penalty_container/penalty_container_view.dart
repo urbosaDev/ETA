@@ -27,8 +27,9 @@ class PenaltyContainerView extends GetView<PenaltyContainerViewModel> {
                 builder: (controller) {
                   return PageView(
                     controller: pageController,
-                    onPageChanged:
-                        (value) => controller.currentPage.value = value,
+                    onPageChanged: (value) {
+                      controller.setCurrentPage(value);
+                    },
                     children: [
                       GetBuilder(
                         init: AddPenaltyViewModel(
