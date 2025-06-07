@@ -11,20 +11,58 @@ class AddPenaltyView extends GetView<AddPenaltyViewModel> {
   @override
   Widget build(BuildContext context) {
     final TextEditingController textController = TextEditingController();
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          //설명서, 단순텍스트
-          _buildPenaltyExample(),
-          //진행도, 어떤 유저가 벌칙을 제안했는지, 또한 진행률은 어떻게 되는지
-          _buildPenaltyProposalProgress(),
-          // 벌칙 입력 필드
-          _buildPenaltyInput(textController),
-          // 스와이프하도록 유도하는 텍스트
-          SwipeHint(icon: Icons.arrow_forward_ios, label: '투표하기'),
-        ],
-      ),
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              //설명서, 단순텍스트
+              _buildPenaltyExample(),
+              //진행도, 어떤 유저가 벌칙을 제안했는지, 또한 진행률은 어떻게 되는지
+              _buildPenaltyProposalProgress(),
+              // 벌칙 입력 필드
+              _buildPenaltyInput(textController),
+              // 스와이프하도록 유도하는 텍스트
+              SwipeHint(icon: Icons.arrow_forward_ios, label: '투표하기'),
+            ],
+          ),
+        ),
+        Obx(() {
+          final successMsg = controller.successMessage.value;
+          final errorMsg = controller.errorMessage.value;
+
+          if (successMsg != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Get.snackbar(
+                '완료',
+                successMsg,
+                backgroundColor: Colors.green,
+                colorText: Colors.white,
+                snackPosition: SnackPosition.BOTTOM,
+                duration: const Duration(seconds: 2),
+              );
+              controller.clearMessages();
+            });
+          }
+
+          if (errorMsg != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Get.snackbar(
+                '오류',
+                errorMsg,
+                backgroundColor: Colors.redAccent,
+                colorText: Colors.white,
+                snackPosition: SnackPosition.BOTTOM,
+                duration: const Duration(seconds: 2),
+              );
+              controller.clearMessages();
+            });
+          }
+
+          return const SizedBox.shrink(); // Obx는 위젯을 반환해야 하므로 빈 위젯 반환
+        }),
+      ],
     );
   }
 
@@ -179,31 +217,6 @@ class AddPenaltyView extends GetView<AddPenaltyViewModel> {
                                   textController.text,
                                 );
                                 textController.clear();
-                                final successMsg =
-                                    controller.successMessage.value;
-                                final errorMsg = controller.errorMessage.value;
-                                if (successMsg != null) {
-                                  Get.snackbar(
-                                    '완료',
-                                    successMsg,
-                                    backgroundColor: Colors.green,
-                                    colorText: Colors.white,
-                                    snackPosition: SnackPosition.BOTTOM,
-                                    duration: const Duration(seconds: 2),
-                                  );
-                                }
-
-                                if (errorMsg != null) {
-                                  Get.snackbar(
-                                    '오류',
-                                    errorMsg,
-                                    backgroundColor: Colors.redAccent,
-                                    colorText: Colors.white,
-                                    snackPosition: SnackPosition.BOTTOM,
-                                    duration: const Duration(seconds: 2),
-                                  );
-                                }
-                                controller.clearMessages();
                               },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
