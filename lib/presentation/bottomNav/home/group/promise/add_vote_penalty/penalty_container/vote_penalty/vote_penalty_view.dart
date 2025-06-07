@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/components/swipe_hint.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/penalty_container_view_model.dart';
+
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/vote_penalty/vote_penalty_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/widget/user_tile.dart';
 
-class VotePenaltyView extends GetView<PenaltyContainerViewModel> {
+class VotePenaltyView extends GetView<VotePenaltyViewModel> {
   const VotePenaltyView({super.key});
 
   @override

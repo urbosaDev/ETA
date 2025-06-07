@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:what_is_your_eta/data/repository/auth_repository.dart';
-import 'package:what_is_your_eta/data/repository/promise_repository.dart';
-import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/penalty_container_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/penalty_container_view_model.dart';
 
@@ -54,10 +52,6 @@ class PromiseView extends GetView<PromiseViewModel> {
                             Get.put(
                               PenaltyContainerViewModel(
                                 promiseId: controller.promiseId,
-                                promiseRepository:
-                                    Get.find<PromiseRepository>(),
-                                userRepository: Get.find<UserRepository>(),
-                                authRepository: Get.find<AuthRepository>(),
                               ),
                             );
                           }),

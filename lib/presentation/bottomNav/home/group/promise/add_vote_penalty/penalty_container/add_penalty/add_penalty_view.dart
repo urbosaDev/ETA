@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/components/swipe_hint.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/penalty_container_view_model.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/add_penalty/add_penalty_view_model.dart';
+
 import 'package:what_is_your_eta/presentation/core/widget/user_tile.dart';
 
-class AddPenaltyView extends GetView<PenaltyContainerViewModel> {
+class AddPenaltyView extends GetView<AddPenaltyViewModel> {
   const AddPenaltyView({super.key});
 
   @override
@@ -15,9 +16,9 @@ class AddPenaltyView extends GetView<PenaltyContainerViewModel> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           //설명서, 단순텍스트
-          _buildePenaltyExample(),
+          _buildPenaltyExample(),
           //진행도, 어떤 유저가 벌칙을 제안했는지, 또한 진행률은 어떻게 되는지
-          _buildePenaltyING(),
+          _buildPenaltyProposalProgress(),
           // 벌칙 입력 필드
           _buildPenaltyInput(textController),
           // 스와이프하도록 유도하는 텍스트
@@ -27,7 +28,7 @@ class AddPenaltyView extends GetView<PenaltyContainerViewModel> {
     );
   }
 
-  Widget _buildePenaltyExample() {
+  Widget _buildPenaltyExample() {
     return Column(
       children: [
         const Text(
@@ -68,8 +69,9 @@ class AddPenaltyView extends GetView<PenaltyContainerViewModel> {
     );
   }
 
-  Widget _buildePenaltyING() {
+  Widget _buildPenaltyProposalProgress() {
     return Obx(() {
+      // 게터함수 내부의 Rx가 변하면 재 랜더링
       final list = controller.memberWithStatusList;
 
       return SizedBox(
