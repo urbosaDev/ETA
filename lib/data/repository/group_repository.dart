@@ -27,12 +27,7 @@ class GroupRepositoryImpl implements GroupRepository {
 
   @override
   Future<String> createGroup(GroupModel group) async {
-    final initMessage = MessageModel(
-      senderId: 'system',
-      text: '채팅방이 생성되었습니다',
-      sentAt: DateTime.now(),
-    );
-    return await _service.createGroup(group.toJson(), initMessage.toJson());
+    return await _service.createGroup(group.toJson());
   }
 
   @override
