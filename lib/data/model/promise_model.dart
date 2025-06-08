@@ -10,7 +10,7 @@ class PromiseModel {
   final List<String> memberIds;
   final PromiseLocationModel location;
   final DateTime time;
-  final String penalty;
+
   final List<String> lateUserIds;
   final Map<String, UserLocationModel>? userLocations;
 
@@ -24,7 +24,7 @@ class PromiseModel {
     required this.memberIds,
     required this.location,
     required this.time,
-    required this.penalty,
+
     required this.lateUserIds,
     this.userLocations,
     this.penaltySuggestions,
@@ -39,7 +39,7 @@ class PromiseModel {
       memberIds: List<String>.from(json['memberIds']),
       location: PromiseLocationModel.fromJson(json['location']),
       time: (json['time'] as Timestamp).toDate(),
-      penalty: json['penalty'] as String,
+
       lateUserIds: List<String>.from(json['lateUserIds']),
       userLocations: (json['userLocations'] as Map<String, dynamic>?)?.map(
         (key, value) => MapEntry(key, UserLocationModel.fromJson(value)),
@@ -66,7 +66,7 @@ class PromiseModel {
       'memberIds': memberIds,
       'location': location.toJson(),
       'time': Timestamp.fromDate(time),
-      'penalty': penalty,
+
       'lateUserIds': lateUserIds,
       if (userLocations != null)
         'userLocations': userLocations!.map((k, v) => MapEntry(k, v.toJson())),

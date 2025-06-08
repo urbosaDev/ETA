@@ -130,7 +130,7 @@ class CreatePromiseViewModel extends GetxController {
         memberIds: selectedMemberIds.toList(),
         location: selectedLocation.value!,
         time: promiseTime.value!,
-        penalty: '',
+
         lateUserIds: [],
         userLocations: null,
         penaltySuggestions: {},
