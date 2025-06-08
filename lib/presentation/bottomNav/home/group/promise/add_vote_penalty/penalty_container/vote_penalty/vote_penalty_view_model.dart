@@ -239,11 +239,9 @@ class VotePenaltyViewModel extends GetxController {
   // VotePenalty ----------------------
   Future<bool> notifyPenalty() async {
     final content = '투표가 완료되어 벌칙이 생성되었습니다. 상단 벌칙 탭을 이용해 확인해보세요.';
-    final msg = MessageModel(
-      senderId: 'system',
-      text: content,
-      sentAt: DateTime.now(),
-    );
+
+    final msg = SystemMessageModel(text: content, sentAt: DateTime.now());
+
     try {
       await _promiseRepository.sendPromiseMessage(promiseId, msg);
       return true; // 성공적으로 알림 전송
