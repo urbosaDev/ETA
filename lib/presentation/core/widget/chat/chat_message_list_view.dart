@@ -23,11 +23,12 @@ class ChatMessageListView extends StatelessWidget {
         itemCount: messages.length,
         itemBuilder: (context, index) {
           final msg = messages[index];
-          final sender = userMap[msg.senderId];
           final isMe = msg.senderId == myUid;
 
-          // sender == null 일 경우는 fallback 처리
-          if (sender == null) {
+          final sender =
+              msg.type == MessageType.system ? null : userMap[msg.senderId];
+
+          if (sender == null && msg.type != MessageType.system) {
             return const SizedBox();
           }
 

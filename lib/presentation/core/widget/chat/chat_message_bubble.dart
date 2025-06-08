@@ -8,7 +8,7 @@ import 'package:what_is_your_eta/data/model/user_model.dart';
 class MessageBubble extends StatelessWidget {
   final MessageModel msg;
   final bool isMe;
-  final UserModel sender;
+  final UserModel? sender; // nullable로 변경
 
   const MessageBubble({
     super.key,
@@ -23,13 +23,15 @@ class MessageBubble extends StatelessWidget {
       case MessageType.text:
         return _buildTextBubble();
       case MessageType.system:
-        return _buildSystemBubble();
+        return _buildSystemBubble(); // sender 없어도 됨
       case MessageType.location:
         return _buildLocationBubble();
     }
   }
 
   Widget _buildTextBubble() {
+    if (sender == null) return const SizedBox();
+
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Column(
@@ -41,10 +43,10 @@ class MessageBubble extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 12,
-                  backgroundImage: NetworkImage(sender.photoUrl),
+                  backgroundImage: NetworkImage(sender!.photoUrl),
                 ),
                 const SizedBox(width: 4),
-                Text(sender.name, style: const TextStyle(fontSize: 12)),
+                Text(sender!.name, style: const TextStyle(fontSize: 12)),
               ],
             ),
           Container(
@@ -81,6 +83,8 @@ class MessageBubble extends StatelessWidget {
   }
 
   Widget _buildLocationBubble() {
+    if (sender == null) return const SizedBox();
+
     final locationMsg = msg as LocationMessageModel;
 
     return Align(
@@ -94,10 +98,10 @@ class MessageBubble extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 12,
-                  backgroundImage: NetworkImage(sender.photoUrl),
+                  backgroundImage: NetworkImage(sender!.photoUrl),
                 ),
                 const SizedBox(width: 4),
-                Text(sender.name, style: const TextStyle(fontSize: 12)),
+                Text(sender!.name, style: const TextStyle(fontSize: 12)),
               ],
             ),
           Container(
