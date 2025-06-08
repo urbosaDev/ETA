@@ -55,7 +55,7 @@ class PrivateChatRoomViewModel extends GetxController {
   Future<void> sendMessage(String content) async {
     if (content.trim().isEmpty) return;
 
-    final message = MessageModel(
+    final message = TextMessageModel(
       senderId: my.uid,
       text: content.trim(),
       sentAt: DateTime.now(),

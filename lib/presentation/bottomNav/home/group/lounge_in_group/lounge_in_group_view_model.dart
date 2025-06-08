@@ -103,7 +103,7 @@ class LoungeInGroupViewModel extends GetxController {
   }
 
   Future<void> sendMessage(String content) async {
-    final msg = MessageModel(
+    final msg = TextMessageModel(
       senderId: userModel.value!.uid,
       text: content,
       sentAt: DateTime.now(),
