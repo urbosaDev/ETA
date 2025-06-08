@@ -1,13 +1,12 @@
 import 'dart:async';
 
-import 'package:get/state_manager.dart';
+import 'package:get/get.dart';
+
 import 'package:what_is_your_eta/data/model/group_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
-
-enum HomeTab { chat, create, group }
 
 class HomeViewModel extends GetxController {
   final UserRepository _userRepository;
@@ -25,15 +24,7 @@ class HomeViewModel extends GetxController {
   final RxList<GroupModel> _groupList = <GroupModel>[].obs;
   List<GroupModel> get groupList => _groupList;
 
-  final selectedIndex = 0.obs; // 0: Chat, 1: Create, 2~: Groups
-
-  GroupModel? get selectedGroup {
-    final index = selectedIndex.value - 2;
-    if (index >= 0 && index < groupList.length) {
-      return groupList[index];
-    }
-    return null;
-  }
+  final selectedIndex = 0.obs; // 0: Chat, 1: Create
 
   StreamSubscription<UserModel>? _userSub;
 

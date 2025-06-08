@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:what_is_your_eta/data/model/group_model.dart';
+
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
+import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/create_group/create_group_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/create_group/create_group_view_model.dart';
@@ -29,10 +30,34 @@ class HomeView extends GetView<HomeViewModel> {
                 onDestinationSelected: (index) {
                   if (index == 1) {
                     showCreateGroupDialog(context);
-                  } else {
-                    // 이제 ViewModel 삭제는 GroupView 내부에서 처리됨. 여긴 index만 바꾸면 됨.
-                    controller.selectedIndex.value = index;
+                    return;
                   }
+
+                  if (index >= 2) {
+                    final group = controller.groupList[index - 2];
+
+                    Get.to(
+                      () => GroupView(),
+                      binding: BindingsBuilder(() {
+                        Get.put(
+                          GroupViewModel(
+                            group: group,
+                            groupRepository: Get.find<GroupRepository>(),
+                            userRepository: Get.find<UserRepository>(),
+                            authRepository: Get.find<AuthRepository>(),
+                            promiseRepository: Get.find<PromiseRepository>(),
+                          ),
+                        );
+                      }),
+                    );
+
+                    // 사이드바 index는 Chat으로 초기화
+                    controller.selectedIndex.value = 0;
+                    return;
+                  }
+
+                  // index == 0 (Chat)
+                  controller.selectedIndex.value = index;
                 },
                 labelType: NavigationRailLabelType.all,
                 destinations: [
@@ -59,27 +84,12 @@ class HomeView extends GetView<HomeViewModel> {
           Expanded(
             child: Obx(() {
               final index = controller.selectedIndex.value;
+
               if (index == 0) {
                 return const PrivateChatView();
-              } else if (index >= 2) {
-                final GroupModel? group = controller.selectedGroup;
-                if (group != null) {
-                  return GetBuilder(
-                    init: GroupViewModel(
-                      group: group,
-                      groupRepository: Get.find(),
-                      userRepository: Get.find(),
-                      authRepository: Get.find(),
-                      promiseRepository: Get.find(),
-                    ),
-                    autoRemove: true,
-                    builder: (controller) => GroupView(),
-                  );
-                }
-                return const Center(child: Text('존재하지 않는 그룹입니다.'));
-              } else {
-                return const Center(child: Text('선택된 뷰가 없습니다.'));
               }
+
+              return const Center(child: Text('그룹은 별도 화면에서 열립니다.'));
             }),
           ),
         ],
