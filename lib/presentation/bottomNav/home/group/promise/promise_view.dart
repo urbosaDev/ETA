@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
+import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/domain/usecase/%08geo_current_location_usecase.dart';
-import 'package:what_is_your_eta/domain/usecase/search_location_usecase.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/components/promise_tab_bar.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/location_share/location_share_view.dart';
@@ -50,10 +50,13 @@ class PromiseView extends GetView<PromiseViewModel> {
 
                             Get.lazyPut(
                               () => LocationShareModalViewModel(
+                                promiseId: controller.promiseId,
                                 getCurrentLocationUseCase:
                                     Get.find<GetCurrentLocationUseCase>(),
                                 locationRepository:
                                     Get.find<LocationRepository>(),
+                                promiseRepository:
+                                    Get.find<PromiseRepository>(),
                               ),
                             );
                             Get.dialog(LocationShareModalView());
