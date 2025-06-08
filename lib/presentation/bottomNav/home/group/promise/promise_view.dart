@@ -47,18 +47,13 @@ class PromiseView extends GetView<PromiseViewModel> {
                         ElevatedButton(
                           onPressed: () {
                             Get.lazyPut(() => GetCurrentLocationUseCase());
-                            Get.lazyPut(
-                              () => SearchLocationUseCase(
-                                locationRepository:
-                                    Get.find<LocationRepository>(),
-                              ),
-                            );
+
                             Get.lazyPut(
                               () => LocationShareModalViewModel(
                                 getCurrentLocationUseCase:
                                     Get.find<GetCurrentLocationUseCase>(),
-                                searchLocationUseCase:
-                                    Get.find<SearchLocationUseCase>(),
+                                locationRepository:
+                                    Get.find<LocationRepository>(),
                               ),
                             );
                             Get.dialog(LocationShareModalView());

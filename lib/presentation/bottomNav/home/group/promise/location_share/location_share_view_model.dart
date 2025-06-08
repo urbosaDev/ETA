@@ -1,17 +1,17 @@
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/location_model/user_location_model.dart';
+import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/domain/usecase/%08geo_current_location_usecase.dart';
-import 'package:what_is_your_eta/domain/usecase/search_location_usecase.dart';
 
 class LocationShareModalViewModel extends GetxController {
   final GetCurrentLocationUseCase _getCurrentLocationUseCase;
-  final SearchLocationUseCase _searchLocationUseCase;
+  final LocationRepository _locationRepository;
 
   LocationShareModalViewModel({
     required GetCurrentLocationUseCase getCurrentLocationUseCase,
-    required SearchLocationUseCase searchLocationUseCase,
+    required LocationRepository locationRepository,
   }) : _getCurrentLocationUseCase = getCurrentLocationUseCase,
-       _searchLocationUseCase = searchLocationUseCase;
+       _locationRepository = locationRepository;
 
   // final RxBool isSharing = false.obs;
 
@@ -21,23 +21,26 @@ class LocationShareModalViewModel extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _initCurrentLocation();
+    initCurrentLocation();
   }
 
-  Future<void> _initCurrentLocation() async {
+  Future<void> initCurrentLocation() async {
     try {
       isLoading.value = true;
 
       final pos = await _getCurrentLocationUseCase.fetchCurrentPosition();
-      final location = UserLocationModel(
-        latitude: pos.latitude,
-        longitude: pos.longitude,
-        address: '', // 현재는 빈 문자열로 초기화 (필요 시 reverse geocoding으로 주소 추가 가능)
-        updatedAt: DateTime.now(),
-      );
-      currentLocation.value = location;
+
+      final userLocation = await _locationRepository
+          .getUserAddressFromCoordinates(
+            latitude: pos.latitude,
+            longitude: pos.longitude,
+          );
+
+      currentLocation.value = userLocation;
+      print(currentLocation.value?.address);
+      print(currentLocation.value?.updatedAt);
     } catch (e) {
-      // print('현재 위치 가져오기 실패: $e');
+      currentLocation.value = null; // 에러 시 null 처리
     } finally {
       isLoading.value = false;
     }
