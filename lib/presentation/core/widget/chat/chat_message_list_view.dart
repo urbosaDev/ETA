@@ -26,13 +26,12 @@ class ChatMessageListView extends StatelessWidget {
           final sender = userMap[msg.senderId];
           final isMe = msg.senderId == myUid;
 
-          return ChatMessageBubble(
-            isMe: isMe,
-            isSystem: msg.senderId == 'system',
-            message: msg.text,
-            senderName: sender?.name,
-            senderPhotoUrl: sender?.photoUrl,
-          );
+          // sender == null 일 경우는 fallback 처리
+          if (sender == null) {
+            return const SizedBox();
+          }
+
+          return MessageBubble(msg: msg, isMe: isMe, sender: sender);
         },
       ),
     );
