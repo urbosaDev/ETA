@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/location_model/promise_location_model.dart';
 import 'package:what_is_your_eta/data/model/location_model/user_location_model.dart';
+import 'package:what_is_your_eta/data/model/message_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
@@ -106,11 +107,6 @@ class LocationShareModalViewModel extends GetxController {
     } else {}
   }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
   Future<void> updateUserLocation() async {
     final currentUid = _authRepository.getCurrentUid();
     if (currentUid == null) {
@@ -122,16 +118,41 @@ class LocationShareModalViewModel extends GetxController {
       errorMessage.value = '현재 위치 정보를 불러올 수 없습니다.';
       return;
     }
+
     try {
       isUpdating.value = true;
+
+      // Firestore userLocations 업데이트
       await _promiseRepository.updateUserLocation(
         promiseId: promiseId,
         uid: currentUid,
         userLocation: sendCurrentLocation,
       );
-      successMessage.value = '위치가 성공적으로 업데이트되었습니다.';
+
+      // 채팅방에 위치 메시지 전송
+      final promiseLoc = promiseLocation.value;
+      String extraText = '';
+      if (promiseLoc != null) {
+        final distance = distanceToPromiseMeters.value;
+        extraText =
+            '(${sendCurrentLocation.address}, 거리: ${distance.toStringAsFixed(1)} m)';
+      } else {
+        extraText = sendCurrentLocation.address;
+      }
+
+      final locationMessage = LocationMessageModel(
+        location: sendCurrentLocation,
+        senderId: currentUid,
+        sentAt: DateTime.now(),
+        text: '위치공유 $extraText',
+        readBy: [],
+      );
+
+      await _promiseRepository.sendPromiseMessage(promiseId, locationMessage);
+
+      successMessage.value = '위치가 성공적으로 업데이트 및 공유되었습니다.';
     } catch (e) {
-      errorMessage.value = '위치 업데이트 실패: $e';
+      errorMessage.value = '위치 업데이트/공유 실패: $e';
       return;
     } finally {
       isUpdating.value = false;
@@ -150,3 +171,5 @@ class LocationShareModalViewModel extends GetxController {
 // 현재 유저를 불러와야함. userModel을 불러올 필요는 없고 auth 사용 
 // 무엇을 공유해야하나 ? -> currentLocation , 거리도 추가. 
 // UseCase 분리 , 그리고 거리는 업데이트하지말고 그때그때 계산 
+
+// 도착버튼, 애초에 도착버튼을 안찍으면 지각임. 

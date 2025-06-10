@@ -26,7 +26,9 @@ class PromiseService {
 
   /// 실시간 구독
   Stream<Map<String, dynamic>> streamPromise(String promiseId) {
-    return _promiseRef.doc(promiseId).snapshots().map((doc) => doc.data()!);
+    return _promiseRef.doc(promiseId).snapshots().map((doc) {
+      return doc.data()!;
+    });
   }
 
   /// 삭제
