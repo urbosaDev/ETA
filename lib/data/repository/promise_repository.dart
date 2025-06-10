@@ -1,3 +1,4 @@
+import 'package:what_is_your_eta/data/model/location_model/user_location_model.dart';
 import 'package:what_is_your_eta/data/model/message_model.dart';
 import 'package:what_is_your_eta/data/model/penalty_model.dart';
 import 'package:what_is_your_eta/data/model/promise_model.dart';
@@ -30,6 +31,11 @@ abstract class PromiseRepository {
   Future<void> setSelectedPenalty({
     required String promiseId,
     required Penalty penalty,
+  });
+  Future<void> updateUserLocation({
+    required String promiseId,
+    required String uid,
+    required UserLocationModel userLocation,
   });
   // Future<void> updatePenaltyVoters({
   //   required String promiseId,
@@ -188,6 +194,18 @@ class PromiseRepositoryImpl implements PromiseRepository {
     );
   }
 
+  @override
+  Future<void> updateUserLocation({
+    required String promiseId,
+    required String uid,
+    required UserLocationModel userLocation,
+  }) async {
+    await _service.updateUserLocation(
+      promiseId: promiseId,
+      uid: uid,
+      userLocationJson: userLocation.toJson(), // 여기서만 변환
+    );
+  }
   // @override
   // Future<void> updatePenaltyVoters({
   //   required String promiseId,

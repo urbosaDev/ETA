@@ -111,6 +111,15 @@ class PromiseService {
     await _promiseRef.doc(promiseId).update({'selectedPenalty': penaltyJson});
   }
 
+  Future<void> updateUserLocation({
+    required String promiseId,
+    required String uid,
+    required Map<String, dynamic> userLocationJson,
+  }) async {
+    await _promiseRef.doc(promiseId).update({
+      'userLocations.$uid': userLocationJson,
+    });
+  }
   // Future<void> updatePenaltyVoters({
   //   required String promiseId,
   //   required List<String> voterUids,

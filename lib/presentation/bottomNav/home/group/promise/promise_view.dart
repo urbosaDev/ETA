@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/domain/usecase/%08geo_current_location_usecase.dart';
@@ -57,6 +58,7 @@ class PromiseView extends GetView<PromiseViewModel> {
                                     Get.find<LocationRepository>(),
                                 promiseRepository:
                                     Get.find<PromiseRepository>(),
+                                authRepository: Get.find<AuthRepository>(),
                               ),
                             );
                             Get.dialog(LocationShareModalView());

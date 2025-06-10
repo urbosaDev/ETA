@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/location_model/promise_location_model.dart';
 import 'package:what_is_your_eta/data/model/location_model/user_location_model.dart';
+import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/domain/usecase/%08geo_current_location_usecase.dart';
@@ -12,15 +13,18 @@ class LocationShareModalViewModel extends GetxController {
   final GetCurrentLocationUseCase _getCurrentLocationUseCase;
   final LocationRepository _locationRepository;
   final PromiseRepository _promiseRepository;
+  final AuthRepository _authRepository;
 
   LocationShareModalViewModel({
     required this.promiseId,
     required GetCurrentLocationUseCase getCurrentLocationUseCase,
     required LocationRepository locationRepository,
     required PromiseRepository promiseRepository,
+    required AuthRepository authRepository,
   }) : _getCurrentLocationUseCase = getCurrentLocationUseCase,
        _locationRepository = locationRepository,
-       _promiseRepository = promiseRepository;
+       _promiseRepository = promiseRepository,
+       _authRepository = authRepository;
 
   // final RxBool isSharing = false.obs;
 
@@ -30,6 +34,10 @@ class LocationShareModalViewModel extends GetxController {
     null,
   );
   final RxDouble distanceToPromiseMeters = 0.0.obs;
+
+  final RxString successMessage = ''.obs;
+  final RxString errorMessage = ''.obs;
+  final RxBool isUpdating = false.obs;
 
   @override
   void onInit() {
@@ -133,4 +141,43 @@ class LocationShareModalViewModel extends GetxController {
   double _degreesToRadians(double degree) {
     return degree * pi / 180;
   }
+
+  Future<void> updateUserLocation() async {
+    final currentUid = _authRepository.getCurrentUid();
+    if (currentUid == null) {
+      errorMessage.value = '사용자 정보를 불러올 수 없습니다.';
+      return;
+    }
+    final sendCurrentLocation = this.currentLocation.value;
+    if (sendCurrentLocation == null) {
+      errorMessage.value = '현재 위치 정보를 불러올 수 없습니다.';
+      return;
+    }
+    try {
+      isUpdating.value = true;
+      await _promiseRepository.updateUserLocation(
+        promiseId: promiseId,
+        uid: currentUid,
+        userLocation: sendCurrentLocation,
+      );
+      successMessage.value = '위치가 성공적으로 업데이트되었습니다.';
+    } catch (e) {
+      errorMessage.value = '위치 업데이트 실패: $e';
+      return;
+    } finally {
+      isUpdating.value = false;
+    }
+  }
+
+  void clearMessages() {
+    successMessage.value = '';
+    errorMessage.value = '';
+  }
 }
+
+// 위치공유 버튼 하나만 만들기 
+// 1. 업데이트를 하는 버튼, 
+//  final Map<String, UserLocationModel>? userLocations; 를 업데이트 해야함. 
+// 현재 유저를 불러와야함. userModel을 불러올 필요는 없고 auth 사용 
+// 무엇을 공유해야하나 ? -> currentLocation , 거리도 추가. 
+// UseCase 분리 , 그리고 거리는 업데이트하지말고 그때그때 계산 
