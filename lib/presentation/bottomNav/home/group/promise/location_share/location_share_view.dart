@@ -3,14 +3,24 @@ import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/location_share/location_share_view_model.dart';
 
-class LocationShareModalView extends GetView<LocationShareModalViewModel> {
-  const LocationShareModalView({super.key});
+class LocationShareView extends GetView<LocationShareViewModel> {
+  const LocationShareView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: SizedBox(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('위치 공유'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () {
+              Get.back();
+            },
+          ),
+        ],
+      ),
+      body: SizedBox(
         width: MediaQuery.of(context).size.width * 0.9,
         height: MediaQuery.of(context).size.height * 0.7,
         child: Stack(

@@ -8,7 +8,7 @@ import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/domain/usecase/%08geo_current_location_usecase.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/location_share/calculate_distance_usecase.dart';
 
-class LocationShareModalViewModel extends GetxController {
+class LocationShareViewModel extends GetxController {
   final String promiseId;
   final GetCurrentLocationUseCase _getCurrentLocationUseCase;
   final LocationRepository _locationRepository;
@@ -16,7 +16,7 @@ class LocationShareModalViewModel extends GetxController {
   final AuthRepository _authRepository;
   final CalculateDistanceUseCase _calculateDistanceUseCase;
 
-  LocationShareModalViewModel({
+  LocationShareViewModel({
     required this.promiseId,
     required GetCurrentLocationUseCase getCurrentLocationUseCase,
     required LocationRepository locationRepository,

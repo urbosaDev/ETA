@@ -48,23 +48,31 @@ class PromiseView extends GetView<PromiseViewModel> {
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            Get.lazyPut(() => GetCurrentLocationUseCase());
-                            Get.lazyPut(() => CalculateDistanceUseCase());
-                            Get.lazyPut(
-                              () => LocationShareModalViewModel(
-                                promiseId: controller.promiseId,
-                                getCurrentLocationUseCase:
-                                    Get.find<GetCurrentLocationUseCase>(),
-                                locationRepository:
-                                    Get.find<LocationRepository>(),
-                                promiseRepository:
-                                    Get.find<PromiseRepository>(),
-                                authRepository: Get.find<AuthRepository>(),
-                                calculateDistanceUseCase:
-                                    Get.find<CalculateDistanceUseCase>(),
-                              ),
+                            Get.to(
+                              () =>
+                                  const LocationShareView(), // 기존에 LocationShareModalView 대신 LocationShareView (Screen용으로 만들면 됨)
+                              binding: BindingsBuilder(() {
+                                Get.lazyPut(() => GetCurrentLocationUseCase());
+                                Get.lazyPut(() => CalculateDistanceUseCase());
+                                Get.lazyPut(
+                                  () => LocationShareViewModel(
+                                    promiseId: controller.promiseId,
+                                    getCurrentLocationUseCase:
+                                        Get.find<GetCurrentLocationUseCase>(),
+                                    locationRepository:
+                                        Get.find<LocationRepository>(),
+                                    promiseRepository:
+                                        Get.find<PromiseRepository>(),
+                                    authRepository: Get.find<AuthRepository>(),
+                                    calculateDistanceUseCase:
+                                        Get.find<CalculateDistanceUseCase>(),
+                                  ),
+                                );
+                              }),
+                              transition:
+                                  Transition.downToUp, // (선택) 모달 느낌 주고 싶으면
+                              fullscreenDialog: true, // (선택) 모달처럼 보이게 할거면 true
                             );
-                            Get.dialog(LocationShareModalView());
                           },
                           child: const Text('위치 공유'),
                         ),
