@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
+import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/domain/usecase/%08geo_current_location_usecase.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/components/promise_tab_bar.dart';
@@ -66,6 +67,7 @@ class PromiseView extends GetView<PromiseViewModel> {
                                     authRepository: Get.find<AuthRepository>(),
                                     calculateDistanceUseCase:
                                         Get.find<CalculateDistanceUseCase>(),
+                                    userRepository: Get.find<UserRepository>(),
                                   ),
                                 );
                               }),

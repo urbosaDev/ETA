@@ -8,6 +8,7 @@ import 'package:what_is_your_eta/data/model/promise_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
+import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/domain/usecase/%08geo_current_location_usecase.dart';
 import 'package:what_is_your_eta/domain/usecase/calculate_distance_usecase.dart';
 
@@ -18,6 +19,7 @@ class LocationShareViewModel extends GetxController {
   final PromiseRepository _promiseRepository;
   final AuthRepository _authRepository;
   final CalculateDistanceUseCase _calculateDistanceUseCase;
+  final UserRepository _userRepository;
 
   LocationShareViewModel({
     required this.promiseId,
@@ -26,11 +28,13 @@ class LocationShareViewModel extends GetxController {
     required PromiseRepository promiseRepository,
     required AuthRepository authRepository,
     required CalculateDistanceUseCase calculateDistanceUseCase,
+    required UserRepository userRepository,
   }) : _getCurrentLocationUseCase = getCurrentLocationUseCase,
        _locationRepository = locationRepository,
        _promiseRepository = promiseRepository,
        _authRepository = authRepository,
-       _calculateDistanceUseCase = calculateDistanceUseCase;
+       _calculateDistanceUseCase = calculateDistanceUseCase,
+       _userRepository = userRepository;
 
   // final RxBool isSharing = false.obs;
 
@@ -225,6 +229,14 @@ class LocationShareViewModel extends GetxController {
         promiseId: promise.value!.id,
         currentUid: currentUid,
       );
+      final user = await _userRepository.getUser(currentUid);
+
+      final systemMessage = SystemMessageModel(
+        text: '🎉 ${user?.name ?? '익명 사용자'}님이 도착했습니다!',
+        sentAt: DateTime.now(),
+      );
+
+      await _promiseRepository.sendPromiseMessage(promiseId, systemMessage);
 
       successMessage.value = '도착이 성공적으로 기록되었습니다.';
     } catch (e) {
