@@ -122,19 +122,35 @@ class PromiseService {
       'userLocations.$uid': userLocationJson,
     });
   }
-  // Future<void> updatePenaltyVoters({
-  //   required String promiseId,
-  //   required List<String> voterUids,
-  // }) async {
-  //   await _promiseRef.doc(promiseId).update({'penaltyVoterUids': voterUids});
-  // }
 
-  // Future<void> updatePenaltySuggesters({
-  //   required String promiseId,
-  //   required List<String> suggesterUids,
-  // }) async {
-  //   await _promiseRef.doc(promiseId).update({
-  //     'penaltySuggesterUids': suggesterUids,
-  //   });
-  // }
+  Future<void> updateArriveUserIds({
+    required String promiseId,
+    required List<String> arriveUserIds,
+  }) async {
+    await _promiseRef.doc(promiseId).update({'arriveUserIds': arriveUserIds});
+  }
+
+  Future<void> addArriveUserIdIfNotExists({
+    required String promiseId,
+    required String currentUid,
+  }) async {
+    await _promiseRef.doc(promiseId).update({
+      'arriveUserIds': FieldValue.arrayUnion([currentUid]),
+    });
+    // Future<void> updatePenaltyVoters({
+    //   required String promiseId,
+    //   required List<String> voterUids,
+    // }) async {
+    //   await _promiseRef.doc(promiseId).update({'penaltyVoterUids': voterUids});
+    // }
+
+    // Future<void> updatePenaltySuggesters({
+    //   required String promiseId,
+    //   required List<String> suggesterUids,
+    // }) async {
+    //   await _promiseRef.doc(promiseId).update({
+    //     'penaltySuggesterUids': suggesterUids,
+    //   });
+    // }
+  }
 }

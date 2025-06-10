@@ -6,7 +6,7 @@ import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/domain/usecase/%08geo_current_location_usecase.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/components/promise_tab_bar.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/location_share/calculate_distance_usecase.dart';
+import 'package:what_is_your_eta/domain/usecase/calculate_distance_usecase.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/location_share/location_share_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/location_share/location_share_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_view_model.dart';

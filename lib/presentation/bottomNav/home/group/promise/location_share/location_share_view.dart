@@ -66,8 +66,22 @@ class LocationShareView extends GetView<LocationShareViewModel> {
                         },
                         child: const Text('위치공유'),
                       ),
-                      ElevatedButton(onPressed: () {}, child: const Text('도착')),
+                      ElevatedButton(
+                        onPressed: () async {
+                          await controller.arriveLocation();
+                        },
+                        child: const Text('도착'),
+                      ),
                     ],
+                  ),
+                  Obx(
+                    () =>
+                        controller.isAlreadyArrived.value
+                            ? const Text(
+                              '도착 완료',
+                              style: TextStyle(color: Colors.red, fontSize: 14),
+                            )
+                            : const SizedBox(),
                   ),
                 ],
               ),

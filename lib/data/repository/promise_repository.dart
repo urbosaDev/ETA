@@ -37,6 +37,10 @@ abstract class PromiseRepository {
     required String uid,
     required UserLocationModel userLocation,
   });
+  Future<void> addArriveUserIdIfNotExists({
+    required String promiseId,
+    required String currentUid,
+  });
   // Future<void> updatePenaltyVoters({
   //   required String promiseId,
   //   required List<String> voterUids,
@@ -204,6 +208,17 @@ class PromiseRepositoryImpl implements PromiseRepository {
       promiseId: promiseId,
       uid: uid,
       userLocationJson: userLocation.toJson(), // 여기서만 변환
+    );
+  }
+
+  @override
+  Future<void> addArriveUserIdIfNotExists({
+    required String promiseId,
+    required String currentUid,
+  }) async {
+    await _service.addArriveUserIdIfNotExists(
+      promiseId: promiseId,
+      currentUid: currentUid,
     );
   }
   // @override

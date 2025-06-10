@@ -1,12 +1,15 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/location_model/promise_location_model.dart';
 import 'package:what_is_your_eta/data/model/location_model/user_location_model.dart';
 import 'package:what_is_your_eta/data/model/message_model.dart';
+import 'package:what_is_your_eta/data/model/promise_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/domain/usecase/%08geo_current_location_usecase.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/location_share/calculate_distance_usecase.dart';
+import 'package:what_is_your_eta/domain/usecase/calculate_distance_usecase.dart';
 
 class LocationShareViewModel extends GetxController {
   final String promiseId;
@@ -37,15 +40,17 @@ class LocationShareViewModel extends GetxController {
     null,
   );
   final RxDouble distanceToPromiseMeters = 0.0.obs;
-
+  final Rx<PromiseModel?> promise = Rx<PromiseModel?>(null);
   final RxString successMessage = ''.obs;
   final RxString errorMessage = ''.obs;
   final RxBool isUpdating = false.obs;
-
+  StreamSubscription<PromiseModel>? _promiseSub;
+  final RxBool isAlreadyArrived = false.obs;
   @override
   void onInit() {
     super.onInit();
     fetchLocationData();
+    fetchPromise();
   }
 
   Future<void> fetchLocationData() async {
@@ -78,6 +83,22 @@ class LocationShareViewModel extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<void> fetchPromise() async {
+    final uid = _authRepository.getCurrentUid();
+    promise.value = await _promiseRepository.getPromise(promiseId);
+    _updateIsAlreadyArrived(uid);
+
+    _promiseSub = _promiseRepository.streamPromise(promiseId).listen((p) {
+      promise.value = p;
+      _updateIsAlreadyArrived(uid);
+    });
+  }
+
+  void _updateIsAlreadyArrived(String? uid) {
+    isAlreadyArrived.value =
+        promise.value?.arriveUserIds.contains(uid) ?? false;
   }
 
   Future<void> initCurrentLocation() async {
@@ -156,6 +177,58 @@ class LocationShareViewModel extends GetxController {
       return;
     } finally {
       isUpdating.value = false;
+    }
+  }
+
+  Future<void> arriveLocation() async {
+    // 거리 확인
+    // 약속시간 확인,
+    // 해당하면 업데이트
+    // promise 내에 lateUserIds -> arriveUserIds 로 변경
+    final currentUid = _authRepository.getCurrentUid();
+    if (isAlreadyArrived.value) {
+      errorMessage.value = '이미 도착하셨습니다.';
+      return;
+    }
+    if (currentUid == null) {
+      errorMessage.value = '사용자 정보를 불러올 수 없습니다.';
+      return;
+    }
+
+    final distance = distanceToPromiseMeters.value;
+    if (distance > 100) {
+      errorMessage.value =
+          '약속 장소에 도착하지 않았습니다. 거리: ${distance.toStringAsFixed(1)} m';
+      return;
+    }
+
+    final currentPromiseTime = promise.value?.time;
+    if (currentPromiseTime == null) {
+      errorMessage.value = '약속 시간을 불러올 수 없습니다.';
+      return;
+    }
+
+    final now = DateTime.now();
+
+    if (currentPromiseTime.isBefore(now)) {
+      errorMessage.value = '약속 시간이 지났습니다. 도착할 수 없습니다.';
+      return;
+    }
+
+    if (now.isBefore(currentPromiseTime.subtract(const Duration(hours: 1)))) {
+      errorMessage.value = '약속 1시간 전부터 도착 확인이 가능합니다.';
+      return;
+    }
+
+    try {
+      await _promiseRepository.addArriveUserIdIfNotExists(
+        promiseId: promise.value!.id,
+        currentUid: currentUid,
+      );
+
+      successMessage.value = '도착이 성공적으로 기록되었습니다.';
+    } catch (e) {
+      errorMessage.value = '도착 기록 중 오류 발생: $e';
     }
   }
 
