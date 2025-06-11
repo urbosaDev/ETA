@@ -1,4 +1,4 @@
-import 'package:what_is_your_eta/data/service/fcm_service.dart';
+import 'package:what_is_your_eta/data/service/fcm_token_service.dart';
 
 abstract interface class TokenRepository {
   Future<void> saveFcmToken();

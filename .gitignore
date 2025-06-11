@@ -61,3 +61,6 @@ flutter_export_environment.sh
 
 .puml
 /out
+
+# Service Account Key
+assets/keys/*.json
