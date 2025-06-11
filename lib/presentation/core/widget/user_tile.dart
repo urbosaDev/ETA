@@ -17,8 +17,7 @@ class UserTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor =
-        isSelected ? Colors.deepPurple.withOpacity(0.2) : Colors.transparent;
+    final backgroundColor = isSelected ? Colors.deepPurple : Colors.transparent;
 
     return GestureDetector(
       onTap: onTap,
@@ -30,9 +29,12 @@ class UserTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween, // ✅ 핵심
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CircleAvatar(
                   radius: 20,
@@ -61,7 +63,7 @@ class UserTile extends StatelessWidget {
                 ),
               ],
             ),
-            if (trailing != null) trailing!, // ✅ 우측 위젯
+            if (trailing != null) trailing!,
           ],
         ),
       ),
