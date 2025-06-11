@@ -6,9 +6,11 @@ import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
+
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/data/service/auth_service.dart';
 import 'package:what_is_your_eta/data/service/chat_service.dart';
+
 import 'package:what_is_your_eta/data/service/group_service.dart';
 import 'package:what_is_your_eta/data/service/local_map_api_service.dart';
 
@@ -37,6 +39,7 @@ class DependencyInjection {
       permanent: true,
     );
     Get.put<PromiseService>(PromiseService(), permanent: true);
+
     Get.put<GroupRepository>(
       GroupRepositoryImpl(Get.find<GroupService>()),
       permanent: true,
