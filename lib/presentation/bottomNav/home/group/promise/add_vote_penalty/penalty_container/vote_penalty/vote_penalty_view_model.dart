@@ -5,6 +5,7 @@ import 'package:what_is_your_eta/data/model/message_model.dart';
 import 'package:what_is_your_eta/data/model/promise_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
+import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/model/member_with_suggestion_vote_status.dart';
@@ -239,14 +240,37 @@ class VotePenaltyViewModel extends GetxController {
   // VotePenalty ----------------------
   Future<bool> notifyPenalty() async {
     final content = '투표가 완료되어 벌칙이 생성되었습니다. 상단 벌칙 탭을 이용해 확인해보세요.';
-
     final msg = SystemMessageModel(text: content, sentAt: DateTime.now());
 
     try {
+      // 1️⃣ Promise Chat에 메시지 저장 (실패시 throw → 여기서 잡음)
       await _promiseRepository.sendPromiseMessage(promiseId, msg);
-      return true; // 성공적으로 알림 전송
+
+      // 2️⃣ FCM 발송 시도
+      try {
+        final memberUidsSnapshot = promise.value?.memberIds.toList() ?? [];
+        final currentUid = userModel.value?.uid;
+
+        for (final memberUid in memberUidsSnapshot) {
+          // 본인 제외
+          if (memberUid == currentUid) continue;
+
+          final tokens = await _userRepository.getFcmTokens(memberUid);
+          if (tokens.isNotEmpty) {
+            await Get.find<FcmRepository>().sendPromiseNotification(
+              targetTokens: tokens,
+              title: '벌칙 확정!',
+              body: content,
+            );
+          }
+        }
+      } catch (e) {
+        print('❌ 벌칙 확정 FCM 전송 실패: $e');
+      }
+
+      return true;
     } catch (e) {
-      return false; // 알림 전송 실패
+      return false;
     }
   }
 
