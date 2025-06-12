@@ -4,11 +4,13 @@ import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/message_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
+import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 
 class PrivateChatRoomViewModel extends GetxController {
   final ChatRepository _chatRepository;
   final UserRepository _userRepository;
+  final FcmRepository _fcmRepository;
   final String chatRoomId;
   final UserModel my;
   final String friendUid; // ❗️이제는 uid만 받기
@@ -16,11 +18,13 @@ class PrivateChatRoomViewModel extends GetxController {
   PrivateChatRoomViewModel({
     required ChatRepository chatRepository,
     required UserRepository userRepository,
+    required FcmRepository fcmRepository,
     required this.chatRoomId,
     required this.my,
     required this.friendUid,
   }) : _chatRepository = chatRepository,
-       _userRepository = userRepository;
+       _userRepository = userRepository,
+       _fcmRepository = fcmRepository;
 
   final RxList<MessageModel> messages = <MessageModel>[].obs;
   final Rxn<UserModel> friendModel = Rxn<UserModel>();
