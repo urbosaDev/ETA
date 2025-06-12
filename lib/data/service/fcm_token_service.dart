@@ -26,7 +26,7 @@ class FcmTokenService {
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
-    print('✅ FCM Token 저장됨: $token');
+    print('FCM Token 저장됨: $token');
   }
 
   // FCM Token 삭제 (로그아웃 시 사용)
@@ -45,7 +45,7 @@ class FcmTokenService {
 
     await fcmTokenDoc.delete();
 
-    print('🗑️ FCM Token 삭제됨: $token');
+    print('FCM Token 삭제됨: $token');
   }
 
   // FCM Token refresh 대응 → app 실행 시 listen 등록
@@ -65,7 +65,7 @@ class FcmTokenService {
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
-      print('🆕 FCM Token 갱신됨: $newToken');
+      print('FCM Token 갱신됨: $newToken');
     });
   }
 }
