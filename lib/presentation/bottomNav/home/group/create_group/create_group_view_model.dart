@@ -126,10 +126,10 @@ class CreateGroupViewModel extends GetxController {
 
       await _groupRepository.sendGroupMessage(groupId, systemMessage);
       // FCM 발송
+
       try {
-        // 멤버들의 토큰 가져오기 (본인은 제외 가능)
         for (final memberUid in finalSelectedUid) {
-          if (memberUid == currentUser) continue; // 본인 제외 (원하면 포함 가능)
+          if (memberUid == currentUser) continue;
 
           final tokens = await _userRepository.getFcmTokens(memberUid);
           if (tokens.isNotEmpty) {

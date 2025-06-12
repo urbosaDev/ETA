@@ -63,7 +63,7 @@ class SelectLocationView extends StatelessWidget {
             child: Stack(
               children: [
                 NaverMap(
-                  key: UniqueKey(),
+                  // key: UniqueKey(),
                   options: const NaverMapViewOptions(),
                   onMapReady: controller.onMapReady,
                 ),
@@ -75,7 +75,10 @@ class SelectLocationView extends StatelessWidget {
                       final selected = controller.selectedLocation.value;
                       return selected != null
                           ? ElevatedButton(
-                            onPressed: () {
+                            onPressed: () async {
+                              await Future.delayed(
+                                const Duration(milliseconds: 100),
+                              );
                               Get.back(
                                 result: controller.selectedLocation.value,
                               );

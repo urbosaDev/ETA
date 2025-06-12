@@ -90,7 +90,10 @@ class CreatePromiseView extends GetView<CreatePromiseViewModel> {
                         onPressed: () {
                           final group = controller.groupModel.value;
                           if (group != null) {
-                            controller.fetchMembers(group.memberIds);
+                            controller.fetchMembers(
+                              group.memberIds,
+                              clearSelection: true,
+                            ); // 명시적
                           }
                         },
                         icon: const Text('↻'),

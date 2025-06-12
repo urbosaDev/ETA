@@ -59,12 +59,23 @@ class FcmService {
     Map<String, String>? data,
   }) async {
     final accessToken = await _getAccessToken();
+    final nowMillis = DateTime.now().millisecondsSinceEpoch.toString();
+    final augmentedData = {...(data ?? {}), 'unique_timestamp': nowMillis};
 
     final messagePayload = {
       'message': {
         'token': targetToken,
         'notification': {'title': title, 'body': body},
-        'data': data ?? {},
+        'data': augmentedData,
+        'apns': {
+          'headers': {'apns-priority': '10', 'apns-push-type': 'alert'},
+          'payload': {
+            'aps': {
+              'alert': {'title': title, 'body': body},
+              'sound': 'default',
+            },
+          },
+        },
       },
     };
 

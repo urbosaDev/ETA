@@ -41,9 +41,12 @@ class SelectLocationViewModel extends GetxController {
   @override
   void onClose() {
     if (_mapReady) {
-      _mapController.dispose();
+      try {
+        _mapController.dispose();
+      } catch (e) {
+        print('⚠️ NaverMap dispose 중 오류 무시: $e');
+      }
     }
-    super.onClose();
   }
 
   Future<void> _initCurrentLocation() async {

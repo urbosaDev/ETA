@@ -35,18 +35,18 @@ class DependencyInjection {
     Get.put<PrivateChatService>(PrivateChatService(), permanent: true);
     Get.put<GroupChatService>(GroupChatService(), permanent: true);
     Get.put<PromiseChatService>(PromiseChatService(), permanent: true);
-    // Get.lazyPut<FcmService>(() => FcmService());
 
     Get.put<FcmRepository>(
       FcmRepositoryImpl(fcmService: Get.find<FcmService>()),
       permanent: true,
     );
 
-    Get.lazyPut<FcmTokenService>(() => FcmTokenService());
-
-    Get.lazyPut<TokenRepository>(
-      () => FcmTokenRepositoryImpl(Get.find<FcmTokenService>()),
+    Get.put<FcmTokenService>(FcmTokenService(), permanent: true);
+    Get.put<TokenRepository>(
+      FcmTokenRepositoryImpl(Get.find<FcmTokenService>()),
+      permanent: true,
     );
+
     Get.put<LocalMapApiService>(
       KakaoMapLocalApiService(
         client: http.Client(),
