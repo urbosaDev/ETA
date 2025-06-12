@@ -7,16 +7,13 @@ class SettingView extends GetView<SettingViewModel> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Setting')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            controller.signOut();
-            Get.offNamed('/login');
-          },
-          child: const Text('Sign Out'),
-        ),
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {
+          controller.signOut();
+          Get.offNamed('/login');
+        },
+        child: const Text('Sign Out'),
       ),
     );
   }

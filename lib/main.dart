@@ -87,7 +87,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      scaffoldMessengerKey: scaffoldMessengerKey,
       title: 'What is your ETA',
       theme: ThemeData(primarySwatch: Colors.blue),
       initialRoute: Routes.splash,

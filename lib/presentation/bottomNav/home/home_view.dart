@@ -17,9 +17,8 @@ class HomeView extends GetView<HomeViewModel> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
-      body: Row(
+    return SafeArea(
+      child: Row(
         children: [
           // 사이드바
           SizedBox(

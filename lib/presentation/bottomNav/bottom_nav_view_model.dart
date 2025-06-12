@@ -1,4 +1,3 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/state_manager.dart';
 import 'package:what_is_your_eta/data/repository/token_repository.dart';
 
@@ -11,7 +10,6 @@ class BottomNavViewModel extends GetxController {
     currentIndex.value = index;
   }
 
-  final Rxn<Map<String, String>> fcmNotification = Rxn<Map<String, String>>();
   @override
   void onInit() {
     super.onInit();
@@ -21,16 +19,6 @@ class BottomNavViewModel extends GetxController {
 
     // 최초 저장
     _tokenRepository.saveFcmToken();
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      final title = message.notification?.title ?? '';
-      final body = message.notification?.body ?? '';
-
-      print('✅ FCM 포그라운드 수신 → $title - $body');
-
-      // 상태 변경 → View에서 감지해서 Snackbar 띄울 수 있도록
-      fcmNotification.value = {'title': title, 'body': body};
-    });
   }
 
   @override
