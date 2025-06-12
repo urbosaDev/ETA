@@ -22,10 +22,12 @@ import 'package:what_is_your_eta/data/service/promise_service.dart';
 import 'package:what_is_your_eta/data/service/user_service.dart';
 
 class DependencyInjection {
-  static void init() {
+  static Future<void> init() async {
     final kakaoApiKey = dotenv.env['KAKAO_REST_API_KEY']!;
     final kakaoBaseUrl = dotenv.env['KAKAO_BASE_URL']!;
-
+    final fcmService = FcmService();
+    await fcmService.init();
+    Get.put<FcmService>(fcmService, permanent: true);
     Get.put<AuthService>(AuthService(), permanent: true);
     Get.put<UserService>(UserService(), permanent: true);
     Get.put<GroupService>(GroupService(), permanent: true);
@@ -33,7 +35,7 @@ class DependencyInjection {
     Get.put<PrivateChatService>(PrivateChatService(), permanent: true);
     Get.put<GroupChatService>(GroupChatService(), permanent: true);
     Get.put<PromiseChatService>(PromiseChatService(), permanent: true);
-    Get.lazyPut<FcmService>(() => FcmService());
+    // Get.lazyPut<FcmService>(() => FcmService());
 
     Get.put<FcmRepository>(
       FcmRepositoryImpl(fcmService: Get.find<FcmService>()),

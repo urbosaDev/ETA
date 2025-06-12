@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:what_is_your_eta/main.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/home_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/bottom_nav_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/notification/notification_view.dart';
@@ -12,6 +13,18 @@ class BottomNavView extends GetView<BottomNavViewModel> {
   Widget build(BuildContext context) {
     return Obx(() {
       final index = controller.currentIndex.value;
+      final fcmNotif = controller.fcmNotification.value;
+
+      if (fcmNotif != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          scaffoldMessengerKey.currentState?.showSnackBar(
+            SnackBar(
+              content: Text('${fcmNotif['title']} - ${fcmNotif['body']}'),
+            ),
+          );
+          controller.fcmNotification.value = null;
+        });
+      }
 
       return Scaffold(
         body: IndexedStack(

@@ -9,6 +9,7 @@ import 'package:what_is_your_eta/core/dependency/dependency_injection.dart';
 import 'package:what_is_your_eta/firebase_options.dart';
 import 'package:what_is_your_eta/routes/app_routes.dart';
 
+@pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print('✅ 백그라운드 메시지 수신: ${message.messageId}');
@@ -30,16 +31,8 @@ Future<void> _requestNotificationPermission() async {
   print('🔔 User granted permission: ${settings.authorizationStatus}');
 }
 
-void _setupForegroundMessageListener() {
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print('✅ 포그라운드 메시지 수신: ${message.messageId}');
-    if (message.notification != null) {
-      print(
-        '📢 Notification: ${message.notification?.title} - ${message.notification?.body}',
-      );
-    }
-  });
-}
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 void _printDeviceFCMToken() async {
   String? token = await FirebaseMessaging.instance.getToken();
@@ -49,7 +42,6 @@ void _printDeviceFCMToken() async {
 void _setupTokenRefreshListener() {
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
     print('🆕 FCM Token refreshed: $newToken');
-    // → 서버에 등록 필요 시 여기서 보내면 됨.
   });
 }
 
@@ -74,8 +66,6 @@ Future<void> main() async {
   // 🔔 iOS Permission 요청 (Android는 자동 허용됨)
   await _requestNotificationPermission();
 
-  // 🔔 Foreground 메시지 처리 등록
-  _setupForegroundMessageListener();
   _setupTokenRefreshListener();
   final naverMap = FlutterNaverMap();
   await naverMap.init(
@@ -85,7 +75,7 @@ Future<void> main() async {
     },
   );
 
-  DependencyInjection.init();
+  await DependencyInjection.init();
   _printDeviceFCMToken();
   _setupApnsTokenDebug();
   runApp(const MyApp());
@@ -97,6 +87,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      scaffoldMessengerKey: scaffoldMessengerKey,
       title: 'What is your ETA',
       theme: ThemeData(primarySwatch: Colors.blue),
       initialRoute: Routes.splash,

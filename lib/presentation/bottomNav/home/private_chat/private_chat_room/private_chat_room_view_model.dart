@@ -67,5 +67,20 @@ class PrivateChatRoomViewModel extends GetxController {
     );
 
     await _chatRepository.sendMessage(chatRoomId, message);
+    try {
+      final tokens = await _userRepository.getFcmTokens(friendUid);
+
+      if (tokens.isNotEmpty) {
+        for (final token in tokens) {
+          await _fcmRepository.sendChatNotification(
+            targetToken: token,
+            senderName: my.name,
+            message: content.trim(),
+          );
+        }
+      }
+    } catch (e) {
+      print('FCM 발송 실패: $e');
+    }
   }
 }
