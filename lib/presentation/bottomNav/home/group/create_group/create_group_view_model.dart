@@ -6,6 +6,7 @@ import 'package:what_is_your_eta/data/model/group_model.dart';
 import 'package:what_is_your_eta/data/model/message_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
+import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
@@ -14,13 +15,16 @@ class CreateGroupViewModel extends GetxController {
   final GroupRepository _groupRepository;
   final UserRepository _userRepository;
   final AuthRepository _authRepository;
+  final FcmRepository _fcmRepository;
   CreateGroupViewModel({
     required GroupRepository groupRepository,
     required AuthRepository authRepository,
     required UserRepository userRepository,
+    required FcmRepository fcmRepository,
   }) : _groupRepository = groupRepository,
        _authRepository = authRepository,
-       _userRepository = userRepository;
+       _userRepository = userRepository,
+       _fcmRepository = fcmRepository;
 
   // init 했을때 내 userModel 가져와야함
   final Rx<UserModel?> userModel = Rx<UserModel?>(null);
@@ -121,7 +125,26 @@ class CreateGroupViewModel extends GetxController {
       );
 
       await _groupRepository.sendGroupMessage(groupId, systemMessage);
+      // FCM 발송
+      try {
+        // 멤버들의 토큰 가져오기 (본인은 제외 가능)
+        for (final memberUid in finalSelectedUid) {
+          if (memberUid == currentUser) continue; // 본인 제외 (원하면 포함 가능)
 
+          final tokens = await _userRepository.getFcmTokens(memberUid);
+          if (tokens.isNotEmpty) {
+            for (final token in tokens) {
+              await _fcmRepository.sendGroupNotification(
+                targetTokens: [token],
+                groupName: groupTitle.value,
+                message: '채팅방이 생성되었습니다',
+              );
+            }
+          }
+        }
+      } catch (e) {
+        print('❌ FCM 그룹 생성 알림 발송 실패: $e');
+      }
       // 그룹 생성 성공
       isGroupCreated.value = true;
     }
