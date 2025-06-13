@@ -60,7 +60,7 @@ class LocationShareViewModel extends GetxController {
       promiseLocation.value = pLoc;
       currentLocation.value = uLoc;
 
-      if (uLoc == null || pLoc == null) {
+      if (uLoc == null) {
         errorMessage.value = '위치 정보를 불러오지 못했습니다.';
         distanceToPromiseMeters.value = 0.0;
         return;
