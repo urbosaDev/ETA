@@ -5,6 +5,7 @@ import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/domain/usecase/%08geo_current_location_usecase.dart';
+import 'package:what_is_your_eta/domain/usecase/location_share_usecase.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/components/promise_tab_bar.dart';
 import 'package:what_is_your_eta/domain/usecase/calculate_distance_usecase.dart';
@@ -56,18 +57,26 @@ class PromiseView extends GetView<PromiseViewModel> {
                                 Get.lazyPut(() => GetCurrentLocationUseCase());
                                 Get.lazyPut(() => CalculateDistanceUseCase());
                                 Get.lazyPut(
-                                  () => LocationShareViewModel(
-                                    promiseId: controller.promiseId,
+                                  () => LocationShareUseCase(
                                     getCurrentLocationUseCase:
                                         Get.find<GetCurrentLocationUseCase>(),
                                     locationRepository:
                                         Get.find<LocationRepository>(),
                                     promiseRepository:
                                         Get.find<PromiseRepository>(),
-                                    authRepository: Get.find<AuthRepository>(),
+                                    userRepository: Get.find<UserRepository>(),
                                     calculateDistanceUseCase:
                                         Get.find<CalculateDistanceUseCase>(),
-                                    userRepository: Get.find<UserRepository>(),
+                                  ),
+                                );
+                                Get.lazyPut(
+                                  () => LocationShareViewModel(
+                                    promiseId: controller.promiseId,
+                                    locationShareUseCase:
+                                        Get.find<LocationShareUseCase>(),
+                                    promiseRepository:
+                                        Get.find<PromiseRepository>(),
+                                    authRepository: Get.find<AuthRepository>(),
                                   ),
                                 );
                               }),
