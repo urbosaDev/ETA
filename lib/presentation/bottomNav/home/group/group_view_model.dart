@@ -38,6 +38,8 @@ class GroupViewModel extends GetxController {
 
   final Rx<String?> snackbarMessage = Rx<String?>(null);
   final RxList<PromiseModel> promiseList = <PromiseModel>[].obs;
+
+  final RxMap<String, bool> promiseParticipationMap = <String, bool>{}.obs;
   @override
   void onInit() {
     super.onInit();
@@ -142,5 +144,11 @@ class GroupViewModel extends GetxController {
       group.promiseIds,
     );
     promiseList.value = promises;
+    final currentUid = _authRepository.getCurrentUid();
+    final Map<String, bool> newParticipationMap = {};
+    for (final promise in promises) {
+      newParticipationMap[promise.id] = promise.memberIds.contains(currentUid);
+    }
+    promiseParticipationMap.value = newParticipationMap;
   }
 }

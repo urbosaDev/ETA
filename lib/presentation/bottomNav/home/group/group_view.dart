@@ -115,77 +115,84 @@ class GroupView extends GetView<GroupViewModel> {
                     itemCount: promises.length,
                     itemBuilder: (context, index) {
                       final promise = promises[index];
+                      final isParticipant =
+                          controller.promiseParticipationMap[promise.id] ??
+                          false;
+
                       return GestureDetector(
-                        onTap: () {
-                          Get.to(
-                            () => PromiseView(),
-                            binding: BindingsBuilder(() {
-                              Get.put(
-                                PromiseViewModel(
-                                  promiseId: promise.id,
-                                  promiseRepository:
-                                      Get.find<PromiseRepository>(),
-                                  authRepository: Get.find<AuthRepository>(),
-                                  userRepository: Get.find<UserRepository>(),
-                                ),
-                              );
-                            }),
-                          );
-                        },
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 2,
+                        onTap:
+                            isParticipant
+                                ? () {
+                                  // 정상 참여중이면 이동
+                                  Get.to(
+                                    () => const PromiseView(),
+                                    binding: BindingsBuilder(() {
+                                      Get.put(
+                                        PromiseViewModel(
+                                          promiseId: promise.id,
+                                          promiseRepository:
+                                              Get.find<PromiseRepository>(),
+                                          authRepository:
+                                              Get.find<AuthRepository>(),
+                                          userRepository:
+                                              Get.find<UserRepository>(),
+                                        ),
+                                      );
+                                    }),
+                                  );
+                                }
+                                : null, // 참여중이 아니면 onTap 없음
+                        child: Container(
                           margin: const EdgeInsets.symmetric(
-                            vertical: 6,
-                            horizontal: 4,
+                            vertical: 8,
+                            horizontal: 16,
                           ),
-                          child: InkWell(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color:
+                                isParticipant
+                                    ? Colors.white
+                                    : Colors.grey.shade300,
                             borderRadius: BorderRadius.circular(12),
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    promise.name,
-                                    style: const TextStyle(
-                                      fontSize: 16,
+                            border: Border.all(
+                              color: isParticipant ? Colors.blue : Colors.grey,
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  promise.name,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color:
+                                        isParticipant
+                                            ? Colors.black
+                                            : Colors.grey.shade600,
+                                  ),
+                                ),
+                              ),
+                              if (!isParticipant)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red.shade100,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Text(
+                                    '미참여',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    promise.time.toLocal().toString(),
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          promise.location.address,
-                                          style: const TextStyle(fontSize: 13),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Text(
-                                        promise.location.placeName,
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          fontStyle: FontStyle.italic,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
+                                ),
+                            ],
                           ),
                         ),
                       );
