@@ -1,7 +1,7 @@
 import 'dart:math';
 
 class CalculateDistanceUseCase {
-  double call({
+  double calculateDistance({
     required double startLat,
     required double startLng,
     required double endLat,

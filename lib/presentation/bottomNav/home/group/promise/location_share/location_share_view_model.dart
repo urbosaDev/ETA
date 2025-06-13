@@ -74,7 +74,7 @@ class LocationShareViewModel extends GetxController {
         return;
       }
 
-      final distance = _calculateDistanceUseCase.call(
+      final distance = _calculateDistanceUseCase.calculateDistance(
         startLat: userLoc.latitude,
         startLng: userLoc.longitude,
         endLat: promiseLoc.latitude,
