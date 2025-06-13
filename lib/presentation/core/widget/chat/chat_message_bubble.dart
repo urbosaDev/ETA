@@ -1,61 +1,52 @@
 import 'package:flutter/material.dart';
 
-class ChatMessageBubble extends StatelessWidget {
-  final bool isMe;
-  final bool isSystem;
-  final String message;
-  final String? senderName;
-  final String? senderPhotoUrl;
+import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:what_is_your_eta/data/model/message_model.dart';
 
-  const ChatMessageBubble({
+import 'package:what_is_your_eta/data/model/user_model.dart';
+
+class MessageBubble extends StatelessWidget {
+  final MessageModel msg;
+  final bool isMe;
+  final UserModel? sender; // nullable로 변경
+
+  const MessageBubble({
     super.key,
+    required this.msg,
     required this.isMe,
-    required this.isSystem,
-    required this.message,
-    this.senderName,
-    this.senderPhotoUrl,
+    required this.sender,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (isSystem) {
-      // 📌 시스템 메시지 스타일
-      return Center(
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 6),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade400,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            message,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-        ),
-      );
+    switch (msg.type) {
+      case MessageType.text:
+        return _buildTextBubble();
+      case MessageType.system:
+        return _buildSystemBubble(); // sender 없어도 됨
+      case MessageType.location:
+        return _buildLocationBubble();
     }
+  }
 
-    // 🧍 일반 유저 메시지 스타일
+  Widget _buildTextBubble() {
+    if (sender == null) return const SizedBox();
+
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Column(
         crossAxisAlignment:
             isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
-          if (!isMe && senderName != null && senderPhotoUrl != null)
+          if (!isMe)
             Row(
               children: [
                 CircleAvatar(
                   radius: 12,
-                  backgroundImage: NetworkImage(senderPhotoUrl!),
+                  backgroundImage: NetworkImage(sender!.photoUrl),
                 ),
                 const SizedBox(width: 4),
-                Text(senderName!, style: const TextStyle(fontSize: 12)),
+                Text(sender!.name, style: const TextStyle(fontSize: 12)),
               ],
             ),
           Container(
@@ -66,8 +57,90 @@ class ChatMessageBubble extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              message,
+              msg.text,
               style: TextStyle(color: isMe ? Colors.white : Colors.black87),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSystemBubble() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Center(
+        child: Text(
+          msg.text,
+          style: const TextStyle(
+            color: Colors.redAccent,
+            fontWeight: FontWeight.bold,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLocationBubble() {
+    if (sender == null) return const SizedBox();
+
+    final locationMsg = msg as LocationMessageModel;
+
+    return Align(
+      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+      child: Column(
+        crossAxisAlignment:
+            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          if (!isMe)
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 12,
+                  backgroundImage: NetworkImage(sender!.photoUrl),
+                ),
+                const SizedBox(width: 4),
+                Text(sender!.name, style: const TextStyle(fontSize: 12)),
+              ],
+            ),
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            height: 200,
+            child: NaverMap(
+              options: NaverMapViewOptions(
+                initialCameraPosition: NCameraPosition(
+                  target: NLatLng(
+                    locationMsg.location.latitude,
+                    locationMsg.location.longitude,
+                  ),
+                  zoom: 16,
+                ),
+                indoorEnable: false,
+                locationButtonEnable: false,
+                scaleBarEnable: false,
+              ),
+              onMapReady: (controller) async {
+                final marker = NMarker(
+                  id: 'location_marker_${DateTime.now().millisecondsSinceEpoch}',
+                  position: NLatLng(
+                    locationMsg.location.latitude,
+                    locationMsg.location.longitude,
+                  ),
+                );
+                controller.addOverlay(marker);
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Text(
+              locationMsg.location.address,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isMe ? Colors.white70 : Colors.black87,
+              ),
             ),
           ),
         ],

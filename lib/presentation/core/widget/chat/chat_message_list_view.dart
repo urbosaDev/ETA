@@ -23,16 +23,16 @@ class ChatMessageListView extends StatelessWidget {
         itemCount: messages.length,
         itemBuilder: (context, index) {
           final msg = messages[index];
-          final sender = userMap[msg.senderId];
           final isMe = msg.senderId == myUid;
 
-          return ChatMessageBubble(
-            isMe: isMe,
-            isSystem: msg.senderId == 'system',
-            message: msg.text,
-            senderName: sender?.name,
-            senderPhotoUrl: sender?.photoUrl,
-          );
+          final sender =
+              msg.type == MessageType.system ? null : userMap[msg.senderId];
+
+          if (sender == null && msg.type != MessageType.system) {
+            return const SizedBox();
+          }
+
+          return MessageBubble(msg: msg, isMe: isMe, sender: sender);
         },
       ),
     );
