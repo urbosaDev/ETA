@@ -140,6 +140,15 @@ class SelectTimeView extends GetView<SelectTimeViewModel> {
     int max,
     int current,
   ) async {
+    // "분" 선택이면 min == 0 && max == 59가 들어옴
+    final isMinutePicker = (min == 0 && max == 59);
+
+    // 분은 10분 단위로 제한
+    final List<int> values =
+        isMinutePicker
+            ? [0, 10, 20, 30, 40, 50]
+            : List.generate(max - min + 1, (index) => min + index);
+
     return await showModalBottomSheet<int>(
       context: context,
       builder:
@@ -147,9 +156,9 @@ class SelectTimeView extends GetView<SelectTimeViewModel> {
             height: 300,
             child: ListView.builder(
               itemExtent: 48,
-              itemCount: max - min + 1,
+              itemCount: values.length,
               itemBuilder: (context, index) {
-                final value = min + index;
+                final value = values[index];
                 return ListTile(
                   title: Center(child: Text('$value')),
                   onTap: () => Navigator.of(context).pop(value),

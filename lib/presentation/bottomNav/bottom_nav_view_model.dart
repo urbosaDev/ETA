@@ -23,8 +23,6 @@ class BottomNavViewModel extends GetxController {
 
   @override
   void onClose() {
-    _tokenRepository.deleteFcmToken();
-
     super.onClose();
   }
 }
