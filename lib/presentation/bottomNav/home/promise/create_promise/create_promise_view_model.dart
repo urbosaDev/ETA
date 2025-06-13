@@ -131,7 +131,7 @@ class CreatePromiseViewModel extends GetxController {
         location: selectedLocation.value!,
         time: promiseTime.value!,
 
-        lateUserIds: [],
+        arriveUserIds: [],
         userLocations: null,
         penaltySuggestions: {},
         selectedPenalty: null,

@@ -84,7 +84,10 @@ class PromiseViewModel extends GetxController {
   }
 
   Future<void> _fetchMembers(List<String> memberIds) async {
+    print('→ _fetchMembers called with memberIds: $memberIds');
     final users = await _userRepository.getUsersByUids(memberIds);
+    print('→ _fetchMembers fetched users: ${users.map((u) => u.uid)}');
+
     memberList.value = users;
     memberMap.value = {for (var u in users) u.uid: u};
   }
@@ -106,6 +109,7 @@ class PromiseViewModel extends GetxController {
       sentAt: DateTime.now(),
       readBy: [userModel.value!.uid],
     );
+
     await _promiseRepository.sendPromiseMessage(promiseId, msg);
   }
 

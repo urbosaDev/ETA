@@ -3,57 +3,95 @@ import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/location_share/location_share_view_model.dart';
 
-class LocationShareModalView extends GetView<LocationShareModalViewModel> {
-  const LocationShareModalView({super.key});
+class LocationShareView extends GetView<LocationShareViewModel> {
+  const LocationShareView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: SizedBox(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('위치 공유'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () {
+              Get.back();
+            },
+          ),
+        ],
+      ),
+      body: SizedBox(
         width: MediaQuery.of(context).size.width * 0.9,
         height: MediaQuery.of(context).size.height * 0.7,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 약속 장소
-              Row(
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 현재 위치
+                  Row(
+                    children: [
+                      Flexible(
+                        flex: 1,
+                        child: Obx(() {
+                          final location = controller.currentLocation.value;
+                          final distance =
+                              controller.distanceToPromiseMeters.value;
+                          return _buildCurrentLocation(location, distance);
+                        }),
+                      ),
+                    ],
+                  ),
+
+                  // Naver Map
                   Flexible(
-                    flex: 1,
+                    flex: 3,
                     child: Obx(() {
+                      final isLoading = controller.isLoading.value;
                       final location = controller.currentLocation.value;
-                      final distance = controller.distanceToPromiseMeters.value;
-                      return _buildCurrentLocation(location, distance);
+                      return SizedBox(
+                        height: 200,
+                        child: _buildNaverMap(isLoading, location),
+                      );
                     }),
+                  ),
+
+                  // 버튼들
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () async {
+                          await controller.updateUserLocation();
+                        },
+                        child: const Text('위치공유'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          await controller.arriveLocation();
+                        },
+                        child: const Text('도착'),
+                      ),
+                    ],
+                  ),
+                  Obx(
+                    () =>
+                        controller.isAlreadyArrived.value
+                            ? const Text(
+                              '도착 완료',
+                              style: TextStyle(color: Colors.red, fontSize: 14),
+                            )
+                            : const SizedBox(),
                   ),
                 ],
               ),
+            ),
 
-              // Naver Map
-              Flexible(
-                flex: 3,
-                child: Obx(() {
-                  final isLoading = controller.isLoading.value;
-                  final location = controller.currentLocation.value;
-                  return SizedBox(
-                    height: 200,
-                    child: _buildNaverMap(isLoading, location),
-                  );
-                }),
-              ),
-
-              Row(
-                children: [
-                  ElevatedButton(onPressed: () {}, child: const Text('위치공유')),
-                  ElevatedButton(onPressed: () {}, child: const Text('위치공유')),
-                ],
-              ),
-            ],
-          ),
+            // Success / Error message 영역
+            Obx(() {
+              return _buildMessageBanner();
+            }),
+          ],
         ),
       ),
     );
@@ -127,6 +165,44 @@ class LocationShareModalView extends GetView<LocationShareModalViewModel> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildMessageBanner() {
+    final message =
+        controller.successMessage.value.isNotEmpty
+            ? controller.successMessage.value
+            : controller.errorMessage.value;
+
+    final isSuccess = controller.successMessage.value.isNotEmpty;
+
+    if (message.isEmpty) return const SizedBox();
+
+    // 자동 clear
+    Future.delayed(const Duration(seconds: 2), () {
+      controller.clearMessages();
+    });
+
+    return Positioned(
+      bottom: 16,
+      left: 16,
+      right: 16,
+      child: AnimatedOpacity(
+        opacity: message.isNotEmpty ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 300),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          decoration: BoxDecoration(
+            color: isSuccess ? Colors.green : Colors.red,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            message,
+            style: const TextStyle(color: Colors.white, fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
     );
   }
 

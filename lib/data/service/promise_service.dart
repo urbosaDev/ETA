@@ -26,7 +26,9 @@ class PromiseService {
 
   /// 실시간 구독
   Stream<Map<String, dynamic>> streamPromise(String promiseId) {
-    return _promiseRef.doc(promiseId).snapshots().map((doc) => doc.data()!);
+    return _promiseRef.doc(promiseId).snapshots().map((doc) {
+      return doc.data()!;
+    });
   }
 
   /// 삭제
@@ -111,19 +113,44 @@ class PromiseService {
     await _promiseRef.doc(promiseId).update({'selectedPenalty': penaltyJson});
   }
 
-  // Future<void> updatePenaltyVoters({
-  //   required String promiseId,
-  //   required List<String> voterUids,
-  // }) async {
-  //   await _promiseRef.doc(promiseId).update({'penaltyVoterUids': voterUids});
-  // }
+  Future<void> updateUserLocation({
+    required String promiseId,
+    required String uid,
+    required Map<String, dynamic> userLocationJson,
+  }) async {
+    await _promiseRef.doc(promiseId).update({
+      'userLocations.$uid': userLocationJson,
+    });
+  }
 
-  // Future<void> updatePenaltySuggesters({
-  //   required String promiseId,
-  //   required List<String> suggesterUids,
-  // }) async {
-  //   await _promiseRef.doc(promiseId).update({
-  //     'penaltySuggesterUids': suggesterUids,
-  //   });
-  // }
+  Future<void> updateArriveUserIds({
+    required String promiseId,
+    required List<String> arriveUserIds,
+  }) async {
+    await _promiseRef.doc(promiseId).update({'arriveUserIds': arriveUserIds});
+  }
+
+  Future<void> addArriveUserIdIfNotExists({
+    required String promiseId,
+    required String currentUid,
+  }) async {
+    await _promiseRef.doc(promiseId).update({
+      'arriveUserIds': FieldValue.arrayUnion([currentUid]),
+    });
+    // Future<void> updatePenaltyVoters({
+    //   required String promiseId,
+    //   required List<String> voterUids,
+    // }) async {
+    //   await _promiseRef.doc(promiseId).update({'penaltyVoterUids': voterUids});
+    // }
+
+    // Future<void> updatePenaltySuggesters({
+    //   required String promiseId,
+    //   required List<String> suggesterUids,
+    // }) async {
+    //   await _promiseRef.doc(promiseId).update({
+    //     'penaltySuggesterUids': suggesterUids,
+    //   });
+    // }
+  }
 }
