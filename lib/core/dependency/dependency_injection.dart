@@ -3,13 +3,17 @@ import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
+import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
+import 'package:what_is_your_eta/data/repository/token_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/data/service/auth_service.dart';
 import 'package:what_is_your_eta/data/service/chat_service.dart';
+import 'package:what_is_your_eta/data/service/fcm_service.dart';
+import 'package:what_is_your_eta/data/service/fcm_token_service.dart';
 
 import 'package:what_is_your_eta/data/service/group_service.dart';
 import 'package:what_is_your_eta/data/service/local_map_api_service.dart';
@@ -29,7 +33,18 @@ class DependencyInjection {
     Get.put<PrivateChatService>(PrivateChatService(), permanent: true);
     Get.put<GroupChatService>(GroupChatService(), permanent: true);
     Get.put<PromiseChatService>(PromiseChatService(), permanent: true);
+    Get.lazyPut<FcmService>(() => FcmService());
 
+    Get.put<FcmRepository>(
+      FcmRepositoryImpl(fcmService: Get.find<FcmService>()),
+      permanent: true,
+    );
+
+    Get.lazyPut<FcmTokenService>(() => FcmTokenService());
+
+    Get.lazyPut<TokenRepository>(
+      () => FcmTokenRepositoryImpl(Get.find<FcmTokenService>()),
+    );
     Get.put<LocalMapApiService>(
       KakaoMapLocalApiService(
         client: http.Client(),

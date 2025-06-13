@@ -1,71 +1,83 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+// lib/data/service/fcm_service.dart
+import 'dart:convert';
 
-class FcmTokenService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:http/http.dart' as http;
+import 'package:googleapis_auth/auth_io.dart';
 
-  // FCM Token 저장 (최초 로그인 시 / 토큰 refresh 시)
-  Future<void> saveFcmToken() async {
-    final user = _auth.currentUser;
-    if (user == null) return;
+class FcmService {
+  static const _fcmEndpoint =
+      'https://fcm.googleapis.com/v1/projects/what-s-your-eta-1805f/messages:send';
+  static const _scope = 'https://www.googleapis.com/auth/firebase.messaging';
 
-    final token = await _messaging.getToken();
-    if (token == null) return;
+  late ServiceAccountCredentials _credentials;
+  AccessCredentials? _accessCredentials;
 
-    final fcmTokenDoc = _firestore
-        .collection('users')
-        .doc(user.uid)
-        .collection('fcmTokens')
-        .doc(token);
-
-    await fcmTokenDoc.set({
-      'createdAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
-
-    print('✅ FCM Token 저장됨: $token');
+  FcmService() {
+    _initCredentials();
   }
 
-  // FCM Token 삭제 (로그아웃 시 사용)
-  Future<void> deleteFcmToken() async {
-    final user = _auth.currentUser;
-    if (user == null) return;
-
-    final token = await _messaging.getToken();
-    if (token == null) return;
-
-    final fcmTokenDoc = _firestore
-        .collection('users')
-        .doc(user.uid)
-        .collection('fcmTokens')
-        .doc(token);
-
-    await fcmTokenDoc.delete();
-
-    print('🗑️ FCM Token 삭제됨: $token');
+  Future<void> _initCredentials() async {
+    final jsonString = await rootBundle.loadString(
+      'assets/keys/firebase_service_account.json',
+    );
+    final jsonMap = json.decode(jsonString);
+    _credentials = ServiceAccountCredentials.fromJson(jsonMap);
   }
 
-  // FCM Token refresh 대응 → app 실행 시 listen 등록
-  void listenTokenRefresh() {
-    _messaging.onTokenRefresh.listen((newToken) async {
-      final user = _auth.currentUser;
-      if (user == null) return;
+  /// AccessToken 발급
+  Future<String> _getAccessToken() async {
+    // 만약 기존에 유효한 token 있으면 재사용 가능
+    if (_accessCredentials != null &&
+        _accessCredentials!.accessToken.hasExpired == false) {
+      return _accessCredentials!.accessToken.data;
+    }
 
-      final fcmTokenDoc = _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('fcmTokens')
-          .doc(newToken);
+    final client = http.Client();
+    try {
+      final accessCredentials = await obtainAccessCredentialsViaServiceAccount(
+        _credentials,
+        [_scope],
+        client,
+      );
+      _accessCredentials = accessCredentials;
+      print('AccessToken 발급됨');
+      return accessCredentials.accessToken.data;
+    } finally {
+      client.close();
+    }
+  }
 
-      await fcmTokenDoc.set({
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+  /// FCM 메시지 발송 (단일 기기용 → token 1개 대상)
+  Future<void> sendFcmMessage({
+    required String targetToken,
+    required String title,
+    required String body,
+    Map<String, String>? data,
+  }) async {
+    final accessToken = await _getAccessToken();
 
-      print('🆕 FCM Token 갱신됨: $newToken');
-    });
+    final messagePayload = {
+      'message': {
+        'token': targetToken,
+        'notification': {'title': title, 'body': body},
+        'data': data ?? {},
+      },
+    };
+
+    final response = await http.post(
+      Uri.parse(_fcmEndpoint),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode(messagePayload),
+    );
+
+    if (response.statusCode == 200) {
+      print('FCM 메시지 발송 성공!');
+    } else {
+      print('FCM 메시지 발송 실패: ${response.statusCode} ${response.body}');
+    }
   }
 }
