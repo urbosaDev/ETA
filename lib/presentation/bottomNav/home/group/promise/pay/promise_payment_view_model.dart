@@ -30,11 +30,9 @@ class PromisePaymentViewModel extends GetxController {
 
   StreamSubscription<PromiseModel>? _promiseSub;
 
-//패널 관리
+  //패널 관리
   final RxBool showPenaltyPanel = false.obs;
-//
-
-
+  //
 
   @override
   void onInit() {
@@ -77,7 +75,6 @@ class PromisePaymentViewModel extends GetxController {
       await _fetchMembers(fetchedPromise.memberIds);
     }
 
-    _promiseSub?.cancel();
     _promiseSub = _promiseRepository.streamPromise(promiseId).listen((p) async {
       promise.value = p;
       await _fetchMembers(p.memberIds);
