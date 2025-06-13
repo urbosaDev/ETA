@@ -1,4 +1,5 @@
 import 'package:what_is_your_eta/data/model/location_model/promise_location_model.dart';
+import 'package:what_is_your_eta/data/model/location_model/user_location_model.dart';
 import 'package:what_is_your_eta/data/service/local_map_api_service.dart';
 
 abstract class LocationRepository {
@@ -10,7 +11,10 @@ abstract class LocationRepository {
     required String keyword,
     int page,
   });
-
+  Future<UserLocationModel?> getUserAddressFromCoordinates({
+    required double latitude,
+    required double longitude,
+  });
   // Future<List<PromiseLocationModel>> searchPlaceByCategoryNearby({
   //   required String categoryGroupCode,
   //   required double latitude,
@@ -85,6 +89,40 @@ class LocationRepositoryImpl implements LocationRepository {
     } catch (e) {
       print('searchPlaceByKeyword 실패: $e');
       return [];
+    }
+  }
+
+  @override
+  Future<UserLocationModel?> getUserAddressFromCoordinates({
+    required double latitude,
+    required double longitude,
+  }) async {
+    try {
+      final data = await _apiService.coordinateToAddress(
+        longitude: longitude.toString(),
+        latitude: latitude.toString(),
+      );
+
+      final documents = data['documents'] as List<dynamic>?;
+
+      if (documents == null || documents.isEmpty) return null;
+
+      final first = documents.first;
+      final addressInfo = first['address'];
+      final roadAddressInfo = first['road_address'];
+
+      return UserLocationModel(
+        latitude: latitude,
+        longitude: longitude,
+        address:
+            roadAddressInfo?['address_name'] ??
+            addressInfo?['address_name'] ??
+            'Unknown',
+        updatedAt: DateTime.now(),
+      );
+    } catch (e) {
+      print('getUserAddressFromCoordinates 실패: $e');
+      return null;
     }
   }
 

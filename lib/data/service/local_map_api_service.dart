@@ -10,6 +10,10 @@ abstract class LocalMapApiService {
     int page,
   });
 
+  Future<Map<String, dynamic>> coordinateToAddress({
+    required String longitude,
+    required String latitude,
+  });
   // Future<Map<String, dynamic>> categoryToPlace({
   //   required String categoryGroupCode,
   //   required String x,
@@ -82,6 +86,26 @@ class KakaoMapLocalApiService implements LocalMapApiService {
     }
   }
 
+  @override
+  Future<Map<String, dynamic>> coordinateToAddress({
+    required String longitude,
+    required String latitude,
+  }) async {
+    final uri = Uri.parse(
+      '$_baseUrl/v2/local/geo/coord2address.json',
+    ).replace(queryParameters: {'x': longitude, 'y': latitude});
+
+    final response = await _client.get(
+      uri,
+      headers: {'Authorization': 'KakaoAK $_apiKey'},
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else {
+      throw Exception('좌표 → 주소 변환 실패: ${response.statusCode}');
+    }
+  }
   // @override
   // Future<Map<String, dynamic>> categoryToPlace({
   //   required String categoryGroupCode,
