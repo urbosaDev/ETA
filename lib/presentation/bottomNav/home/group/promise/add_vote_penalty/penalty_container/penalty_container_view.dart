@@ -6,6 +6,8 @@ import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/add_penalty/add_penalty_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/add_penalty/add_penalty_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/penalty_container_view_model.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/view_penalty/view_penalty_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/view_penalty/view_penalty_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/vote_penalty/vote_penalty_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/vote_penalty/vote_penalty_view_model.dart';
 
@@ -31,6 +33,14 @@ class PenaltyContainerView extends GetView<PenaltyContainerViewModel> {
                       controller.setCurrentPage(value);
                     },
                     children: [
+                      GetBuilder(
+                        init: ViewPenaltyViewModel(
+                          promiseId: controller.promiseId,
+                          promiseRepository: Get.find<PromiseRepository>(),
+                        ),
+                        autoRemove: true,
+                        builder: (controller) => ViewPenaltyView(),
+                      ),
                       GetBuilder(
                         init: AddPenaltyViewModel(
                           promiseId: controller.promiseId,
@@ -60,7 +70,7 @@ class PenaltyContainerView extends GetView<PenaltyContainerViewModel> {
             Obx(
               () => Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(2, (index) {
+                children: List.generate(3, (index) {
                   final isSelected = controller.currentPage.value == index;
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 300),

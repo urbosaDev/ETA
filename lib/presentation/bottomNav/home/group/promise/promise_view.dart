@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/penalty_container_view.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/add_vote_penalty/penalty_container/penalty_container_view_model.dart';
-
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/components/promise_tab_bar.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/widget/chat/chat_input_box.dart';
@@ -40,25 +37,6 @@ class PromiseView extends GetView<PromiseViewModel> {
                 ),
                 Row(
                   children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Get.to(
-                          () => const PenaltyContainerView(),
-                          transition: Transition.downToUp,
-                          opaque: false,
-                          duration: const Duration(milliseconds: 300),
-                          fullscreenDialog: true,
-                          binding: BindingsBuilder(() {
-                            Get.put(
-                              PenaltyContainerViewModel(
-                                promiseId: controller.promiseId,
-                              ),
-                            );
-                          }),
-                        );
-                      },
-                      child: const Text('벌칙생성'),
-                    ),
                     Expanded(
                       child: ChatInputBox(
                         controller: textController,
