@@ -93,11 +93,7 @@ class PromisePaymentViewModel extends GetxController {
     }
     final content =
         '결제 알림: ${bankName.value} 계좌로 ${accountNumber.value}에 ${perPersonAmount.value}원을 입금해 주세요.';
-    final msg = MessageModel(
-      senderId: 'system',
-      text: content,
-      sentAt: DateTime.now(),
-    );
+    final msg = SystemMessageModel(text: content, sentAt: DateTime.now());
     try {
       await _promiseRepository.sendPromiseMessage(promiseId, msg);
       return true; // 성공적으로 알림 전송

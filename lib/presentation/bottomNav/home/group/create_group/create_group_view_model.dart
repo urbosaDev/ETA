@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/group_model.dart';
+import 'package:what_is_your_eta/data/model/message_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
@@ -85,15 +86,16 @@ class CreateGroupViewModel extends GetxController {
   final RxBool isGroupCreated = false.obs;
   // 그룹 만들기 메서드
   Future<void> createGroup() async {
-    // isReadyToCreate가 true일때만 실행
     final currentUser = userModel.value?.uid;
 
     if (currentUser == null) return;
     if (!isReadyToCreate) return;
+
     final finalSelectedUid = [
       currentUser,
       ...selectedFriends.map((u) => u.uid),
     ];
+
     // GroupModel 생성
     final group = GroupModel(
       id: '',
@@ -103,12 +105,23 @@ class CreateGroupViewModel extends GetxController {
       promiseIds: [],
       createdAt: DateTime.now(),
     );
+
+    // 그룹 생성
     final groupId = await _groupRepository.createGroup(group);
+
+    // 각 유저의 groupId 업데이트
     for (final user in finalSelectedUid) {
-      // 각 유저의 groupId에 추가
       await _userRepository.addGroupId(user, groupId);
     }
+
     if (groupId.isNotEmpty) {
+      final systemMessage = SystemMessageModel(
+        text: '채팅방이 생성되었습니다',
+        sentAt: DateTime.now(),
+      );
+
+      await _groupRepository.sendGroupMessage(groupId, systemMessage);
+
       // 그룹 생성 성공
       isGroupCreated.value = true;
     }

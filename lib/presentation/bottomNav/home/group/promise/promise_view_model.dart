@@ -100,7 +100,7 @@ class PromiseViewModel extends GetxController {
 
   Future<void> sendMessage(String content) async {
     if (userModel.value == null) return;
-    final msg = MessageModel(
+    final msg = TextMessageModel(
       senderId: userModel.value!.uid,
       text: content,
       sentAt: DateTime.now(),
