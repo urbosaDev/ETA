@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/group_model.dart';
 import 'package:what_is_your_eta/data/model/promise_model.dart';
@@ -47,7 +48,7 @@ class GroupViewModel extends GetxController {
   @override
   void onClose() {
     _groupSub?.cancel();
-
+    debugPrint('🗑️ GroupViewModel deleted');
     super.onClose();
   }
 
