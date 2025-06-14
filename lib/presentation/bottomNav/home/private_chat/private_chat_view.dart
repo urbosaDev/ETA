@@ -9,6 +9,7 @@ import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/pri
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view_model.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_view_model.dart';
+import 'package:what_is_your_eta/presentation/core/dialog/user_info_dialog.dart';
 
 class PrivateChatView extends GetView<PrivateChatViewModel> {
   const PrivateChatView({super.key});
@@ -41,63 +42,9 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                         return GestureDetector(
                           onTap: () {
                             Get.dialog(
-                              AlertDialog(
-                                title: Text('${e.name}님 정보'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('이름: ${e.name}'),
-                                    Text('ID: ${e.uniqueId}'),
-                                    ElevatedButton(
-                                      onPressed: () async {
-                                        Get.back();
-                                        final chatRoomId = await controller
-                                            .createChatRoom(e.uid);
-                                        if (chatRoomId != null) {
-                                          Get.to(
-                                            () => const PrivateChatRoomView(),
-                                            arguments: chatRoomId,
-                                            binding: BindingsBuilder(() {
-                                              Get.put(
-                                                PrivateChatRoomViewModel(
-                                                  chatRepository:
-                                                      Get.find<
-                                                        ChatRepository
-                                                      >(),
-                                                  userRepository:
-                                                      Get.find<
-                                                        UserRepository
-                                                      >(),
-                                                  fcmRepository:
-                                                      Get.find<FcmRepository>(),
-                                                  chatRoomId: chatRoomId,
-                                                  my:
-                                                      controller
-                                                          .userModel
-                                                          .value!,
-                                                  friendUid: e.uid,
-                                                ),
-                                              );
-                                            }),
-                                          );
-                                        } else {
-                                          Get.snackbar(
-                                            "에러",
-                                            "채팅방을 생성할 수 없습니다.",
-                                          );
-                                        }
-                                      },
-                                      child: const Text('채팅 시작'),
-                                    ),
-                                  ],
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Get.back(),
-                                    child: const Text('닫기'),
-                                  ),
-                                ],
+                              userInfoDialogView(
+                                targetUser: e,
+                                controller: controller,
                               ),
                             );
                           },
