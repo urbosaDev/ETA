@@ -11,8 +11,11 @@ class SettingViewModel extends GetxController {
   }) : _fcmTokenRepository = fcmTokenRepository,
        _authRepository = authRepository;
 
+  final RxBool isSignedOut = false.obs;
+
   Future<void> signOut() async {
     await _fcmTokenRepository.deleteFcmToken();
     await _authRepository.signOut();
+    isSignedOut.value = true;
   }
 }
