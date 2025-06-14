@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/home_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/bottom_nav_view_model.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/notification/notification_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/profile/profile_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/setting/setting_view.dart';
 
 class BottomNavView extends GetView<BottomNavViewModel> {

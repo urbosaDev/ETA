@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserService {
-  final CollectionReference _userRef = FirebaseFirestore.instance.collection(
-    'users',
-  );
+  final CollectionReference<Map<String, dynamic>> _userRef = FirebaseFirestore
+      .instance
+      .collection('users');
   // 개인톡방이 생길때, 유저 채팅방정보 업데이트
   Future<void> addPrivateChatId(String uid, String chatRoomId) async {
     await _userRef.doc(uid).update({
@@ -37,7 +37,7 @@ class UserService {
   /// 유저 조회
   Future<Map<String, dynamic>?> getUserData(String uid) async {
     final doc = await _userRef.doc(uid).get();
-    return doc.data() as Map<String, dynamic>?;
+    return doc.data();
   }
   // 유저 아이디를 통해 유저를 찾는메서드 (친구추가)
   // Future<Map<String, dynamic>?> getUserDataByUniqueId(String uniqueId) async {
@@ -93,14 +93,18 @@ class UserService {
             .where(FieldPath.documentId, whereIn: uids.take(10).toList())
             .get();
 
-    return snapshot.docs
-        .map((doc) => doc.data() as Map<String, dynamic>)
-        .toList();
+    return snapshot.docs.map((doc) => doc.data()).toList();
   }
 
   Future<List<String>> getFcmTokens(String uid) async {
-    final snapshot = await _userRef.doc(uid).collection('fcmTokens').get();
+    final userDoc = await _userRef.doc(uid).get();
 
-    return snapshot.docs.map((doc) => doc.id).toList();
+    final tokens = userDoc.data()?['fcmTokens'] ?? [];
+
+    if (tokens is List) {
+      return tokens.cast<String>();
+    } else {
+      return [];
+    }
   }
 }

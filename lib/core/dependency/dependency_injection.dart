@@ -7,7 +7,7 @@ import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
-import 'package:what_is_your_eta/data/repository/token_repository.dart';
+import 'package:what_is_your_eta/data/repository/fcm_token_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/data/service/auth_service.dart';
