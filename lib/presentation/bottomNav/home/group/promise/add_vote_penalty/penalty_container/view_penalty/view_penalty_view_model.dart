@@ -22,6 +22,13 @@ class ViewPenaltyViewModel extends GetxController {
     // Initialize any necessary data or state here
   }
 
+  @override
+  onClose() {
+    _promiseSub?.cancel();
+    super.onClose();
+    // Clean up any resources or streams if necessary
+  }
+
   Future<void> _initialize() async {
     isLoading.value = true;
 
