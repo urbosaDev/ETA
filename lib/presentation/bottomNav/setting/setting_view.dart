@@ -40,7 +40,7 @@ class SettingView extends GetView<SettingViewModel> {
             SettingTile(title: "앱 버전", value: "1.0.0", onTap: () {}),
             const Divider(),
             SettingTile(title: "로그아웃", onTap: controller.signOut),
-            SettingTile(title: "계정 삭제", onTap: () {}),
+            // SettingTile(title: "계정 삭제", onTap: () {}),
           ],
         ),
       );
