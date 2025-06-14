@@ -6,6 +6,7 @@ import 'package:what_is_your_eta/data/model/group_model.dart';
 import 'package:what_is_your_eta/data/model/promise_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
+import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
@@ -16,17 +17,20 @@ class GroupViewModel extends GetxController {
   final UserRepository _userRepository;
   final AuthRepository _authRepository;
   final PromiseRepository _promiseRepository;
+  final ChatRepository _chatRepository;
 
   GroupViewModel({
     required GroupRepository groupRepository,
     required UserRepository userRepository,
     required AuthRepository authRepository,
     required PromiseRepository promiseRepository,
+    required ChatRepository chatRepository,
     required this.group,
   }) : _groupRepository = groupRepository,
        _userRepository = userRepository,
        _authRepository = authRepository,
-       _promiseRepository = promiseRepository;
+       _promiseRepository = promiseRepository,
+       _chatRepository = chatRepository;
 
   final Rx<GroupModel?> groupModel = Rx<GroupModel?>(null);
   final RxBool isLoading = true.obs;
@@ -40,6 +44,7 @@ class GroupViewModel extends GetxController {
   final RxList<PromiseModel> promiseList = <PromiseModel>[].obs;
 
   final RxMap<String, bool> promiseParticipationMap = <String, bool>{}.obs;
+  final RxString myUid = ''.obs;
   @override
   void onInit() {
     super.onInit();
@@ -54,8 +59,14 @@ class GroupViewModel extends GetxController {
     super.onClose();
   }
 
+  bool isOtherUser(UserModel user) => user.uid != myUid.value;
+
   Future<void> _initialize() async {
     isLoading.value = true;
+    final currentUid = _authRepository.getCurrentUid();
+    if (currentUid != null) {
+      myUid.value = currentUid;
+    }
 
     final fetchedGroup = await _groupRepository.getGroup(group.id);
     if (fetchedGroup == null) {
@@ -150,5 +161,39 @@ class GroupViewModel extends GetxController {
       newParticipationMap[promise.id] = promise.memberIds.contains(currentUid);
     }
     promiseParticipationMap.value = newParticipationMap;
+  }
+
+  Future<String?> createChatRoom(String friendUid) async {
+    try {
+      final myUid = _authRepository.getCurrentUser()!.uid;
+      final chatRoomId = generateChatRoomId(myUid, friendUid);
+
+      final exists = await _chatRepository.chatRoomExists(chatRoomId);
+      if (exists) return chatRoomId;
+
+      final chatRoomData = {
+        'participantIds': [myUid, friendUid],
+        'lastMessage': '',
+        'lastMessageAt': DateTime.now(),
+      };
+
+      await _chatRepository.createChatRoom(
+        chatId: chatRoomId,
+        data: chatRoomData,
+      );
+
+      await _userRepository.addPrivateChatId(myUid, chatRoomId);
+      await _userRepository.addPrivateChatId(friendUid, chatRoomId);
+
+      return chatRoomId;
+    } catch (e) {
+      print('🔥 그룹 내 채팅방 생성 오류: $e');
+      return null;
+    }
+  }
+
+  String generateChatRoomId(String uid1, String uid2) {
+    final sorted = [uid1, uid2]..sort();
+    return '${sorted[0]}_${sorted[1]}';
   }
 }

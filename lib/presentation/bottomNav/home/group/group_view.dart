@@ -15,6 +15,7 @@ import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/pr
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view_model.dart';
+import 'package:what_is_your_eta/presentation/core/dialog/user_info_dialog.dart';
 import 'package:what_is_your_eta/presentation/core/widget/select_friend_dialog.dart';
 
 class GroupView extends GetView<GroupViewModel> {
@@ -236,6 +237,8 @@ Widget groupMemberList(GroupViewModel controller) {
       return const Text('구성원이 없습니다.');
     }
 
+    final currentUid = controller.myUid.value;
+
     return SizedBox(
       height: 80,
       child: ListView.builder(
@@ -243,13 +246,30 @@ Widget groupMemberList(GroupViewModel controller) {
         itemCount: members.length,
         itemBuilder: (context, index) {
           final user = members[index];
+          final isSelf = user.uid == currentUid;
+
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Column(
-              children: [
-                CircleAvatar(backgroundImage: NetworkImage(user.photoUrl)),
-                Text(user.name, style: const TextStyle(fontSize: 12)),
-              ],
+            child: GestureDetector(
+              onTap: () {
+                if (controller.isOtherUser(user)) {
+                  Get.dialog(
+                    userInfoDialogView(
+                      targetUser: user,
+                      createChatRoom: controller.createChatRoom,
+                    ),
+                  );
+                }
+              },
+              child: Opacity(
+                opacity: isSelf ? 0.4 : 1.0, // 본인은 반투명하게
+                child: Column(
+                  children: [
+                    CircleAvatar(backgroundImage: NetworkImage(user.photoUrl)),
+                    Text(user.name, style: const TextStyle(fontSize: 12)),
+                  ],
+                ),
+              ),
             ),
           );
         },
