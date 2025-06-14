@@ -17,7 +17,7 @@ class BottomNavView extends GetView<BottomNavViewModel> {
       return Scaffold(
         body: IndexedStack(
           index: index,
-          children: const [HomeView(), ProfileView(), SettingView()],
+          children: [HomeView(), ProfileView(), SettingView()],
         ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: index,

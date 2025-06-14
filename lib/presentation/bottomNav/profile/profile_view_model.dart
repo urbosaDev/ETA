@@ -3,17 +3,21 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
+import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 
 class ProfileViewModel extends GetxController {
   final AuthRepository _authRepository;
   final UserRepository _userRepository;
+  final ChatRepository _chatRepository;
 
   ProfileViewModel({
     required AuthRepository authRepository,
     required UserRepository userRepository,
+    required ChatRepository chatRepository,
   }) : _authRepository = authRepository,
-       _userRepository = userRepository;
+       _userRepository = userRepository,
+       _chatRepository = chatRepository;
 
   final Rx<UserModel?> userModel = Rx<UserModel?>(null);
   final RxList<UserModel> friendList = <UserModel>[].obs;
@@ -56,6 +60,40 @@ class ProfileViewModel extends GetxController {
 
   Future<void> getUsersByUids(List<String> uids) async {
     friendList.value = await _userRepository.getUsersByUids(uids);
+  }
+
+  String generateChatRoomId(String uid1, String uid2) {
+    final sorted = [uid1, uid2]..sort();
+    return '${sorted[0]}_${sorted[1]}';
+  }
+
+  Future<String?> createChatRoom(String friendUid) async {
+    try {
+      final myUid = userModel.value!.uid;
+      final chatRoomId = generateChatRoomId(myUid, friendUid);
+
+      final exists = await _chatRepository.chatRoomExists(chatRoomId);
+      if (exists) return chatRoomId;
+
+      final chatRoomData = {
+        'participantIds': [myUid, friendUid],
+        'lastMessage': '',
+        'lastMessageAt': DateTime.now(),
+      };
+
+      await _chatRepository.createChatRoom(
+        chatId: chatRoomId,
+        data: chatRoomData,
+      );
+      await _userRepository.addPrivateChatId(myUid, chatRoomId);
+      await _userRepository.addPrivateChatId(friendUid, chatRoomId);
+
+      return chatRoomId;
+    } catch (e, stack) {
+      print('🔥 채팅방 생성 오류: $e');
+      print(stack);
+      return null;
+    }
   }
 }
 // userModel fetch, stream 

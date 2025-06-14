@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/%08add_friend/add_friend_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/profile/profile_view_model.dart';
+import 'package:what_is_your_eta/presentation/core/dialog/user_info_dialog.dart';
 import 'package:what_is_your_eta/presentation/core/widget/user_tile.dart';
 
 class ProfileView extends GetView<ProfileViewModel> {
@@ -94,7 +95,19 @@ class ProfileView extends GetView<ProfileViewModel> {
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          ...friends.map((user) => UserTile(user: user)).toList(),
+          ...friends.map((user) {
+            return GestureDetector(
+              onTap: () {
+                Get.dialog(
+                  userInfoDialogView(
+                    targetUser: user,
+                    createChatRoom: controller.createChatRoom,
+                  ),
+                );
+              },
+              child: UserTile(user: user),
+            );
+          }).toList(),
         ],
       );
     });

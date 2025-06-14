@@ -44,7 +44,7 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                             Get.dialog(
                               userInfoDialogView(
                                 targetUser: e,
-                                controller: controller,
+                                createChatRoom: controller.createChatRoom,
                               ),
                             );
                           },
