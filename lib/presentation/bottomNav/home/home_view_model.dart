@@ -38,6 +38,7 @@ class HomeViewModel extends GetxController {
   void onClose() {
     _userSub?.cancel();
     super.onClose();
+    print('HomeViewModel closed');
   }
 
   void _initUser() {

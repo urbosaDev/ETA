@@ -17,7 +17,7 @@ class BottomNavView extends GetView<BottomNavViewModel> {
       return Scaffold(
         body: IndexedStack(
           index: index,
-          children: const [HomeView(), NotificationView(), SettingView()],
+          children: const [HomeView(), ProfileView(), SettingView()],
         ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: index,
@@ -25,8 +25,8 @@ class BottomNavView extends GetView<BottomNavViewModel> {
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
             BottomNavigationBarItem(
-              icon: Icon(Icons.notifications),
-              label: '알림',
+              icon: Icon(Icons.emoji_people_rounded),
+              label: '프로필',
             ),
             BottomNavigationBarItem(icon: Icon(Icons.settings), label: '설정'),
           ],
