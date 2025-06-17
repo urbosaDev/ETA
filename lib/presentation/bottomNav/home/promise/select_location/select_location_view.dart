@@ -75,13 +75,12 @@ class SelectLocationView extends StatelessWidget {
                       final selected = controller.selectedLocation.value;
                       return selected != null
                           ? ElevatedButton(
-                            onPressed: () async {
-                              await Future.delayed(
-                                const Duration(milliseconds: 100),
-                              );
-                              Get.back(
-                                result: controller.selectedLocation.value,
-                              );
+                            onPressed: () {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                Get.back(
+                                  result: controller.selectedLocation.value,
+                                );
+                              });
                             },
                             child: Text("${selected.placeName} 선택하기"),
                           )
