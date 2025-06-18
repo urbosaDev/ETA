@@ -18,7 +18,9 @@ class BottomNavBinding extends Bindings {
   void dependencies() {
     // ViewModels
 
-    Get.put(BottomNavViewModel(tokenRepository: Get.find<TokenRepository>()));
+    Get.put(
+      BottomNavViewModel(fcmTokenRepository: Get.find<FcmTokenRepository>()),
+    );
     Get.put(
       HomeViewModel(
         authRepository: Get.find<AuthRepository>(),
@@ -29,7 +31,7 @@ class BottomNavBinding extends Bindings {
     Get.put(
       SettingViewModel(
         authRepository: Get.find<AuthRepository>(),
-        tokenRepository: Get.find<TokenRepository>(),
+        fcmTokenRepository: Get.find<FcmTokenRepository>(),
       ),
     );
     Get.put(NotificationViewModel());

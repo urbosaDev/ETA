@@ -4,15 +4,15 @@ import 'package:what_is_your_eta/data/repository/token_repository.dart';
 
 class SettingViewModel extends GetxController {
   final AuthRepository _authRepository;
-  final TokenRepository _tokenRepository;
+  final FcmTokenRepository _fcmTokenRepository;
   SettingViewModel({
     required AuthRepository authRepository,
-    required TokenRepository tokenRepository,
-  }) : _tokenRepository = tokenRepository,
+    required FcmTokenRepository fcmTokenRepository,
+  }) : _fcmTokenRepository = fcmTokenRepository,
        _authRepository = authRepository;
 
   Future<void> signOut() async {
-    await _tokenRepository.deleteFcmToken();
+    await _fcmTokenRepository.deleteFcmToken();
     await _authRepository.signOut();
   }
 }

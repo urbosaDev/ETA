@@ -42,8 +42,8 @@ class DependencyInjection {
     );
 
     Get.put<FcmTokenService>(FcmTokenService(), permanent: true);
-    Get.put<TokenRepository>(
-      FcmTokenRepositoryImpl(Get.find<FcmTokenService>()),
+    Get.put<FcmTokenRepository>(
+      FcmTokenRepository(service: Get.find<FcmTokenService>()),
       permanent: true,
     );
 
