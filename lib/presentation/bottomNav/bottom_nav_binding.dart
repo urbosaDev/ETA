@@ -34,7 +34,7 @@ class BottomNavBinding extends Bindings {
         fcmTokenRepository: Get.find<FcmTokenRepository>(),
       ),
     );
-    Get.put(NotificationViewModel());
+
     Get.put(
       PrivateChatViewModel(
         userRepository: Get.find<UserRepository>(),
@@ -43,5 +43,12 @@ class BottomNavBinding extends Bindings {
       ),
     );
     Get.put(AddFriendViewModel(userRepository: Get.find<UserRepository>()));
+
+    Get.put(
+      ProfileViewModel(
+        userRepository: Get.find<UserRepository>(),
+        authRepository: Get.find<AuthRepository>(),
+      ),
+    );
   }
 }
