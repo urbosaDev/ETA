@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/home_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/bottom_nav_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/notification/notification_view.dart';

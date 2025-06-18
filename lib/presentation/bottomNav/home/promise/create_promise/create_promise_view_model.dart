@@ -5,6 +5,7 @@ import 'package:what_is_your_eta/data/model/group_model.dart';
 import 'package:what_is_your_eta/data/model/location_model/promise_location_model.dart';
 import 'package:what_is_your_eta/data/model/promise_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
+import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
@@ -14,14 +15,17 @@ class CreatePromiseViewModel extends GetxController {
   final GroupRepository _groupRepository;
   final UserRepository _userRepository;
   final PromiseRepository _promiseRepository;
+  final FcmRepository _fcmRepository;
   CreatePromiseViewModel({
     required this.groupId,
     required GroupRepository groupRepository,
     required UserRepository userRepository,
     required PromiseRepository promiseRepository,
+    required FcmRepository fcmRepository,
   }) : _groupRepository = groupRepository,
        _userRepository = userRepository,
-       _promiseRepository = promiseRepository;
+       _promiseRepository = promiseRepository,
+       _fcmRepository = fcmRepository;
 
   final Rx<GroupModel?> groupModel = Rx<GroupModel?>(null);
   final RxList<UserModel> memberList = <UserModel>[].obs;
@@ -94,12 +98,17 @@ class CreatePromiseViewModel extends GetxController {
     });
   }
 
-  Future<void> fetchMembers(List<String> memberIds) async {
+  Future<void> fetchMembers(
+    List<String> memberIds, {
+    bool clearSelection = false,
+  }) async {
     isMemberFetchLoading.value = true;
     final members = await _userRepository.getUsersByUids(memberIds);
     memberList.value = members;
     isMemberFetchLoading.value = false;
-    selectedMemberIds.clear();
+    if (clearSelection) {
+      selectedMemberIds.clear();
+    }
   }
 
   void toggleMember(UserModel member) {
@@ -142,7 +151,23 @@ class CreatePromiseViewModel extends GetxController {
         groupId: groupId,
         promiseId: createdId,
       );
+      // FCM 발송
+      try {
+        final memberUidsSnapshot = selectedMemberIds.toList();
 
+        for (final memberUid in memberUidsSnapshot) {
+          final tokens = await _userRepository.getFcmTokens(memberUid);
+          if (tokens.isNotEmpty) {
+            await _fcmRepository.sendPromiseNotification(
+              targetTokens: tokens,
+              title: '${groupModel.value?.title ?? '그룹'} 약속 생성',
+              body: '${promiseName.value} 약속이 생성되었습니다!',
+            );
+          }
+        }
+      } catch (e) {
+        print('❌ FCM 약속 생성 알림 발송 실패: $e');
+      }
       return true; // 성공!
     } catch (e) {
       return false; // 실패

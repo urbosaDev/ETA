@@ -93,7 +93,7 @@ class PromiseStatusView extends GetView<PromiseStatusViewModel> {
       return Stack(
         children: [
           NaverMap(
-            key: UniqueKey(),
+            // key: UniqueKey(),
             options: NaverMapViewOptions(
               initialCameraPosition: NCameraPosition(
                 target: NLatLng(

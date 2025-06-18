@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
+import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
@@ -211,6 +212,7 @@ class GroupView extends GetView<GroupViewModel> {
                           groupRepository: Get.find<GroupRepository>(),
                           userRepository: Get.find<UserRepository>(),
                           promiseRepository: Get.find<PromiseRepository>(),
+                          fcmRepository: Get.find<FcmRepository>(),
                         ),
                       );
                     }),

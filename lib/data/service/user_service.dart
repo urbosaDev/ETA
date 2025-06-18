@@ -97,4 +97,10 @@ class UserService {
         .map((doc) => doc.data() as Map<String, dynamic>)
         .toList();
   }
+
+  Future<List<String>> getFcmTokens(String uid) async {
+    final snapshot = await _userRef.doc(uid).collection('fcmTokens').get();
+
+    return snapshot.docs.map((doc) => doc.id).toList();
+  }
 }

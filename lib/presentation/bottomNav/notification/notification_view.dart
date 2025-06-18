@@ -7,6 +7,6 @@ class NotificationView extends GetView<NotificationViewModel> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: const Text('Notification')));
+    return Text('Notification');
   }
 }

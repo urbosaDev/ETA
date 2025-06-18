@@ -10,24 +10,27 @@ class FcmService {
       'https://fcm.googleapis.com/v1/projects/what-s-your-eta-1805f/messages:send';
   static const _scope = 'https://www.googleapis.com/auth/firebase.messaging';
 
-  late ServiceAccountCredentials _credentials;
+  ServiceAccountCredentials? _credentials;
   AccessCredentials? _accessCredentials;
 
-  FcmService() {
-    _initCredentials();
-  }
-
-  Future<void> _initCredentials() async {
+  /// 명시적 초기화 메서드
+  Future<void> init() async {
     final jsonString = await rootBundle.loadString(
-      'assets/keys/firebase_service_account.json',
+      'assets/keys/what-s-your-eta-1805f-firebase-adminsdk-fbsvc-4547e7bcc6.json',
     );
     final jsonMap = json.decode(jsonString);
     _credentials = ServiceAccountCredentials.fromJson(jsonMap);
+
+    print(' FcmService init 완료');
   }
 
   /// AccessToken 발급
   Future<String> _getAccessToken() async {
-    // 만약 기존에 유효한 token 있으면 재사용 가능
+    if (_credentials == null) {
+      throw Exception('FcmService.init() 먼저 호출 필요!');
+    }
+
+    // 기존 유효 토큰 재사용
     if (_accessCredentials != null &&
         _accessCredentials!.accessToken.hasExpired == false) {
       return _accessCredentials!.accessToken.data;
@@ -36,7 +39,7 @@ class FcmService {
     final client = http.Client();
     try {
       final accessCredentials = await obtainAccessCredentialsViaServiceAccount(
-        _credentials,
+        _credentials!,
         [_scope],
         client,
       );
@@ -56,12 +59,23 @@ class FcmService {
     Map<String, String>? data,
   }) async {
     final accessToken = await _getAccessToken();
+    final nowMillis = DateTime.now().millisecondsSinceEpoch.toString();
+    final augmentedData = {...(data ?? {}), 'unique_timestamp': nowMillis};
 
     final messagePayload = {
       'message': {
         'token': targetToken,
         'notification': {'title': title, 'body': body},
-        'data': data ?? {},
+        'data': augmentedData,
+        'apns': {
+          'headers': {'apns-priority': '10', 'apns-push-type': 'alert'},
+          'payload': {
+            'aps': {
+              'alert': {'title': title, 'body': body},
+              'sound': 'default',
+            },
+          },
+        },
       },
     };
 
@@ -75,9 +89,9 @@ class FcmService {
     );
 
     if (response.statusCode == 200) {
-      print('FCM 메시지 발송 성공!');
+      print(' FCM 메시지 발송 성공!');
     } else {
-      print('FCM 메시지 발송 실패: ${response.statusCode} ${response.body}');
+      print(' FCM 메시지 발송 실패: ${response.statusCode} ${response.body}');
     }
   }
 }

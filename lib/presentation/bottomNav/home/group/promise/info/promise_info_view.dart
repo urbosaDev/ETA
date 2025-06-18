@@ -80,7 +80,7 @@ Widget buildPromiseLocationSection(PromiseLocationModel location) {
       SizedBox(
         height: 300,
         child: NaverMap(
-          key: UniqueKey(),
+          // key: UniqueKey(),
           options: NaverMapViewOptions(
             initialCameraPosition: NCameraPosition(target: latLng, zoom: 16),
             locationButtonEnable: false,

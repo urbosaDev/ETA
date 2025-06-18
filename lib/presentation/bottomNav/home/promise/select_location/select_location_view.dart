@@ -63,7 +63,7 @@ class SelectLocationView extends StatelessWidget {
             child: Stack(
               children: [
                 NaverMap(
-                  key: UniqueKey(),
+                  // key: UniqueKey(),
                   options: const NaverMapViewOptions(),
                   onMapReady: controller.onMapReady,
                 ),
@@ -76,9 +76,11 @@ class SelectLocationView extends StatelessWidget {
                       return selected != null
                           ? ElevatedButton(
                             onPressed: () {
-                              Get.back(
-                                result: controller.selectedLocation.value,
-                              );
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                Get.back(
+                                  result: controller.selectedLocation.value,
+                                );
+                              });
                             },
                             child: Text("${selected.placeName} 선택하기"),
                           )

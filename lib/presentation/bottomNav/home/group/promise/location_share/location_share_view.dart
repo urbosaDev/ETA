@@ -147,7 +147,7 @@ class LocationShareView extends GetView<LocationShareViewModel> {
     }
 
     return NaverMap(
-      key: UniqueKey(),
+      // key: UniqueKey(),
       options: NaverMapViewOptions(
         initialCameraPosition: NCameraPosition(
           target: NLatLng(location.latitude, location.longitude),
