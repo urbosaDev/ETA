@@ -25,8 +25,9 @@ class DependencyInjection {
   static Future<void> init() async {
     final kakaoApiKey = dotenv.env['KAKAO_REST_API_KEY']!;
     final kakaoBaseUrl = dotenv.env['KAKAO_BASE_URL']!;
-    final fcmService = FcmService();
-    await fcmService.init();
+    final fcmFunctionUrl = dotenv.env['FIREBASE_FCM_FUNCTION_URL']!;
+    final fcmService = FcmService(functionUrl: fcmFunctionUrl);
+
     Get.put<FcmService>(fcmService, permanent: true);
     Get.put<AuthService>(AuthService(), permanent: true);
     Get.put<UserService>(UserService(), permanent: true);

@@ -2,7 +2,7 @@ import 'package:what_is_your_eta/data/service/fcm_service.dart';
 
 abstract interface class FcmRepository {
   Future<void> sendChatNotification({
-    required String targetToken,
+    required List<String> targetTokens,
     required String senderName,
     required String message,
   });
@@ -28,12 +28,13 @@ class FcmRepositoryImpl implements FcmRepository {
 
   @override
   Future<void> sendChatNotification({
-    required String targetToken,
+    required List<String> targetTokens,
     required String senderName,
     required String message,
   }) async {
-    await _fcmService.sendFcmMessage(
-      targetToken: targetToken,
+    if (targetTokens.isEmpty) return;
+    await _fcmService.sendFcmMessages(
+      targetTokens: targetTokens,
       title: senderName,
       body: message,
     );
@@ -45,13 +46,12 @@ class FcmRepositoryImpl implements FcmRepository {
     required String groupName,
     required String message,
   }) async {
-    for (final token in targetTokens) {
-      await _fcmService.sendFcmMessage(
-        targetToken: token,
-        title: '[$groupName]',
-        body: message,
-      );
-    }
+    if (targetTokens.isEmpty) return;
+    await _fcmService.sendFcmMessages(
+      targetTokens: targetTokens,
+      title: '[$groupName]',
+      body: message,
+    );
   }
 
   @override
@@ -60,12 +60,11 @@ class FcmRepositoryImpl implements FcmRepository {
     required String title,
     required String body,
   }) async {
-    for (final token in targetTokens) {
-      await _fcmService.sendFcmMessage(
-        targetToken: token,
-        title: title,
-        body: body,
-      );
-    }
+    if (targetTokens.isEmpty) return;
+    await _fcmService.sendFcmMessages(
+      targetTokens: targetTokens,
+      title: title,
+      body: body,
+    );
   }
 }

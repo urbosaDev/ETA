@@ -128,19 +128,22 @@ class CreateGroupViewModel extends GetxController {
       // FCM 발송
 
       try {
-        for (final memberUid in finalSelectedUid) {
-          if (memberUid == currentUser) continue;
+        final otherUids =
+            finalSelectedUid.where((uid) => uid != currentUser).toList();
 
-          final tokens = await _userRepository.getFcmTokens(memberUid);
-          if (tokens.isNotEmpty) {
-            for (final token in tokens) {
-              await _fcmRepository.sendGroupNotification(
-                targetTokens: [token],
-                groupName: groupTitle.value,
-                message: '채팅방이 생성되었습니다',
-              );
-            }
-          }
+        final allTokens = <String>[];
+
+        for (final uid in otherUids) {
+          final tokens = await _userRepository.getFcmTokens(uid);
+          allTokens.addAll(tokens);
+        }
+
+        if (allTokens.isNotEmpty) {
+          await _fcmRepository.sendGroupNotification(
+            targetTokens: allTokens,
+            groupName: groupTitle.value,
+            message: '채팅방이 생성되었습니다',
+          );
         }
       } catch (e) {
         print('❌ FCM 그룹 생성 알림 발송 실패: $e');
