@@ -35,6 +35,8 @@ class PromiseInfoViewModel extends GetxController {
   void onClose() {
     // Clean up any resources or streams if necessary
     super.onClose();
+    _promiseSub?.cancel();
+
     // debugPrint('🗑️ PromiseInfoViewModel deleted');
   }
 
