@@ -4,10 +4,10 @@ import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
+import 'package:what_is_your_eta/data/repository/fcm_token_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
-import 'package:what_is_your_eta/data/repository/token_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/data/service/auth_service.dart';
@@ -42,8 +42,8 @@ class DependencyInjection {
     );
 
     Get.put<FcmTokenService>(FcmTokenService(), permanent: true);
-    Get.put<TokenRepository>(
-      FcmTokenRepositoryImpl(Get.find<FcmTokenService>()),
+    Get.put<FcmTokenRepository>(
+      FcmTokenRepository(service: Get.find<FcmTokenService>()),
       permanent: true,
     );
 

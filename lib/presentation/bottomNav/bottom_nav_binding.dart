@@ -1,8 +1,9 @@
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
+import 'package:what_is_your_eta/data/repository/fcm_token_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
-import 'package:what_is_your_eta/data/repository/token_repository.dart';
+
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/home_view_model.dart';
@@ -18,7 +19,9 @@ class BottomNavBinding extends Bindings {
   void dependencies() {
     // ViewModels
 
-    Get.put(BottomNavViewModel(tokenRepository: Get.find<TokenRepository>()));
+    Get.put(
+      BottomNavViewModel(fcmTokenRepository: Get.find<FcmTokenRepository>()),
+    );
     Get.put(
       HomeViewModel(
         authRepository: Get.find<AuthRepository>(),
@@ -29,7 +32,7 @@ class BottomNavBinding extends Bindings {
     Get.put(
       SettingViewModel(
         authRepository: Get.find<AuthRepository>(),
-        tokenRepository: Get.find<TokenRepository>(),
+        fcmTokenRepository: Get.find<FcmTokenRepository>(),
       ),
     );
     Get.put(NotificationViewModel());

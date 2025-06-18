@@ -144,6 +144,8 @@ class CreatePromiseViewModel extends GetxController {
         userLocations: null,
         penaltySuggestions: {},
         selectedPenalty: null,
+        notify1HourScheduled: false,
+        notifyStartScheduled: false,
       );
 
       final createdId = await _promiseRepository.createPromise(promise);

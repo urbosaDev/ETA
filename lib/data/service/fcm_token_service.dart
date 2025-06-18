@@ -7,7 +7,6 @@ class FcmTokenService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
-  // FCM Token 저장 (최초 로그인 시 / 토큰 refresh 시)
   Future<void> saveFcmToken() async {
     final user = _auth.currentUser;
     if (user == null) return;
@@ -15,21 +14,15 @@ class FcmTokenService {
     final token = await _messaging.getToken();
     if (token == null) return;
 
-    final fcmTokenDoc = _firestore
-        .collection('users')
-        .doc(user.uid)
-        .collection('fcmTokens')
-        .doc(token);
+    final userDocRef = _firestore.collection('users').doc(user.uid);
 
-    await fcmTokenDoc.set({
-      'createdAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+    await userDocRef.set({
+      'fcmTokens': FieldValue.arrayUnion([token]),
+    }, SetOptions(merge: true));
 
-    print('FCM Token 저장됨: $token');
+    print('FCM Token 저장됨 (Array): $token');
   }
 
-  // FCM Token 삭제 (로그아웃 시 사용)
   Future<void> deleteFcmToken() async {
     final user = _auth.currentUser;
     if (user == null) return;
@@ -37,15 +30,13 @@ class FcmTokenService {
     final token = await _messaging.getToken();
     if (token == null) return;
 
-    final fcmTokenDoc = _firestore
-        .collection('users')
-        .doc(user.uid)
-        .collection('fcmTokens')
-        .doc(token);
+    final userDocRef = _firestore.collection('users').doc(user.uid);
 
-    await fcmTokenDoc.delete();
+    await userDocRef.update({
+      'fcmTokens': FieldValue.arrayRemove([token]),
+    });
 
-    print('FCM Token 삭제됨: $token');
+    print('FCM Token 삭제됨 (Array): $token');
   }
 
   // FCM Token refresh 대응 → app 실행 시 listen 등록

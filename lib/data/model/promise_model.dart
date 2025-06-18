@@ -16,7 +16,8 @@ class PromiseModel {
 
   final Map<String, Penalty>? penaltySuggestions;
   final Penalty? selectedPenalty;
-
+  final bool notify1HourScheduled;
+  final bool notifyStartScheduled;
   PromiseModel({
     required this.id,
     required this.groupId,
@@ -26,6 +27,8 @@ class PromiseModel {
     required this.time,
 
     required this.arriveUserIds,
+    required this.notify1HourScheduled,
+    required this.notifyStartScheduled,
     this.userLocations,
     this.penaltySuggestions,
     this.selectedPenalty,
@@ -55,6 +58,8 @@ class PromiseModel {
                 json['selectedPenalty'] as Map<String, dynamic>,
               )
               : null,
+      notify1HourScheduled: json['notify1HourScheduled'] as bool? ?? false,
+      notifyStartScheduled: json['notifyStartScheduled'] as bool? ?? false,
     );
   }
 
@@ -75,6 +80,8 @@ class PromiseModel {
           (k, v) => MapEntry(k, v.toJson()),
         ),
       'selectedPenalty': selectedPenalty?.toJson(),
+      'notify1HourScheduled': notify1HourScheduled,
+      'notifyStartScheduled': notifyStartScheduled,
     };
   }
 }

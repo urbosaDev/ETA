@@ -3,9 +3,9 @@ import 'package:what_is_your_eta/data/repository/token_repository.dart';
 
 class BottomNavViewModel extends GetxController {
   final currentIndex = 0.obs;
-  final TokenRepository _tokenRepository;
-  BottomNavViewModel({required TokenRepository tokenRepository})
-    : _tokenRepository = tokenRepository;
+  final FcmTokenRepository _fcmTokenRepository;
+  BottomNavViewModel({required FcmTokenRepository fcmTokenRepository})
+    : _fcmTokenRepository = fcmTokenRepository;
   void changeIndex(int index) {
     currentIndex.value = index;
   }
@@ -15,16 +15,14 @@ class BottomNavViewModel extends GetxController {
     super.onInit();
 
     // listen 등록 → 앱 실행 중 갱신 대응
-    _tokenRepository.listenTokenRefresh();
+    _fcmTokenRepository.listenTokenRefresh();
 
     // 최초 저장
-    _tokenRepository.saveFcmToken();
+    _fcmTokenRepository.saveFcmToken();
   }
 
   @override
   void onClose() {
-    _tokenRepository.deleteFcmToken();
-
     super.onClose();
   }
 }
