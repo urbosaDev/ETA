@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
+import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
@@ -13,6 +14,8 @@ import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/lounge_in_
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/lounge_in_group/lounge_in_group_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_view_model.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/dialog/user_info_dialog.dart';
@@ -256,7 +259,29 @@ Widget groupMemberList(GroupViewModel controller) {
                   Get.dialog(
                     userInfoDialogView(
                       targetUser: user,
-                      createChatRoom: controller.createChatRoom,
+                      onChatPressed: () async {
+                        final chatRoomId = await controller.createChatRoom(
+                          user.uid,
+                        );
+                        if (chatRoomId != null) {
+                          Get.back(); // 다이얼로그 닫기
+                          Get.to(
+                            () => PrivateChatRoomView(),
+                            binding: BindingsBuilder(() {
+                              Get.put(
+                                PrivateChatRoomViewModel(
+                                  chatRoomId: chatRoomId,
+                                  friendUid: user.uid,
+                                  chatRepository: Get.find<ChatRepository>(),
+                                  fcmRepository: Get.find<FcmRepository>(),
+                                  userRepository: Get.find<UserRepository>(),
+                                  myUid: controller.myUid.value,
+                                ),
+                              );
+                            }),
+                          );
+                        }
+                      },
                     ),
                   );
                 }

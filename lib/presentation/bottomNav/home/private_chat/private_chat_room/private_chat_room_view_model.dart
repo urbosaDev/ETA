@@ -12,15 +12,15 @@ class PrivateChatRoomViewModel extends GetxController {
   final UserRepository _userRepository;
   final FcmRepository _fcmRepository;
   final String chatRoomId;
-  final UserModel my;
-  final String friendUid; // ❗️이제는 uid만 받기
+  final String myUid;
+  final String friendUid;
 
   PrivateChatRoomViewModel({
     required ChatRepository chatRepository,
     required UserRepository userRepository,
     required FcmRepository fcmRepository,
     required this.chatRoomId,
-    required this.my,
+    required this.myUid,
     required this.friendUid,
   }) : _chatRepository = chatRepository,
        _userRepository = userRepository,
@@ -29,12 +29,14 @@ class PrivateChatRoomViewModel extends GetxController {
   final RxList<MessageModel> messages = <MessageModel>[].obs;
   final Rxn<UserModel> friendModel = Rxn<UserModel>();
   StreamSubscription<UserModel>? _friendSub;
+  final Rxn<UserModel> myModel = Rxn<UserModel>();
+  StreamSubscription<UserModel>? _mySub;
 
   @override
   void onInit() {
     super.onInit();
     _listenToMessages();
-    _listenToFriend();
+    _listenToMeAndFriend();
   }
 
   void _listenToMessages() {
@@ -43,27 +45,33 @@ class PrivateChatRoomViewModel extends GetxController {
     });
   }
 
-  void _listenToFriend() {
+  void _listenToMeAndFriend() {
     _friendSub = _userRepository
         .streamUser(friendUid)
         .listen((user) => friendModel.value = user);
+    _mySub = _userRepository
+        .streamUser(myUid)
+        .listen((user) => myModel.value = user);
   }
 
   @override
   void onClose() {
     _friendSub?.cancel();
+    _mySub?.cancel();
     super.onClose();
     // debugPrint('🗑️ PrivateChatRoomViewModel deleted');
   }
 
   Future<void> sendMessage(String content) async {
-    if (content.trim().isEmpty) return;
+    final myName = myModel.value?.name;
+
+    if (content.trim().isEmpty || myName == null) return;
 
     final message = TextMessageModel(
-      senderId: my.uid,
+      senderId: myUid,
       text: content.trim(),
       sentAt: DateTime.now(),
-      readBy: [my.uid],
+      readBy: [myUid],
     );
 
     await _chatRepository.sendMessage(chatRoomId, message);
@@ -74,13 +82,13 @@ class PrivateChatRoomViewModel extends GetxController {
         for (final token in tokens) {
           await _fcmRepository.sendChatNotification(
             targetToken: token,
-            senderName: my.name,
+            senderName: myName,
             message: content.trim(),
           );
         }
       }
     } catch (e) {
-      print('FCM 발송 실패: $e');
+      return;
     }
   }
 }

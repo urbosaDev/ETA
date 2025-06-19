@@ -89,9 +89,7 @@ class ProfileViewModel extends GetxController {
       await _userRepository.addPrivateChatId(friendUid, chatRoomId);
 
       return chatRoomId;
-    } catch (e, stack) {
-      print('🔥 채팅방 생성 오류: $e');
-      print(stack);
+    } catch (e) {
       return null;
     }
   }

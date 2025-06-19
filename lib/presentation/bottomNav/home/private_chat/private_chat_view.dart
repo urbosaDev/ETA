@@ -38,13 +38,38 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
               children:
                   controller.friendList.isEmpty
                       ? [const Text('친구가 없습니다.')]
-                      : controller.friendList.map((e) {
+                      : controller.friendList.map((user) {
                         return GestureDetector(
                           onTap: () {
                             Get.dialog(
                               userInfoDialogView(
-                                targetUser: e,
-                                createChatRoom: controller.createChatRoom,
+                                targetUser: user,
+                                onChatPressed: () async {
+                                  final chatRoomId = await controller
+                                      .createChatRoom(user.uid);
+                                  if (chatRoomId != null) {
+                                    Get.back(); // 다이얼로그 닫기
+                                    Get.to(
+                                      () => PrivateChatRoomView(),
+                                      binding: BindingsBuilder(() {
+                                        Get.put(
+                                          PrivateChatRoomViewModel(
+                                            chatRoomId: chatRoomId,
+                                            friendUid: user.uid,
+                                            chatRepository:
+                                                Get.find<ChatRepository>(),
+                                            fcmRepository:
+                                                Get.find<FcmRepository>(),
+                                            userRepository:
+                                                Get.find<UserRepository>(),
+                                            myUid:
+                                                controller.userModel.value!.uid,
+                                          ),
+                                        );
+                                      }),
+                                    );
+                                  }
+                                },
                               ),
                             );
                           },
@@ -52,7 +77,7 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                             width: 60,
                             height: 60,
                             color: Colors.yellow,
-                            child: Text(e.name),
+                            child: Text(user.name),
                           ),
                         );
                       }).toList(),
@@ -87,7 +112,7 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                                     userRepository: Get.find<UserRepository>(),
                                     fcmRepository: Get.find<FcmRepository>(),
                                     chatRoomId: chatRoom.id,
-                                    my: my,
+                                    myUid: my.uid,
                                     friendUid: opponent.uid,
                                   ),
                                 );

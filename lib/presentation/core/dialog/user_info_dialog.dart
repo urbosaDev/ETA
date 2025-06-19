@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
-import 'package:what_is_your_eta/data/repository/chat_repository.dart';
-import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
-import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view_model.dart';
 
 Widget userInfoDialogView({
   required UserModel targetUser,
-  required Future<String?> Function(String friendUid) createChatRoom,
+  required VoidCallback onChatPressed,
 }) {
   return AlertDialog(
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -42,29 +37,7 @@ Widget userInfoDialogView({
           child: ElevatedButton.icon(
             icon: const Icon(Icons.chat_bubble_outline),
             label: const Text("1:1 채팅"),
-            onPressed: () async {
-              Get.back();
-              final chatRoomId = await createChatRoom(targetUser.uid);
-
-              if (chatRoomId != null) {
-                Get.to(
-                  () => const PrivateChatRoomView(),
-                  arguments: chatRoomId,
-                  binding: BindingsBuilder(() {
-                    Get.put(
-                      PrivateChatRoomViewModel(
-                        chatRepository: Get.find<ChatRepository>(),
-                        userRepository: Get.find<UserRepository>(),
-                        fcmRepository: Get.find<FcmRepository>(),
-                        chatRoomId: chatRoomId,
-                        my: targetUser,
-                        friendUid: targetUser.uid,
-                      ),
-                    );
-                  }),
-                );
-              }
-            },
+            onPressed: onChatPressed,
           ),
         ),
       ],

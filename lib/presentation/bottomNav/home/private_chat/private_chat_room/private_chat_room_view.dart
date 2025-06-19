@@ -39,14 +39,14 @@ class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
 
               // 개인 채팅에서는 유저맵을 간단히 구성
               final userMap = {
-                controller.my.uid: controller.my,
-                friend.uid: friend,
+                controller.myUid: controller.myModel.value!,
+                friend.uid: controller.friendModel.value!,
               };
 
               return ChatMessageListView(
                 messages: msgs,
                 userMap: userMap,
-                myUid: controller.my.uid,
+                myUid: controller.myUid,
               );
             }),
           ),
