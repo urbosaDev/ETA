@@ -103,13 +103,21 @@ class PrivateChatViewModel extends GetxController {
     return '${sorted[0]}_${sorted[1]}';
   }
 
+  final RxBool navigateToChat = false.obs;
+  void resetNavigateToChat() {
+    navigateToChat.value = false;
+  }
+
   Future<String?> createChatRoom(String friendUid) async {
     try {
       final myUid = userModel.value!.uid;
       final chatRoomId = generateChatRoomId(myUid, friendUid);
 
       final exists = await _chatRepository.chatRoomExists(chatRoomId);
-      if (exists) return chatRoomId;
+      if (exists) {
+        navigateToChat.value = true;
+        return chatRoomId;
+      }
 
       final chatRoomData = {
         'participantIds': [myUid, friendUid],
@@ -123,11 +131,10 @@ class PrivateChatViewModel extends GetxController {
       );
       await _userRepository.addPrivateChatId(myUid, chatRoomId);
       await _userRepository.addPrivateChatId(friendUid, chatRoomId);
-
+      navigateToChat.value = true;
       return chatRoomId;
-    } catch (e, stack) {
-      print('🔥 채팅방 생성 오류: $e');
-      print(stack);
+    } catch (e) {
+      navigateToChat.value = false;
       return null;
     }
   }
