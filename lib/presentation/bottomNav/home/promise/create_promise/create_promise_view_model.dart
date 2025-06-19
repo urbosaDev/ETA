@@ -155,20 +155,23 @@ class CreatePromiseViewModel extends GetxController {
       );
       // FCM 발송
       try {
-        final memberUidsSnapshot = selectedMemberIds.toList();
+        final memberUids = selectedMemberIds.toList();
+        final allTokens = <String>[];
 
-        for (final memberUid in memberUidsSnapshot) {
-          final tokens = await _userRepository.getFcmTokens(memberUid);
-          if (tokens.isNotEmpty) {
-            await _fcmRepository.sendPromiseNotification(
-              targetTokens: tokens,
-              title: '${groupModel.value?.title ?? '그룹'} 약속 생성',
-              body: '${promiseName.value} 약속이 생성되었습니다!',
-            );
-          }
+        for (final uid in memberUids) {
+          final tokens = await _userRepository.getFcmTokens(uid);
+          allTokens.addAll(tokens);
+        }
+
+        if (allTokens.isNotEmpty) {
+          await _fcmRepository.sendPromiseNotification(
+            targetTokens: allTokens,
+            title: '${groupModel.value?.title ?? '그룹'} 약속 생성',
+            body: '${promiseName.value} 약속이 생성되었습니다!',
+          );
         }
       } catch (e) {
-        print('❌ FCM 약속 생성 알림 발송 실패: $e');
+        print('FCM 약속 생성 알림 발송 실패: $e');
       }
       return true; // 성공!
     } catch (e) {

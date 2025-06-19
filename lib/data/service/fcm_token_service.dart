@@ -45,18 +45,13 @@ class FcmTokenService {
       final user = _auth.currentUser;
       if (user == null) return;
 
-      final fcmTokenDoc = _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('fcmTokens')
-          .doc(newToken);
+      final userDocRef = _firestore.collection('users').doc(user.uid);
 
-      await fcmTokenDoc.set({
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      await userDocRef.set({
+        'fcmTokens': FieldValue.arrayUnion([newToken]),
+      }, SetOptions(merge: true));
 
-      print('FCM Token 갱신됨: $newToken');
+      print('FCM Token 갱신됨 (Array): $newToken');
     });
   }
 }
