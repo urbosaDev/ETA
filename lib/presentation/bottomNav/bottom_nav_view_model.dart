@@ -1,6 +1,7 @@
 import 'package:get/state_manager.dart';
 import 'package:what_is_your_eta/data/repository/fcm_token_repository.dart';
 
+
 class BottomNavViewModel extends GetxController {
   final currentIndex = 0.obs;
   final FcmTokenRepository _fcmTokenRepository;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/late/late_view_model.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/page2_late/late_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/widget/user_tile.dart';
 
 class LateView extends GetView<LateViewModel> {

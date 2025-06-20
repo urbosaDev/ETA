@@ -133,15 +133,7 @@ class GroupView extends GetView<GroupViewModel> {
                                     () => PromiseView(),
                                     binding: BindingsBuilder(() {
                                       Get.put(
-                                        PromiseViewModel(
-                                          promiseId: promise.id,
-                                          promiseRepository:
-                                              Get.find<PromiseRepository>(),
-                                          authRepository:
-                                              Get.find<AuthRepository>(),
-                                          userRepository:
-                                              Get.find<UserRepository>(),
-                                        ),
+                                        PromiseViewModel(promiseId: promise.id),
                                       );
                                     }),
                                   );

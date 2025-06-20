@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/location_model/promise_location_model.dart';
 import 'package:what_is_your_eta/data/model/promise_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/info/promise_info_view_model.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/page1_info/promise_info_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/widget/user_tile.dart';
 
 class PromiseInfoView extends GetView<PromiseInfoViewModel> {
