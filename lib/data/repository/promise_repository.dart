@@ -1,5 +1,5 @@
 import 'package:what_is_your_eta/data/model/location_model/user_location_model.dart';
-import 'package:what_is_your_eta/data/model/message_model.dart';
+
 import 'package:what_is_your_eta/data/model/penalty_model.dart';
 import 'package:what_is_your_eta/data/model/promise_model.dart';
 import 'package:what_is_your_eta/data/service/promise_service.dart';
@@ -11,8 +11,7 @@ abstract class PromiseRepository {
   Stream<PromiseModel> streamPromise(String promiseId);
   Future<void> deletePromise(String promiseId);
   Future<List<PromiseModel>> getPromisesByIds(List<String> ids);
-  Future<void> sendPromiseMessage(String promiseId, MessageModel message);
-  Stream<List<MessageModel>> streamPromiseMessages(String promiseId);
+
   Future<bool> addPenaltySuggestion({
     required String promiseId,
     required String uid,
@@ -86,18 +85,6 @@ class PromiseRepositoryImpl implements PromiseRepository {
     final futures = ids.map(getPromise); // 기존 단일 getPromise 사용
     final results = await Future.wait(futures);
     return results.whereType<PromiseModel>().toList(); // null 제거
-  }
-
-  @override
-  Future<void> sendPromiseMessage(String promiseId, MessageModel message) {
-    return _service.sendPromiseMessage(promiseId, message.toJson());
-  }
-
-  @override
-  Stream<List<MessageModel>> streamPromiseMessages(String promiseId) {
-    return _service
-        .streamPromiseMessages(promiseId)
-        .map((list) => list.map(MessageModel.fromJson).toList());
   }
 
   @override
@@ -221,25 +208,4 @@ class PromiseRepositoryImpl implements PromiseRepository {
       currentUid: currentUid,
     );
   }
-  // @override
-  // Future<void> updatePenaltyVoters({
-  //   required String promiseId,
-  //   required List<String> voterUids,
-  // }) async {
-  //   await _service.updatePenaltyVoters(
-  //     promiseId: promiseId,
-  //     voterUids: voterUids,
-  //   );
-  // }
-
-  // @override
-  // Future<void> updatePenaltySuggesters({
-  //   required String promiseId,
-  //   required List<String> suggesterUids,
-  // }) async {
-  //   await _service.updatePenaltySuggesters(
-  //     promiseId: promiseId,
-  //     suggesterUids: suggesterUids,
-  //   );
-  // }
 }
