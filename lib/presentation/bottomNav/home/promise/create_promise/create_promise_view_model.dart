@@ -142,8 +142,7 @@ class CreatePromiseViewModel extends GetxController {
 
         arriveUserIds: [],
         userLocations: null,
-        penaltySuggestions: {},
-        selectedPenalty: null,
+
         notify1HourScheduled: false,
         notifyStartScheduled: false,
       );

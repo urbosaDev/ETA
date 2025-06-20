@@ -33,7 +33,6 @@ class LateView extends GetView<LateViewModel> {
               ),
             ),
             const Divider(),
-            _buildPenaltySection(),
           ],
         );
       }),
@@ -54,18 +53,6 @@ class LateView extends GetView<LateViewModel> {
           if (users.isEmpty) const Text('없음'),
           ...users.map((user) => UserTile(user: user)),
         ],
-      ),
-    );
-  }
-
-  Widget _buildPenaltySection() {
-    final penalty = controller.promise.value?.selectedPenalty;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
-      child: Text(
-        penalty != null ? '벌칙: ${penalty.description}' : '벌칙이 정해지지 않았습니다.',
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       ),
     );
   }

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:what_is_your_eta/data/model/location_model/promise_location_model.dart';
 import 'package:what_is_your_eta/data/model/location_model/user_location_model.dart';
-import 'package:what_is_your_eta/data/model/penalty_model.dart';
 
 class PromiseModel {
   final String id;
@@ -14,8 +13,6 @@ class PromiseModel {
   final List<String> arriveUserIds;
   final Map<String, UserLocationModel>? userLocations;
 
-  final Map<String, Penalty>? penaltySuggestions;
-  final Penalty? selectedPenalty;
   final bool notify1HourScheduled;
   final bool notifyStartScheduled;
   PromiseModel({
@@ -30,8 +27,6 @@ class PromiseModel {
     required this.notify1HourScheduled,
     required this.notifyStartScheduled,
     this.userLocations,
-    this.penaltySuggestions,
-    this.selectedPenalty,
   });
 
   factory PromiseModel.fromJson(Map<String, dynamic> json) {
@@ -47,17 +42,7 @@ class PromiseModel {
       userLocations: (json['userLocations'] as Map<String, dynamic>?)?.map(
         (key, value) => MapEntry(key, UserLocationModel.fromJson(value)),
       ),
-      penaltySuggestions: (json['penaltySuggestions'] as Map<String, dynamic>?)
-          ?.map(
-            (key, value) =>
-                MapEntry(key, Penalty.fromJson(value as Map<String, dynamic>)),
-          ),
-      selectedPenalty:
-          (json['selectedPenalty'] is Map<String, dynamic>)
-              ? Penalty.fromJson(
-                json['selectedPenalty'] as Map<String, dynamic>,
-              )
-              : null,
+
       notify1HourScheduled: json['notify1HourScheduled'] as bool? ?? false,
       notifyStartScheduled: json['notifyStartScheduled'] as bool? ?? false,
     );
@@ -75,11 +60,7 @@ class PromiseModel {
       'arriveUserIds': arriveUserIds,
       if (userLocations != null)
         'userLocations': userLocations!.map((k, v) => MapEntry(k, v.toJson())),
-      if (penaltySuggestions != null)
-        'penaltySuggestions': penaltySuggestions!.map(
-          (k, v) => MapEntry(k, v.toJson()),
-        ),
-      'selectedPenalty': selectedPenalty?.toJson(),
+
       'notify1HourScheduled': notify1HourScheduled,
       'notifyStartScheduled': notifyStartScheduled,
     };
