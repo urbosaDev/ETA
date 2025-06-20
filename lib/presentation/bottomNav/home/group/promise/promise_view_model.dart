@@ -2,7 +2,6 @@ import 'dart:async';
 
 // import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:what_is_your_eta/data/model/message_model.dart';
 import 'package:what_is_your_eta/data/model/promise_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
@@ -29,19 +28,14 @@ class PromiseViewModel extends GetxController {
 
   final Rx<UserModel?> userModel = Rx<UserModel?>(null);
   final RxList<UserModel> memberList = <UserModel>[].obs;
-  final RxMap<String, UserModel> memberMap = <String, UserModel>{}.obs;
 
   StreamSubscription<UserModel>? _userSub;
   StreamSubscription<PromiseModel>? _promiseSub;
-
-  final RxList<MessageModel> messages = <MessageModel>[].obs;
-  StreamSubscription<List<MessageModel>>? _messageSub;
 
   @override
   void onInit() {
     super.onInit();
     _initialize();
-    listenToMessages();
   }
 
   Future<void> _initialize() async {
@@ -87,35 +81,13 @@ class PromiseViewModel extends GetxController {
     final users = await _userRepository.getUsersByUids(memberIds);
 
     memberList.value = users;
-    memberMap.value = {for (var u in users) u.uid: u};
-  }
-
-  void listenToMessages() {
-    _messageSub?.cancel();
-    _messageSub = _promiseRepository.streamPromiseMessages(promiseId).listen((
-      msgs,
-    ) {
-      messages.value = msgs;
-    });
-  }
-
-  Future<void> sendMessage(String content) async {
-    if (userModel.value == null) return;
-    final msg = TextMessageModel(
-      senderId: userModel.value!.uid,
-      text: content,
-      sentAt: DateTime.now(),
-      readBy: [userModel.value!.uid],
-    );
-
-    await _promiseRepository.sendPromiseMessage(promiseId, msg);
   }
 
   @override
   void onClose() {
     _userSub?.cancel();
     _promiseSub?.cancel();
-    _messageSub?.cancel();
+
     super.onClose();
     // debugPrint('🗑️ 약속 뷰모델 deleted');
   }

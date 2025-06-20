@@ -12,16 +12,12 @@ import 'package:what_is_your_eta/domain/usecase/calculate_distance_usecase.dart'
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/location_share/location_share_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/location_share/location_share_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_view_model.dart';
-import 'package:what_is_your_eta/presentation/core/widget/chat/chat_input_box.dart';
-import 'package:what_is_your_eta/presentation/core/widget/chat/chat_message_list_view.dart';
 
 class PromiseView extends GetView<PromiseViewModel> {
   const PromiseView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final textController = TextEditingController();
-
     return Scaffold(
       appBar: AppBar(
         title: Obx(() {
@@ -37,13 +33,7 @@ class PromiseView extends GetView<PromiseViewModel> {
             return Column(
               children: [
                 PromiseTabBar(promiseId: controller.promiseId),
-                Expanded(
-                  child: ChatMessageListView(
-                    messages: controller.messages,
-                    userMap: controller.memberMap,
-                    myUid: controller.userModel.value?.uid ?? '',
-                  ),
-                ),
+
                 Column(
                   children: [
                     Row(
@@ -88,14 +78,6 @@ class PromiseView extends GetView<PromiseViewModel> {
                           child: const Text('위치 공유'),
                         ),
                       ],
-                    ),
-                    ChatInputBox(
-                      controller: textController,
-                      onSend: (msg) async {
-                        await controller.sendMessage(msg);
-                        textController.clear();
-                        FocusScope.of(context).unfocus();
-                      },
                     ),
                   ],
                 ),
