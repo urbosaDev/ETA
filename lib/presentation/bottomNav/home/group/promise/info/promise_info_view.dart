@@ -12,44 +12,41 @@ class PromiseInfoView extends GetView<PromiseInfoViewModel> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('약속 정보')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 🔹 로딩 상태
-            Obx(() {
-              if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              return const SizedBox.shrink(); // 로딩 아니면 아무것도 안 보여줌
-            }),
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 🔹 로딩 상태
+          Obx(() {
+            if (controller.isLoading.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            return const SizedBox.shrink(); // 로딩 아니면 아무것도 안 보여줌
+          }),
 
-            // 🔹 시간
-            Obx(() {
-              final promise = controller.promise.value;
-              if (promise == null) return const SizedBox();
-              return buildPromiseTimeSection(promise);
-            }),
-            const SizedBox(height: 24),
+          // 🔹 시간
+          Obx(() {
+            final promise = controller.promise.value;
+            if (promise == null) return const SizedBox();
+            return buildPromiseTimeSection(promise);
+          }),
+          const SizedBox(height: 24),
 
-            // 🔹 장소
-            Obx(() {
-              final location = controller.location.value;
-              if (location == null) return const SizedBox();
-              return buildPromiseLocationSection(location);
-            }),
-            const SizedBox(height: 24),
+          // 🔹 장소
+          Obx(() {
+            final location = controller.location.value;
+            if (location == null) return const SizedBox();
+            return buildPromiseLocationSection(location);
+          }),
+          const SizedBox(height: 24),
 
-            // 🔹 참여자
-            Obx(() {
-              final members = controller.memberList;
-              return buildPromiseMemberSection(members);
-            }),
-          ],
-        ),
+          // 🔹 참여자
+          Obx(() {
+            final members = controller.memberList;
+            return buildPromiseMemberSection(members);
+          }),
+        ],
       ),
     );
   }

@@ -32,6 +32,13 @@ class PromiseViewModel extends GetxController {
   StreamSubscription<UserModel>? _userSub;
   StreamSubscription<PromiseModel>? _promiseSub;
 
+  final RxInt currentPage = 0.obs;
+  void setCurrentPage(int page) {
+    if (currentPage.value != page) {
+      currentPage.value = page;
+    }
+  }
+
   @override
   void onInit() {
     super.onInit();

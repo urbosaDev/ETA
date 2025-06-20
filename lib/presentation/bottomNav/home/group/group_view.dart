@@ -130,7 +130,7 @@ class GroupView extends GetView<GroupViewModel> {
                                 ? () {
                                   // 정상 참여중이면 이동
                                   Get.to(
-                                    () => const PromiseView(),
+                                    () => PromiseView(),
                                     binding: BindingsBuilder(() {
                                       Get.put(
                                         PromiseViewModel(

@@ -9,34 +9,31 @@ class LateView extends GetView<LateViewModel> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('지각자 목록')),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
 
-        if (!controller.isAfterPromiseTime.value) {
-          return const Center(child: Text('약속 시간이 아직 지나지 않았습니다.'));
-        }
+      if (!controller.isAfterPromiseTime.value) {
+        return const Center(child: Text('약속 시간이 아직 지나지 않았습니다.'));
+      }
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: ListView(
-                children: [
-                  _buildUserSection('도착한 친구들', controller.arrivedUsers),
-                  const Divider(),
-                  _buildUserSection('지각한 친구들', controller.lateUsers),
-                ],
-              ),
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: ListView(
+              children: [
+                _buildUserSection('도착한 친구들', controller.arrivedUsers),
+                const Divider(),
+                _buildUserSection('지각한 친구들', controller.lateUsers),
+              ],
             ),
-            const Divider(),
-          ],
-        );
-      }),
-    );
+          ),
+          const Divider(),
+        ],
+      );
+    });
   }
 
   Widget _buildUserSection(String title, List<UserModel> users) {
