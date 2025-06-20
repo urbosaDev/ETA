@@ -12,7 +12,9 @@ class PrivateChatRoomViewModel extends GetxController {
   final UserRepository _userRepository;
   final FcmRepository _fcmRepository;
   final String chatRoomId;
-  final String myUid;
+
+  final UserModel my;
+
   final String friendUid;
 
   PrivateChatRoomViewModel({
@@ -79,13 +81,13 @@ class PrivateChatRoomViewModel extends GetxController {
       final tokens = await _userRepository.getFcmTokens(friendUid);
 
       if (tokens.isNotEmpty) {
-        for (final token in tokens) {
-          await _fcmRepository.sendChatNotification(
-            targetToken: token,
-            senderName: myName,
-            message: content.trim(),
-          );
-        }
+
+        await _fcmRepository.sendChatNotification(
+          targetTokens: tokens,
+          senderName: my.name,
+          message: content.trim(),
+        );
+
       }
     } catch (e) {
       return;

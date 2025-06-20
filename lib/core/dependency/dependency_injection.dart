@@ -4,10 +4,11 @@ import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
+import 'package:what_is_your_eta/data/repository/fcm_token_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
-import 'package:what_is_your_eta/data/repository/fcm_token_repository.dart';
+
 
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/data/service/auth_service.dart';
@@ -25,8 +26,9 @@ class DependencyInjection {
   static Future<void> init() async {
     final kakaoApiKey = dotenv.env['KAKAO_REST_API_KEY']!;
     final kakaoBaseUrl = dotenv.env['KAKAO_BASE_URL']!;
-    final fcmService = FcmService();
-    await fcmService.init();
+    final fcmFunctionUrl = dotenv.env['FIREBASE_FCM_FUNCTION_URL']!;
+    final fcmService = FcmService(functionUrl: fcmFunctionUrl);
+
     Get.put<FcmService>(fcmService, permanent: true);
     Get.put<AuthService>(AuthService(), permanent: true);
     Get.put<UserService>(UserService(), permanent: true);
