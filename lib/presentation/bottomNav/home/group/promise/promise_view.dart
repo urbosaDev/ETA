@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
+import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
@@ -57,6 +58,8 @@ class PromiseView extends GetView<PromiseViewModel> {
                                     userRepository: Get.find<UserRepository>(),
                                     calculateDistanceUseCase:
                                         Get.find<CalculateDistanceUseCase>(),
+                                    groupRepository:
+                                        Get.find<GroupRepository>(),
                                   ),
                                 );
                                 Get.lazyPut(

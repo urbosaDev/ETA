@@ -1,6 +1,7 @@
 import 'package:what_is_your_eta/data/model/location_model/promise_location_model.dart';
 import 'package:what_is_your_eta/data/model/location_model/user_location_model.dart';
 import 'package:what_is_your_eta/data/model/message_model.dart';
+import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
@@ -11,6 +12,7 @@ class LocationShareUseCase {
   final GetCurrentLocationUseCase _getCurrentLocationUseCase;
   final LocationRepository _locationRepository;
   final PromiseRepository _promiseRepository;
+  final GroupRepository _groupRepository;
   final UserRepository _userRepository;
   final CalculateDistanceUseCase _calculateDistanceUseCase;
 
@@ -20,11 +22,13 @@ class LocationShareUseCase {
     required PromiseRepository promiseRepository,
     required UserRepository userRepository,
     required CalculateDistanceUseCase calculateDistanceUseCase,
+    required GroupRepository groupRepository,
   }) : _getCurrentLocationUseCase = getCurrentLocationUseCase,
        _locationRepository = locationRepository,
        _promiseRepository = promiseRepository,
        _userRepository = userRepository,
-       _calculateDistanceUseCase = calculateDistanceUseCase;
+       _calculateDistanceUseCase = calculateDistanceUseCase,
+       _groupRepository = groupRepository;
 
   //  현재 위치 + 주소 가져오기
   Future<UserLocationModel?> getCurrentUserLocation() async {
@@ -62,6 +66,7 @@ class LocationShareUseCase {
   //  위치 업데이트 + 메시지 전송
   Future<void> updateUserLocationAndSendMessage({
     required String promiseId,
+    required String groupId,
     required String currentUid,
     required UserLocationModel userLocation,
     required PromiseLocationModel promiseLocation,
@@ -84,7 +89,7 @@ class LocationShareUseCase {
       readBy: [],
     );
 
-    await _promiseRepository.sendPromiseMessage(promiseId, locationMessage);
+    await _groupRepository.sendGroupMessage(groupId, locationMessage);
   }
 
   //  도착 가능 여부 판단
@@ -121,6 +126,7 @@ class LocationShareUseCase {
   Future<void> markUserArrived({
     required String promiseId,
     required String currentUid,
+    required String groupId,
   }) async {
     await _promiseRepository.addArriveUserIdIfNotExists(
       promiseId: promiseId,
@@ -134,7 +140,7 @@ class LocationShareUseCase {
       sentAt: DateTime.now(),
     );
 
-    await _promiseRepository.sendPromiseMessage(promiseId, systemMessage);
+    await _groupRepository.sendGroupMessage(groupId, systemMessage);
   }
 }
 

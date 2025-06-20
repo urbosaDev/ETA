@@ -144,6 +144,7 @@ class LocationShareViewModel extends GetxController {
         userLocation: uLoc,
         promiseLocation: pLoc,
         distanceMeters: distance,
+        groupId: promise.value!.groupId,
       );
 
       successMessage.value = '위치가 성공적으로 업데이트 및 공유되었습니다.';
@@ -183,6 +184,7 @@ class LocationShareViewModel extends GetxController {
       await _locationShareUseCase.markUserArrived(
         promiseId: promise.value!.id,
         currentUid: currentUid,
+        groupId: promise.value!.groupId,
       );
 
       successMessage.value = '도착이 성공적으로 기록되었습니다.';
