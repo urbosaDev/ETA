@@ -35,7 +35,7 @@ class CreateGroupViewModel extends GetxController {
   StreamSubscription<UserModel>? _userSub;
 
   final RxList<UserModel> selectedFriends = <UserModel>[].obs;
-
+  final RxBool isCreating = false.obs;
   void toggleFriend(UserModel user) {
     if (selectedFriends.any((u) => u.uid == user.uid)) {
       selectedFriends.removeWhere((u) => u.uid == user.uid);
@@ -89,18 +89,18 @@ class CreateGroupViewModel extends GetxController {
 
   final RxBool isGroupCreated = false.obs;
   // 그룹 만들기 메서드
-  Future<void> createGroup() async {
+  Future<bool> createGroup() async {
     final currentUser = userModel.value?.uid;
+    if (isCreating.value) return false;
+    if (currentUser == null || !isReadyToCreate) return false;
 
-    if (currentUser == null) return;
-    if (!isReadyToCreate) return;
+    isCreating.value = true;
 
     final finalSelectedUid = [
       currentUser,
       ...selectedFriends.map((u) => u.uid),
     ];
 
-    // GroupModel 생성
     final group = GroupModel(
       id: '',
       createrId: currentUser,
@@ -111,46 +111,40 @@ class CreateGroupViewModel extends GetxController {
       createdAt: DateTime.now(),
     );
 
-    // 그룹 생성
-    final groupId = await _groupRepository.createGroup(group);
+    try {
+      final groupId = await _groupRepository.createGroup(group);
+      if (groupId.isEmpty) return false;
 
-    // 각 유저의 groupId 업데이트
-    for (final user in finalSelectedUid) {
-      await _userRepository.addGroupId(user, groupId);
-    }
+      for (final uid in finalSelectedUid) {
+        await _userRepository.addGroupId(uid, groupId);
+      }
 
-    if (groupId.isNotEmpty) {
-      final systemMessage = SystemMessageModel(
-        text: '채팅방이 생성되었습니다',
-        sentAt: DateTime.now(),
+      await _groupRepository.sendGroupMessage(
+        groupId,
+        SystemMessageModel(text: '채팅방이 생성되었습니다', sentAt: DateTime.now()),
       );
 
-      await _groupRepository.sendGroupMessage(groupId, systemMessage);
-      // FCM 발송
-
-      try {
-        final otherUids =
-            finalSelectedUid.where((uid) => uid != currentUser).toList();
-
-        final allTokens = <String>[];
-
-        for (final uid in otherUids) {
-          final tokens = await _userRepository.getFcmTokens(uid);
-          allTokens.addAll(tokens);
-        }
-
-        if (allTokens.isNotEmpty) {
-          await _fcmRepository.sendGroupNotification(
-            targetTokens: allTokens,
-            groupName: groupTitle.value,
-            message: '채팅방이 생성되었습니다',
-          );
-        }
-      } catch (e) {
-        print('❌ FCM 그룹 생성 알림 발송 실패: $e');
+      final otherUids = finalSelectedUid.where((uid) => uid != currentUser);
+      final allTokens = <String>[];
+      for (final uid in otherUids) {
+        final tokens = await _userRepository.getFcmTokens(uid);
+        allTokens.addAll(tokens);
       }
-      // 그룹 생성 성공
-      isGroupCreated.value = true;
+
+      if (allTokens.isNotEmpty) {
+        await _fcmRepository.sendGroupNotification(
+          targetTokens: allTokens,
+          groupName: groupTitle.value,
+          message: '채팅방이 생성되었습니다',
+        );
+      }
+
+      return true;
+    } catch (e) {
+      debugPrint('❌ 그룹 생성 실패: $e');
+      return false;
+    } finally {
+      isCreating.value = false;
     }
   }
 

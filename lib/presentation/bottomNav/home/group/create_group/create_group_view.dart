@@ -66,18 +66,25 @@ class CreateGroupView extends GetView<CreateGroupViewModel> {
             () => Center(
               child: ElevatedButton(
                 onPressed:
-                    controller.isReadyToCreate
+                    controller.isReadyToCreate && !controller.isCreating.value
                         ? () async {
-                          await controller.createGroup();
-                          if (controller.isGroupCreated.value) {
+                          final success = await controller.createGroup();
+                          if (success) {
                             Get.offAllNamed('/main');
                             Get.snackbar('그룹 생성 완료', '그룹이 생성되었습니다.');
                           } else {
-                            Get.snackbar('그룹 생성 실패', '그룹 생성에 실패했습니다.');
+                            Get.snackbar('그룹 생성 실패', '다시 시도해주세요.');
                           }
                         }
                         : null,
-                child: const Text('그룹 만들기'),
+                child:
+                    controller.isCreating.value
+                        ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                        : const Text('그룹 만들기'),
               ),
             ),
           ),
