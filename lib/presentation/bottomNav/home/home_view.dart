@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
-import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
-import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/create_group/create_group_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/create_group/create_group_view_model.dart';
@@ -34,31 +32,6 @@ class HomeView extends GetView<HomeViewModel> {
                     return;
                   }
 
-                  if (index >= 2) {
-                    final group = controller.groupList[index - 2];
-
-                    Get.to(
-                      () => GroupView(),
-                      binding: BindingsBuilder(() {
-                        Get.put(
-                          GroupViewModel(
-                            group: group,
-                            groupRepository: Get.find<GroupRepository>(),
-                            userRepository: Get.find<UserRepository>(),
-                            authRepository: Get.find<AuthRepository>(),
-                            promiseRepository: Get.find<PromiseRepository>(),
-                            chatRepository: Get.find<ChatRepository>(),
-                          ),
-                        );
-                      }),
-                    );
-
-                    // 사이드바 index는 Chat으로 초기화
-                    controller.selectedIndex.value = 0;
-                    return;
-                  }
-
-                  // index == 0 (Chat)
                   controller.selectedIndex.value = index;
                 },
                 labelType: NavigationRailLabelType.all,
@@ -90,7 +63,30 @@ class HomeView extends GetView<HomeViewModel> {
               if (index == 0) {
                 return const PrivateChatView();
               }
+              if (index >= 2) {
+                final group = controller.groupList[index - 2];
+                final tag = group.id;
 
+                if (!Get.isRegistered<GroupViewModel>(tag: tag)) {
+                  Get.put(
+                    GroupViewModel(
+                      group: group,
+                      groupRepository: Get.find(),
+                      userRepository: Get.find(),
+                      authRepository: Get.find(),
+                      promiseRepository: Get.find(),
+                      chatRepository: Get.find(),
+                    ),
+                    tag: tag,
+                    permanent: true,
+                  );
+                }
+
+                return GetBuilder<GroupViewModel>(
+                  tag: tag,
+                  builder: (_) => GroupView(groupTag: tag),
+                );
+              }
               return const Center(child: Text('그룹은 별도 화면에서 열립니다.'));
             }),
           ),

@@ -22,10 +22,12 @@ import 'package:what_is_your_eta/presentation/core/dialog/user_info_dialog.dart'
 import 'package:what_is_your_eta/presentation/core/widget/select_friend_dialog.dart';
 
 class GroupView extends GetView<GroupViewModel> {
-  const GroupView({super.key});
+  final String groupTag;
+  const GroupView({super.key, required this.groupTag});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<GroupViewModel>(tag: groupTag);
     return Scaffold(
       appBar: AppBar(
         title: Obx(() {
