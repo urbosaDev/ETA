@@ -65,17 +65,19 @@ class GroupService {
   }
 
   /// 여러 그룹 조회 (예: 유저의 groupIds 기준)
-  Future<List<Map<String, dynamic>>> getGroupsByIds(
+  Future<List<Map<String, dynamic>?>> getGroupsByIds(
     List<String> groupIds,
   ) async {
-    if (groupIds.isEmpty) return [];
+    final futures = groupIds.map((id) => _groupRef.doc(id).get());
+    final snapshots = await Future.wait(futures);
 
-    final snapshot =
-        await _groupRef
-            .where(FieldPath.documentId, whereIn: groupIds.take(10).toList())
-            .get();
-
-    return snapshot.docs.map((doc) => doc.data()).toList();
+    return snapshots
+        .map((doc) {
+          if (!doc.exists) return null;
+          return doc.data();
+        })
+        .cast<Map<String, dynamic>?>()
+        .toList();
   }
 
   // 메인 화면에서 보여줄 stream 그룹들 // firestore는 최대10개

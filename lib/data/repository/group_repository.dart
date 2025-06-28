@@ -61,7 +61,11 @@ class GroupRepositoryImpl implements GroupRepository {
   @override
   Future<List<GroupModel>> getGroupsByIds(List<String> groupIds) async {
     final jsonList = await _service.getGroupsByIds(groupIds);
-    return jsonList.map(GroupModel.fromJson).toList();
+
+    return jsonList
+        .where((json) => json != null)
+        .map((json) => GroupModel.fromJson(json!))
+        .toList();
   }
 
   @override
