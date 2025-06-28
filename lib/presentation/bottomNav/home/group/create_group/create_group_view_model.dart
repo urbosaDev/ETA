@@ -103,6 +103,7 @@ class CreateGroupViewModel extends GetxController {
     // GroupModel 생성
     final group = GroupModel(
       id: '',
+      createrId: currentUser,
       title: groupTitle.value,
       memberIds: finalSelectedUid,
       chatRoomId: '',

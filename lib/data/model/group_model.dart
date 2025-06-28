@@ -11,6 +11,7 @@ class GroupModel {
   final String chatRoomId;
   final List<String> promiseIds;
   final DateTime createdAt;
+  final String createrId;
 
   const GroupModel({
     required this.id,
@@ -19,12 +20,14 @@ class GroupModel {
     required this.chatRoomId,
     required this.promiseIds,
     required this.createdAt,
+    required this.createrId,
   });
 
   /// Firestore → Model
   factory GroupModel.fromJson(Map<String, dynamic> json) {
     return GroupModel(
       id: json['id'] as String,
+      createrId: json['createrId'] as String,
       title: json['title'] as String,
       memberIds: List<String>.from(json['memberIds'] ?? []),
       chatRoomId: json['chatRoomId'] as String,
@@ -37,6 +40,7 @@ class GroupModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'createrId': createrId,
       'title': title,
       'memberIds': memberIds,
       'chatRoomId': chatRoomId,
@@ -48,6 +52,7 @@ class GroupModel {
   /// 상태 업데이트용
   GroupModel copyWith({
     String? id,
+    String? createrId,
     String? title,
     List<String>? memberIds,
     String? chatRoomId,
@@ -56,6 +61,7 @@ class GroupModel {
   }) {
     return GroupModel(
       id: id ?? this.id,
+      createrId: createrId ?? this.createrId,
       title: title ?? this.title,
       memberIds: memberIds ?? this.memberIds,
       chatRoomId: chatRoomId ?? this.chatRoomId,

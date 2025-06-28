@@ -61,4 +61,15 @@ class PromiseService {
       'arriveUserIds': FieldValue.arrayUnion([currentUid]),
     });
   }
+
+  Future<void> removeUserFromPromise({
+    required String promiseId,
+    required String userId,
+  }) async {
+    await _promiseRef.doc(promiseId).update({
+      'memberIds': FieldValue.arrayRemove([userId]),
+      'arriveUserIds': FieldValue.arrayRemove([userId]),
+      'userLocations.$userId': FieldValue.delete(),
+    });
+  }
 }

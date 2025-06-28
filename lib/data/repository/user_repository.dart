@@ -16,6 +16,7 @@ abstract class UserRepository {
   Future<void> addFriendUid(String currentUid, String friendUid);
   Future<void> addGroupId(String uid, String groupId); // 그룹생성시 유저 업데이트
   Future<List<String>> getFcmTokens(String uid);
+  Future<void> removeGroupId({required String userId, required String groupId});
 }
 
 class UserRepositoryImpl implements UserRepository {
@@ -96,5 +97,13 @@ class UserRepositoryImpl implements UserRepository {
   Future<List<String>> getFcmTokens(String uid) async {
     final tokens = await _userService.getFcmTokens(uid);
     return tokens;
+  }
+
+  @override
+  Future<void> removeGroupId({
+    required String userId,
+    required String groupId,
+  }) {
+    return _userService.removeGroupId(uid: userId, groupId: groupId);
   }
 }

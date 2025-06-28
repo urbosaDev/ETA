@@ -20,6 +20,10 @@ abstract class PromiseRepository {
     required String promiseId,
     required String currentUid,
   });
+  Future<void> removeUserFromPromise({
+    required String promiseId,
+    required String userId,
+  });
 }
 
 class PromiseRepositoryImpl implements PromiseRepository {
@@ -81,5 +85,13 @@ class PromiseRepositoryImpl implements PromiseRepository {
       promiseId: promiseId,
       currentUid: currentUid,
     );
+  }
+
+  @override
+  Future<void> removeUserFromPromise({
+    required String promiseId,
+    required String userId,
+  }) {
+    return _service.removeUserFromPromise(promiseId: promiseId, userId: userId);
   }
 }

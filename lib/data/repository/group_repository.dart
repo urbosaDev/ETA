@@ -18,6 +18,10 @@ abstract class GroupRepository {
     required String groupId,
     required String promiseId,
   });
+  Future<void> removeUserFromGroup({
+    required String groupId,
+    required String userId,
+  });
 }
 
 class GroupRepositoryImpl implements GroupRepository {
@@ -43,7 +47,10 @@ class GroupRepositoryImpl implements GroupRepository {
 
   @override
   Stream<GroupModel> streamGroup(String groupId) {
-    return _service.streamGroup(groupId).map(GroupModel.fromJson);
+    return _service
+        .streamGroup(groupId)
+        .where((json) => json != null)
+        .map((json) => GroupModel.fromJson(json!));
   }
 
   @override
@@ -90,5 +97,13 @@ class GroupRepositoryImpl implements GroupRepository {
     required String promiseId,
   }) async {
     await _service.addPromiseIdToGroup(groupId: groupId, promiseId: promiseId);
+  }
+
+  @override
+  Future<void> removeUserFromGroup({
+    required String groupId,
+    required String userId,
+  }) async {
+    await _service.removeUserFromGroup(groupId: groupId, userId: userId);
   }
 }

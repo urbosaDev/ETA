@@ -48,12 +48,19 @@ class GroupService {
   }
 
   /// 그룹 실시간 구독
-  Stream<Map<String, dynamic>> streamGroup(String groupId) {
-    return _groupRef.doc(groupId).snapshots().map((doc) => doc.data()!);
+  Stream<Map<String, dynamic>?> streamGroup(String groupId) {
+    return _groupRef.doc(groupId).snapshots().map((doc) {
+      if (!doc.exists || doc.data() == null) return null;
+      return doc.data();
+    });
   }
 
   /// 그룹 삭제
   Future<void> deleteGroup(String groupId) async {
+    final messages = await _groupRef.doc(groupId).collection('messages').get();
+    for (final msg in messages.docs) {
+      await msg.reference.delete();
+    }
     await _groupRef.doc(groupId).delete();
   }
 
@@ -90,6 +97,15 @@ class GroupService {
   }) async {
     await _groupRef.doc(groupId).update({
       'promiseIds': FieldValue.arrayUnion([promiseId]), // 중복 방지됨
+    });
+  }
+
+  Future<void> removeUserFromGroup({
+    required String groupId,
+    required String userId,
+  }) async {
+    await _groupRef.doc(groupId).update({
+      'memberIds': FieldValue.arrayRemove([userId]),
     });
   }
 }

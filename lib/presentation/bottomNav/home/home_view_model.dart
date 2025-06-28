@@ -49,9 +49,24 @@ class HomeViewModel extends GetxController {
   }
 
   void _startUserStream(String uid) {
-    _userSub = _userRepository.streamUser(uid).listen((userModel) {
-      if (userModel.groupIds.isNotEmpty) {
-        _fetchGroups(userModel.groupIds);
+    _userSub = _userRepository.streamUser(uid).listen((userModel) async {
+      final oldGroupIds = _groupList.map((g) => g.id).toList();
+      final newGroupIds = userModel.groupIds;
+
+      //현재 선택된 그룹 ID
+      final selectedGroupIndex = selectedIndex.value;
+      if (selectedGroupIndex >= 2) {
+        final selectedGroupId = oldGroupIds[selectedGroupIndex - 2];
+
+        //해당 그룹이 삭제되었는지 체크
+        if (!newGroupIds.contains(selectedGroupId)) {
+          selectedIndex.value = 0; // 채팅 탭으로 리셋
+        }
+      }
+
+      //groupList 갱신
+      if (newGroupIds.isNotEmpty) {
+        await _fetchGroups(newGroupIds);
       } else {
         _groupList.clear();
       }

@@ -107,4 +107,13 @@ class UserService {
       return [];
     }
   }
+
+  Future<void> removeGroupId({
+    required String uid,
+    required String groupId,
+  }) async {
+    await _userRef.doc(uid).update({
+      'groupIds': FieldValue.arrayRemove([groupId]),
+    });
+  }
 }

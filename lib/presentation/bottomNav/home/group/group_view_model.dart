@@ -44,7 +44,9 @@ class GroupViewModel extends GetxController {
   final RxList<PromiseModel> promiseList = <PromiseModel>[].obs;
 
   final RxMap<String, bool> promiseParticipationMap = <String, bool>{}.obs;
-  final RxString myUid = ''.obs;
+  String? get currentUser => _authRepository.getCurrentUser()?.uid;
+  bool get isMyGroup => groupModel.value?.createrId == currentUser;
+  bool isOtherUser(UserModel user) => user.uid != currentUser;
   @override
   void onInit() {
     super.onInit();
@@ -59,14 +61,8 @@ class GroupViewModel extends GetxController {
     super.onClose();
   }
 
-  bool isOtherUser(UserModel user) => user.uid != myUid.value;
-
   Future<void> _initialize() async {
     isLoading.value = true;
-    final currentUid = _authRepository.getCurrentUid();
-    if (currentUid != null) {
-      myUid.value = currentUid;
-    }
 
     final fetchedGroup = await _groupRepository.getGroup(group.id);
     if (fetchedGroup == null) {
@@ -77,7 +73,7 @@ class GroupViewModel extends GetxController {
     groupModel.value = fetchedGroup;
     await _fetchMember(fetchedGroup.memberIds);
     await _fetchPromise(fetchedGroup);
-    // ✅ 유저 가져오고 친구 리스트 받아오기
+
     final currentUser = _authRepository.getCurrentUser();
     if (currentUser != null) {
       await _fetchFriendList(currentUser.uid);
@@ -203,5 +199,68 @@ class GroupViewModel extends GetxController {
   String generateChatRoomId(String uid1, String uid2) {
     final sorted = [uid1, uid2]..sort();
     return '${sorted[0]}_${sorted[1]}';
+  }
+
+  Future<void> leaveGroup() async {
+    final uid = _authRepository.getCurrentUid();
+    if (uid == null) return;
+    if (isMyGroup) return;
+
+    try {
+      isLoading.value = true;
+
+      // 1. 그룹에서 멤버 제거
+      await _groupRepository.removeUserFromGroup(
+        groupId: group.id,
+        userId: uid,
+      );
+
+      // 2. 유저 문서에서 그룹 ID 제거
+      await _userRepository.removeGroupId(userId: uid, groupId: group.id);
+
+      // 3. 약속들에서 사용자 제거
+      for (final promiseId in groupModel.value?.promiseIds ?? []) {
+        await _promiseRepository.removeUserFromPromise(
+          promiseId: promiseId,
+          userId: uid,
+        );
+      }
+
+      // 성공 메시지 등 추가 가능
+    } catch (e) {
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> deleteGroup() async {
+    if (!isMyGroup) return;
+    final group = groupModel.value;
+    if (group == null) return;
+
+    try {
+      isLoading.value = true;
+
+      // 1. 연결된 약속 삭제
+      for (final promiseId in group.promiseIds) {
+        await _promiseRepository.deletePromise(promiseId);
+      }
+
+      // 2. 유저 문서에서 그룹 ID 제거
+      for (final memberId in group.memberIds) {
+        await _userRepository.removeGroupId(
+          userId: memberId,
+          groupId: group.id,
+        );
+      }
+
+      // 3. 그룹 삭제
+      await _groupRepository.deleteGroup(group.id);
+
+      // 성공 메시지 등 추가 가능
+    } catch (e) {
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

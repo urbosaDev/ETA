@@ -1,4 +1,4 @@
-import 'package:get/state_manager.dart';
+import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/fcm_token_repository.dart';
 
@@ -15,6 +15,7 @@ class SettingViewModel extends GetxController {
   Future<void> signOut() async {
     await _fcmTokenRepository.deleteFcmToken();
     await _authRepository.signOut();
+
     isSignedOut.value = true;
   }
 }
