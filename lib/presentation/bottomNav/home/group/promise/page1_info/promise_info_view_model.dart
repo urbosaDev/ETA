@@ -1,22 +1,29 @@
 import 'dart:async';
 
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/location_model/promise_location_model.dart';
+import 'package:what_is_your_eta/data/model/location_model/user_location_model.dart';
 import 'package:what_is_your_eta/data/model/promise_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/domain/usecase/calculate_distance_usecase.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/model/promise_member_status.dart';
 
 class PromiseInfoViewModel extends GetxController {
   final String promiseId;
   final PromiseRepository _promiseRepository;
   final UserRepository _userRepository;
+  final CalculateDistanceUseCase _calculateDistanceUseCase;
   PromiseInfoViewModel({
     required this.promiseId,
     required PromiseRepository promiseRepository,
     required UserRepository userRepository,
+    required CalculateDistanceUseCase calculateDistanceUseCase,
   }) : _promiseRepository = promiseRepository,
-       _userRepository = userRepository;
+       _userRepository = userRepository,
+       _calculateDistanceUseCase = calculateDistanceUseCase;
 
   final Rxn<PromiseModel> promise = Rxn<PromiseModel>();
   StreamSubscription<PromiseModel>? _promiseSub;
@@ -24,6 +31,10 @@ class PromiseInfoViewModel extends GetxController {
   final RxList<UserModel> memberList = <UserModel>[].obs;
   final Rxn<PromiseLocationModel> location = Rxn();
 
+  final Rx<NLatLng?> currentPosition = Rx<NLatLng?>(null);
+  final Rxn<NaverMapController> mapController = Rxn<NaverMapController>();
+  final RxMap<String, UserLocationModel> userLocations = RxMap();
+  final Rxn<PromiseMemberStatus> selectedUser = Rxn<PromiseMemberStatus>();
   @override
   void onInit() {
     super.onInit();
@@ -36,8 +47,7 @@ class PromiseInfoViewModel extends GetxController {
     // Clean up any resources or streams if necessary
     super.onClose();
     _promiseSub?.cancel();
-
-    // debugPrint('🗑️ PromiseInfoViewModel deleted');
+    mapController.value?.dispose();
   }
 
   Future<void> _initialize() async {
@@ -55,6 +65,13 @@ class PromiseInfoViewModel extends GetxController {
     if (fetchedPromise != null) {
       promise.value = fetchedPromise;
       location.value = fetchedPromise.location;
+      userLocations.value = fetchedPromise.userLocations ?? {};
+      final latLng = NLatLng(
+        fetchedPromise.location.latitude,
+        fetchedPromise.location.longitude,
+      );
+      currentPosition.value = latLng;
+
       await _fetchMembers(fetchedPromise.memberIds);
     }
 
@@ -62,6 +79,7 @@ class PromiseInfoViewModel extends GetxController {
       // 추후 memberIds 변경 감지 로직 추가 가능
       promise.value = p;
       location.value = p.location;
+      userLocations.value = p.userLocations ?? {};
       await _fetchMembers(p.memberIds);
     });
   }
@@ -70,12 +88,84 @@ class PromiseInfoViewModel extends GetxController {
     final users = await _userRepository.getUsersByUids(memberIds);
     memberList.value = users;
   }
+
+  List<PromiseMemberStatus> get promiseMemberStatusList {
+    final targetLat = location.value?.latitude;
+    final targetLng = location.value?.longitude;
+
+    return memberList.map((user) {
+      final loc = userLocations[user.uid];
+
+      double? distance;
+      if (loc != null && targetLat != null && targetLng != null) {
+        distance = _calculateDistanceUseCase.calculateDistance(
+          startLat: loc.latitude,
+          startLng: loc.longitude,
+          endLat: targetLat,
+          endLng: targetLng,
+        );
+      }
+
+      final updateStatus =
+          loc == null
+              ? MemberUpdateStatus.notUpdated
+              : MemberUpdateStatus.updated;
+
+      return PromiseMemberStatus(
+        user: user,
+        location: loc,
+        distance: distance,
+        updateStatus: updateStatus,
+        address: loc?.address,
+      );
+    }).toList();
+  }
+
+  void setThisPosition(NLatLng latLng) {
+    currentPosition.value = latLng;
+    _updateMarkerAndCamera(latLng);
+  }
+
+  void _updateMarkerAndCamera(NLatLng latLng) {
+    final controller = mapController.value;
+    if (controller == null) return;
+
+    controller.clearOverlays();
+    controller.addOverlay(NMarker(id: 'selected_location', position: latLng));
+    controller.updateCamera(NCameraUpdate.withParams(target: latLng, zoom: 16));
+  }
+
+  Future<void> setPromiseLocation() async {
+    final loc = location.value;
+    if (loc == null) return;
+    final latLng = NLatLng(loc.latitude, loc.longitude);
+    setThisPosition(latLng);
+  }
+
+  void selectUser(PromiseMemberStatus user) async {
+    selectedUser.value = user;
+
+    final mapCtrl = mapController.value;
+    final location = user.location;
+
+    if (mapCtrl != null && location != null) {
+      await mapCtrl.clearOverlays();
+
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      await mapCtrl.addOverlay(
+        NMarker(
+          id: 'selected-user-marker',
+          position: NLatLng(location.latitude, location.longitude),
+        ),
+      );
+
+      await mapCtrl.updateCamera(
+        NCameraUpdate.withParams(
+          target: NLatLng(location.latitude, location.longitude),
+          zoom: 15,
+        ),
+      );
+    }
+  }
 }
-
-
-// 이곳에서 보여줘야 할 것, promioseId 로 promise fetch 후 그 정보들을 띄워야함, 
-// 시간, 주소 , 참여자 3개로 분류 
-
-// promiseModel 에 PromiseLocationModel 이 있음 
-// PromiseLocationModel 에는 주소 정보가 있음
-// 이를 어떻게 꺼내지 ? 
