@@ -41,9 +41,9 @@ class GroupViewModel extends GetxController {
   final RxList<UserModel> friendList = <UserModel>[].obs;
 
   final Rx<String?> snackbarMessage = Rx<String?>(null);
-  final RxList<PromiseModel> promiseList = <PromiseModel>[].obs;
+  final Rx<PromiseModel?> currentPromise = Rx<PromiseModel?>(null);
 
-  final RxMap<String, bool> promiseParticipationMap = <String, bool>{}.obs;
+  final RxBool isParticipating = false.obs;
   String? get currentUser => _authRepository.getCurrentUser()?.uid;
   bool get isMyGroup => groupModel.value?.createrId == currentUser;
   bool isOtherUser(UserModel user) => user.uid != currentUser;
@@ -142,21 +142,23 @@ class GroupViewModel extends GetxController {
 
   Future<void> _fetchPromise([GroupModel? paramGroup]) async {
     final group = paramGroup ?? groupModel.value;
-    if (group == null || group.promiseIds.isEmpty) {
-      promiseList.clear();
+    final currentPromiseId = group?.currentPromiseId;
+    if (group == null || currentPromiseId == null) {
+      currentPromise.value = null;
+      isParticipating.value = false;
       return;
     }
 
-    final promises = await _promiseRepository.getPromisesByIds(
-      group.promiseIds,
-    );
-    promiseList.value = promises;
-    final currentUid = _authRepository.getCurrentUid();
-    final Map<String, bool> newParticipationMap = {};
-    for (final promise in promises) {
-      newParticipationMap[promise.id] = promise.memberIds.contains(currentUid);
+    final promise = await _promiseRepository.getPromise(currentPromiseId);
+    if (promise == null) {
+      currentPromise.value = null;
+      return;
     }
-    promiseParticipationMap.value = newParticipationMap;
+
+    currentPromise.value = promise;
+
+    final currentUid = _authRepository.getCurrentUid();
+    isParticipating.value = promise.memberIds.contains(currentUid);
   }
 
   final RxBool navigateToChat = false.obs;
@@ -219,9 +221,10 @@ class GroupViewModel extends GetxController {
       await _userRepository.removeGroupId(userId: uid, groupId: group.id);
 
       // 3. 약속들에서 사용자 제거
-      for (final promiseId in groupModel.value?.promiseIds ?? []) {
+      final currentId = groupModel.value?.currentPromiseId;
+      if (currentId != null) {
         await _promiseRepository.removeUserFromPromise(
-          promiseId: promiseId,
+          promiseId: currentId,
           userId: uid,
         );
       }
@@ -242,8 +245,9 @@ class GroupViewModel extends GetxController {
       isLoading.value = true;
 
       // 1. 연결된 약속 삭제
-      for (final promiseId in group.promiseIds) {
-        await _promiseRepository.deletePromise(promiseId);
+      final currentId = group.currentPromiseId;
+      if (currentId != null) {
+        await _promiseRepository.deletePromise(currentId);
       }
 
       // 2. 유저 문서에서 그룹 ID 제거

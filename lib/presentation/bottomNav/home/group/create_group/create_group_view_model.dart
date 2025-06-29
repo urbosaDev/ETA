@@ -107,7 +107,8 @@ class CreateGroupViewModel extends GetxController {
       title: groupTitle.value,
       memberIds: finalSelectedUid,
       chatRoomId: '',
-      promiseIds: [],
+      currentPromiseId: null,
+      endPromiseIds: [],
       createdAt: DateTime.now(),
     );
 

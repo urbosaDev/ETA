@@ -132,96 +132,86 @@ class GroupView extends GetView<GroupViewModel> {
             const Text('약속'),
             const SizedBox(height: 12),
 
-            SingleChildScrollView(
-              child: Obx(() {
-                final promises = controller.promiseList;
+            Obx(() {
+              final promise = controller.currentPromise.value;
 
-                if (promises.isEmpty) {
-                  return const Text('약속이 없습니다.');
-                }
-
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: promises.length,
-                  itemBuilder: (context, index) {
-                    final promise = promises[index];
-                    final isParticipant =
-                        controller.promiseParticipationMap[promise.id] ?? false;
-
-                    return GestureDetector(
-                      onTap:
-                          isParticipant
-                              ? () {
-                                // 정상 참여중이면 이동
-                                Get.to(
-                                  () => PromiseView(),
-                                  binding: BindingsBuilder(() {
-                                    Get.put(
-                                      PromiseViewModel(promiseId: promise.id),
-                                    );
-                                  }),
+              if (promise != null) {
+                return GestureDetector(
+                  onTap:
+                      controller.isParticipating.value
+                          ? () {
+                            // 정상 참여중이면 이동
+                            Get.to(
+                              () => PromiseView(),
+                              binding: BindingsBuilder(() {
+                                Get.put(
+                                  PromiseViewModel(promiseId: promise.id),
                                 );
-                              }
-                              : null, // 참여중이 아니면 onTap 없음
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color:
-                              isParticipant
-                                  ? Colors.white
-                                  : Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isParticipant ? Colors.blue : Colors.grey,
-                            width: 1,
+                              }),
+                            );
+                          }
+                          : null, // 참여중이 아니면 onTap 없음
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 16,
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color:
+                          controller.isParticipating.value
+                              ? Colors.white
+                              : Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color:
+                            controller.isParticipating.value
+                                ? Colors.blue
+                                : Colors.grey,
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            promise.name,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color:
+                                  controller.isParticipating.value
+                                      ? Colors.black
+                                      : Colors.grey.shade600,
+                            ),
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                promise.name,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color:
-                                      isParticipant
-                                          ? Colors.black
-                                          : Colors.grey.shade600,
-                                ),
+                        if (!controller.isParticipating.value)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade100,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Text(
+                              '미참여',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            if (!isParticipant)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.red.shade100,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Text(
-                                  '미참여',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+                          ),
+                      ],
+                    ),
+                  ),
                 );
-              }),
-            ),
+              } else {
+                return const Text('약속이 없습니다.');
+              }
+            }),
             ElevatedButton(
               onPressed: () {
                 Get.to(
