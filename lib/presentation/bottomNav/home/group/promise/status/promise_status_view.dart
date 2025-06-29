@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:get/get.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/status/model/promise_member_status.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/model/promise_member_status.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/status/promise_status_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/widget/user_tile.dart';
 

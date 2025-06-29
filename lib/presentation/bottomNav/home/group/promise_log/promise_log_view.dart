@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise_log/component/promise_log_tile.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise_log/promise_log_view_model.dart';
 
 class PromiseLogView extends GetView<PromiseLogViewModel> {
@@ -9,7 +11,25 @@ class PromiseLogView extends GetView<PromiseLogViewModel> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('약속 기록')),
-      body: Center(child: Text('약속 기록을 확인할 수 있는 화면입니다.')),
+      body: SafeArea(
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (controller.endPromises.isEmpty) {
+            return const Center(child: Text('약속 기록이 없습니다.'));
+          }
+
+          return ListView.builder(
+            itemCount: controller.endPromises.length,
+            itemBuilder: (context, index) {
+              final promise = controller.endPromises[index];
+              return PromiseLogTile(promise: promise);
+            },
+          );
+        }),
+      ),
     );
   }
 }
