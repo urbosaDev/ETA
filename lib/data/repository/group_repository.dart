@@ -22,6 +22,11 @@ abstract class GroupRepository {
     required String groupId,
     required String userId,
   });
+  Future<void> endCurrentPromise({
+    required String groupId,
+    required String promiseId,
+  });
+  Future<void> clearCurrentPromiseId(String groupId);
 }
 
 class GroupRepositoryImpl implements GroupRepository {
@@ -109,5 +114,18 @@ class GroupRepositoryImpl implements GroupRepository {
     required String userId,
   }) async {
     await _service.removeUserFromGroup(groupId: groupId, userId: userId);
+  }
+
+  @override
+  Future<void> endCurrentPromise({
+    required String groupId,
+    required String promiseId,
+  }) async {
+    await _service.endCurrentPromise(groupId: groupId, promiseId: promiseId);
+  }
+
+  @override
+  Future<void> clearCurrentPromiseId(String groupId) {
+    return _service.clearCurrentPromiseId(groupId);
   }
 }

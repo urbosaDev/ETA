@@ -42,11 +42,12 @@ class GroupViewModel extends GetxController {
 
   final Rx<String?> snackbarMessage = Rx<String?>(null);
   final Rx<PromiseModel?> currentPromise = Rx<PromiseModel?>(null);
-
+  final Rx<UserModel?> leaderModel = Rx<UserModel?>(null);
   final RxBool isParticipating = false.obs;
   String? get currentUser => _authRepository.getCurrentUser()?.uid;
   bool get isMyGroup => groupModel.value?.createrId == currentUser;
   bool isOtherUser(UserModel user) => user.uid != currentUser;
+  final RxBool isPromiseExisted = false.obs;
   @override
   void onInit() {
     super.onInit();
@@ -65,6 +66,9 @@ class GroupViewModel extends GetxController {
     isLoading.value = true;
 
     final fetchedGroup = await _groupRepository.getGroup(group.id);
+    if (fetchedGroup?.currentPromiseId != null) {
+      isPromiseExisted.value = true;
+    }
     if (fetchedGroup == null) {
       isLoading.value = false;
       return;
@@ -73,7 +77,7 @@ class GroupViewModel extends GetxController {
     groupModel.value = fetchedGroup;
     await _fetchMember(fetchedGroup.memberIds);
     await _fetchPromise(fetchedGroup);
-
+    await fetchLeaderInfo(fetchedGroup.createrId);
     final currentUser = _authRepository.getCurrentUser();
     if (currentUser != null) {
       await _fetchFriendList(currentUser.uid);
@@ -81,6 +85,11 @@ class GroupViewModel extends GetxController {
 
     _startGroupStream();
     isLoading.value = false;
+  }
+
+  Future<void> fetchLeaderInfo(String uid) async {
+    final user = await _userRepository.getUser(uid);
+    leaderModel.value = user;
   }
 
   Future<void> _fetchFriendList(String uid) async {
@@ -94,7 +103,7 @@ class GroupViewModel extends GetxController {
   void _startGroupStream() {
     _groupSub = _groupRepository.streamGroup(group.id).listen((group) {
       groupModel.value = group;
-
+      isPromiseExisted.value = group.currentPromiseId != null;
       _fetchMember(group.memberIds);
       _fetchPromise(group);
     });
@@ -266,5 +275,35 @@ class GroupViewModel extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  final RxBool successEndPromise = false.obs;
+
+  Future<void> endPromise() async {
+    final group = groupModel.value;
+    final promiseId = group?.currentPromiseId;
+    if (group == null || promiseId == null) return;
+
+    final promise = await _promiseRepository.getPromise(promiseId);
+    if (promise == null) return;
+
+    if (promise.notifyStartScheduled == false) {
+      // 1. 약속 시작되지 않음 → 삭제만
+      await _promiseRepository.deletePromise(promiseId);
+
+      // currentPromiseId만 제거
+      await _groupRepository.clearCurrentPromiseId(group.id);
+    } else {
+      // 2. 시작된 약속 → 마감 처리
+      await _groupRepository.endCurrentPromise(
+        groupId: group.id,
+        promiseId: promiseId,
+      );
+    }
+
+    // 상태 정리
+    currentPromise.value = null;
+    isPromiseExisted.value = false;
+    successEndPromise.value = true;
   }
 }

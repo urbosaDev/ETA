@@ -45,7 +45,13 @@ class GroupView extends GetView<GroupViewModel> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(data.title, style: const TextStyle(fontSize: 20)),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(data.title, style: const TextStyle(fontSize: 20)),
+                    Text('그룹장 : ${controller.leaderModel.value?.name}'),
+                  ],
+                ),
                 Align(
                   alignment: Alignment.centerRight,
 
@@ -128,8 +134,9 @@ class GroupView extends GetView<GroupViewModel> {
                 child: Center(child: const Text('속닥속닥 라운지')),
               ),
             ),
+
             const SizedBox(height: 20),
-            const Text('약속'),
+            const Text('현재 진행중인 약속'),
             const SizedBox(height: 12),
 
             Obx(() {
@@ -212,29 +219,192 @@ class GroupView extends GetView<GroupViewModel> {
                 return const Text('약속이 없습니다.');
               }
             }),
-            ElevatedButton(
-              onPressed: () {
-                Get.to(
-                  () => const CreatePromiseView(),
-                  binding: BindingsBuilder(() {
-                    Get.put(
-                      CreatePromiseViewModel(
-                        groupId: controller.group.id,
-                        groupRepository: Get.find<GroupRepository>(),
-                        userRepository: Get.find<UserRepository>(),
-                        promiseRepository: Get.find<PromiseRepository>(),
-                        fcmRepository: Get.find<FcmRepository>(),
-                      ),
-                    );
-                  }),
-                );
-              },
 
-              child: Text('약속 추가하기'),
+            Row(
+              children: [
+                // 왼쪽: 약속 추가하러 가기
+                Flexible(
+                  flex: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 8.0),
+                        child: Text(
+                          '약속 추가하러 가기',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap:
+                            controller.isPromiseExisted.value
+                                ? null
+                                : () {
+                                  Get.to(
+                                    () => const CreatePromiseView(),
+                                    binding: BindingsBuilder(() {
+                                      Get.put(
+                                        CreatePromiseViewModel(
+                                          groupId: controller.group.id,
+                                          groupRepository:
+                                              Get.find<GroupRepository>(),
+                                          userRepository:
+                                              Get.find<UserRepository>(),
+                                          promiseRepository:
+                                              Get.find<PromiseRepository>(),
+                                          fcmRepository:
+                                              Get.find<FcmRepository>(),
+                                        ),
+                                      );
+                                    }),
+                                  );
+                                },
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          height: 150,
+                          decoration: BoxDecoration(
+                            color:
+                                controller.isPromiseExisted.value
+                                    ? Colors.grey.shade300
+                                    : Colors.blue,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              controller.isPromiseExisted.value
+                                  ? '현재 진행중인 약속을 마감해야\n새로운 약속을 추가할 수 있어요'
+                                  : '약속을 추가하러 가기',
+                              style: TextStyle(
+                                color:
+                                    controller.isPromiseExisted.value
+                                        ? Colors.grey.shade700
+                                        : Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+
+                // 오른쪽: 예전 약속들이 궁금하다면
+                Flexible(
+                  flex: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 8.0),
+                        child: Text(
+                          '약속 log보기',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          // TODO: 예전 약속 리스트로 이동
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          height: 150,
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade400,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Center(
+                            child: Text(
+                              '지난 약속 목록 보기',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Column(
+              children: [
+                ElevatedButton(
+                  onPressed:
+                      controller.isMyGroup &&
+                              controller.currentPromise.value != null
+                          ? () {
+                            Get.dialog(
+                              _buildEndPromiseDialog(
+                                onConfirm: () {
+                                  controller.endPromise();
+                                  Get.back(); // 다이얼로그 닫기
+                                },
+                              ),
+                            );
+                          }
+                          : null, // 그룹장이 아니면 버튼 비활성화
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        controller.isMyGroup
+                            ? Colors.blue
+                            : Colors.grey.shade400,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('현재 약속 마감하기'),
+                ),
+                const SizedBox(height: 4),
+                const Text('약속 마감은 그룹장만 진행할 수 있어요.'),
+              ],
             ),
           ],
         );
       }),
+    );
+  }
+
+  Widget _buildEndPromiseDialog({required VoidCallback onConfirm}) {
+    return AlertDialog(
+      title: const Text('약속 마감'),
+      content: const Text(
+        '현재 진행중인 약속을 마감하시겠어요? \n 진행되지 않은 약속은 삭제됩니다. \n진행된 약속은 기록으로 볼 수 있어요',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Get.back(); // 아니오: 그냥 닫기
+          },
+          child: const Text('아니오'),
+        ),
+        ElevatedButton(onPressed: onConfirm, child: const Text('네')),
+      ],
     );
   }
 }

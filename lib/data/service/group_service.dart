@@ -108,4 +108,20 @@ class GroupService {
       'memberIds': FieldValue.arrayRemove([userId]),
     });
   }
+
+  Future<void> endCurrentPromise({
+    required String groupId,
+    required String promiseId,
+  }) async {
+    await _groupRef.doc(groupId).update({
+      'currentPromiseId': null,
+      'endPromiseIds': FieldValue.arrayUnion([promiseId]),
+    });
+  }
+
+  Future<void> clearCurrentPromiseId(String groupId) async {
+    await _groupRef.doc(groupId).update({
+      'currentPromiseId': FieldValue.delete(),
+    });
+  }
 }
