@@ -32,7 +32,7 @@ class LoungeInGroupViewModel extends GetxController {
   StreamSubscription<UserModel>? _userSub;
   StreamSubscription<GroupModel>? _groupSub;
   final RxList<UserModel> memberList = <UserModel>[].obs;
-
+  final RxnString currentPromiseId = RxnString();
   @override
   void onInit() {
     super.onInit();
@@ -65,7 +65,7 @@ class LoungeInGroupViewModel extends GetxController {
       return;
     }
     groupModel.value = fetchedGroup;
-
+    currentPromiseId.value = fetchedGroup.currentPromiseId;
     await _fetchMember(fetchedGroup.memberIds); // 먼저 memberMap 초기화
     listenToMessages(); //그 후 메시지 받기 시작
     _startGroupStream();
@@ -84,6 +84,7 @@ class LoungeInGroupViewModel extends GetxController {
     _groupSub = _groupRepository.streamGroup(groupId).listen((group) {
       groupModel.value = group;
       _fetchMember(group.memberIds);
+      currentPromiseId.value = group.currentPromiseId;
     });
   }
 
