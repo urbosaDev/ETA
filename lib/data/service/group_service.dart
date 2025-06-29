@@ -97,9 +97,7 @@ class GroupService {
     required String groupId,
     required String promiseId,
   }) async {
-    await _groupRef.doc(groupId).update({
-      'promiseIds': FieldValue.arrayUnion([promiseId]), // 중복 방지됨
-    });
+    await _groupRef.doc(groupId).update({'currentPromiseId': promiseId});
   }
 
   Future<void> removeUserFromGroup({
