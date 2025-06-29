@@ -14,6 +14,8 @@ import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/lounge_in_
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/lounge_in_group/lounge_in_group_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_view_model.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise_log/promise_log_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise_log/promise_log_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view.dart';
@@ -320,7 +322,19 @@ class GroupView extends GetView<GroupViewModel> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          // TODO: 예전 약속 리스트로 이동
+                          Get.to(
+                            () => const PromiseLogView(),
+                            binding: BindingsBuilder(() {
+                              Get.put(
+                                PromiseLogViewModel(
+                                  groupId: controller.group.id,
+                                  groupRepository: Get.find<GroupRepository>(),
+                                  promiseRepository:
+                                      Get.find<PromiseRepository>(),
+                                ),
+                              );
+                            }),
+                          );
                         },
                         child: Container(
                           padding: const EdgeInsets.all(16),
