@@ -12,7 +12,7 @@ import 'package:what_is_your_eta/routes/app_routes.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print('✅ 백그라운드 메시지 수신: ${message.messageId}');
+  print(' 백그라운드 메시지 수신: ${message.messageId}');
 }
 
 Future<void> _requestNotificationPermission() async {
@@ -63,7 +63,7 @@ Future<void> main() async {
   // Background Handler 등록
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  // 🔔 iOS Permission 요청 (Android는 자동 허용됨)
+  // iOS Permission 요청 (Android는 자동 허용됨)
   await _requestNotificationPermission();
 
   _setupTokenRefreshListener();

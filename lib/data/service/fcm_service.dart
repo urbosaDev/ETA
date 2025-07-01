@@ -10,11 +10,17 @@ class FcmService {
     required List<String> targetTokens,
     required String title,
     required String body,
+    Map<String, String>? data,
   }) async {
     final response = await http.post(
       Uri.parse(functionUrl),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'tokens': targetTokens, 'title': title, 'body': body}),
+      body: jsonEncode({
+        'tokens': targetTokens,
+        'title': title,
+        'body': body,
+        'data': data,
+      }),
     );
 
     if (response.statusCode == 200) {

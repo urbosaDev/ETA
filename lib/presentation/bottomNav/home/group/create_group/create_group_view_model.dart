@@ -137,6 +137,7 @@ class CreateGroupViewModel extends GetxController {
           targetTokens: allTokens,
           groupName: groupTitle.value,
           message: '채팅방이 생성되었습니다',
+          groupId: groupId,
         );
       }
 

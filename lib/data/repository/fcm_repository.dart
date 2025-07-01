@@ -11,12 +11,14 @@ abstract interface class FcmRepository {
     required List<String> targetTokens,
     required String groupName,
     required String message,
+    required String groupId,
   });
 
   Future<void> sendPromiseNotification({
     required List<String> targetTokens,
     required String title,
     required String body,
+    required String promiseId,
   });
 }
 
@@ -45,12 +47,14 @@ class FcmRepositoryImpl implements FcmRepository {
     required List<String> targetTokens,
     required String groupName,
     required String message,
+    required String groupId,
   }) async {
     if (targetTokens.isEmpty) return;
     await _fcmService.sendFcmMessages(
       targetTokens: targetTokens,
       title: '[$groupName]',
       body: message,
+      data: {'type': 'group', 'promiseId': groupId},
     );
   }
 
@@ -59,12 +63,14 @@ class FcmRepositoryImpl implements FcmRepository {
     required List<String> targetTokens,
     required String title,
     required String body,
+    required String promiseId,
   }) async {
     if (targetTokens.isEmpty) return;
     await _fcmService.sendFcmMessages(
       targetTokens: targetTokens,
       title: title,
       body: body,
+      data: {'type': 'promise', 'promiseId': promiseId},
     );
   }
 }

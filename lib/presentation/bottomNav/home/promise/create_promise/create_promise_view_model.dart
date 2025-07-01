@@ -167,6 +167,7 @@ class CreatePromiseViewModel extends GetxController {
             targetTokens: allTokens,
             title: '${groupModel.value?.title ?? '그룹'} 약속 생성',
             body: '${promiseName.value} 약속이 생성되었습니다!',
+            promiseId: createdId,
           );
         }
       } catch (e) {
