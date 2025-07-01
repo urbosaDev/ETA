@@ -17,14 +17,22 @@ class SettingViewModel extends GetxController {
   final RxBool isSignedOut = false.obs;
 
   Future<void> signOut() async {
-    await _fcmTokenRepository.deleteFcmToken();
-    await _authRepository.signOut();
+    isLoading.value = true;
+    try {
+      await _fcmTokenRepository.deleteFcmToken();
+      await _authRepository.signOut();
+    } catch (e) {
+      isLoading.value = false;
+      return;
+    }
 
     isSignedOut.value = true;
   }
 
+  final RxBool isLoading = false.obs;
   final RxBool isDeleting = false.obs;
   Future<void> deleteAccount() async {
+    isLoading.value = true;
     final user = _authRepository.getCurrentUser()?.uid;
     if (user == null) {
       return;
@@ -36,6 +44,7 @@ class SettingViewModel extends GetxController {
       await _authRepository.deleteAccount();
       isDeleting.value = true;
     } catch (e) {
+      isLoading.value = false;
       return;
     } finally {}
   }

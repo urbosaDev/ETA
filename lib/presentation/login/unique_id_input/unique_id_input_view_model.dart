@@ -25,7 +25,7 @@ class UniqueIdInputViewModel extends GetxController {
 
   bool get isFormValid =>
       selectedId.value.isNotEmpty && name.value.trim().isNotEmpty;
-
+  final RxBool isLoading = false.obs;
   void onUniqueIdChanged(String value) {
     uniqueId.value = value;
     uniqueIdCheck.value = UniqueIdCheck.none;
@@ -68,9 +68,11 @@ class UniqueIdInputViewModel extends GetxController {
   }
 
   Future<void> createUser() async {
+    isLoading.value = true;
     final user = _authRepository.getCurrentUser();
     if (user == null) {
       errorMessage.value = '로그인 상태가 아닙니다';
+      isLoading.value = false;
       return;
     }
 
@@ -87,6 +89,8 @@ class UniqueIdInputViewModel extends GetxController {
     } catch (e) {
       isCreated.value = false;
       errorMessage.value = '사용자 생성에 실패했습니다';
+    } finally {
+      isLoading.value = false;
     }
   }
 }

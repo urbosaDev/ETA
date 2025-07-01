@@ -13,26 +13,37 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('아이디 설정')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildUniqueIdInput(),
-              const SizedBox(height: 8),
-              _buildUniqueIdStatusText(),
-              const SizedBox(height: 8),
-              _buildUniqueIdButtons(),
-              const SizedBox(height: 16),
-              _buildSelectedIdText(),
-              _buildNameInput(),
-              const SizedBox(height: 24),
-              _buildSubmitButton(),
-            ],
-          ),
-        ),
-      ),
+      body: Obx(() {
+        return Stack(
+          children: [
+            if (controller.isLoading.value)
+              Container(
+                color: Colors.black.withOpacity(0.3),
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildUniqueIdInput(),
+                    const SizedBox(height: 8),
+                    _buildUniqueIdStatusText(),
+                    const SizedBox(height: 8),
+                    _buildUniqueIdButtons(),
+                    const SizedBox(height: 16),
+                    _buildSelectedIdText(),
+                    _buildNameInput(),
+                    const SizedBox(height: 24),
+                    _buildSubmitButton(),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
 

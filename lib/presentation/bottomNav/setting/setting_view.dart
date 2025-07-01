@@ -14,47 +14,54 @@ class SettingView extends GetView<SettingViewModel> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Get.offAllNamed('/login');
         });
-      } else if (controller.isDeleting.value) {
+      }
+      if (controller.isDeleting.value) {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           Get.offAll(() => const GoodbyeView());
         });
       }
 
-      return SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                "설정하기",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+      return Stack(
+        children: [
+          SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    "설정하기",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SettingTile(
+                  title: "화면 테마",
+                  value: Get.isDarkMode ? "어두운 모드" : "밝은 모드",
+                  onTap: () {},
+                ),
+                const Divider(),
+                SettingTile(title: "개인정보 처리방침", onTap: () {}),
+                SettingTile(title: "서비스 이용약관", onTap: () {}),
+                const Divider(),
+                SettingTile(title: "사용자 리뷰", value: "부탁드려요!", onTap: () {}),
+                SettingTile(title: "앱 버전", value: "1.0.0", onTap: () {}),
+                const Divider(),
+                SettingTile(title: "로그아웃", onTap: controller.signOut),
+                SettingTile(
+                  title: "탈퇴하기",
+                  value: "가지마!",
+                  onTap: controller.deleteAccount,
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            SettingTile(
-              title: "화면 테마",
-              value: Get.isDarkMode ? "어두운 모드" : "밝은 모드",
-              onTap: () {},
+          ),
+          if (controller.isLoading.value)
+            Container(
+              color: Colors.black.withOpacity(0.3),
+              child: const Center(child: CircularProgressIndicator()),
             ),
-            const Divider(),
-            SettingTile(title: "개인정보 처리방침", onTap: () {}),
-            SettingTile(title: "서비스 이용약관", onTap: () {}),
-            const Divider(),
-            SettingTile(title: "사용자 리뷰", value: "부탁드려요!", onTap: () {}),
-            SettingTile(title: "앱 버전", value: "1.0.0", onTap: () {}),
-            const Divider(),
-            SettingTile(title: "로그아웃", onTap: controller.signOut),
-            SettingTile(
-              title: "탈퇴하기",
-              value: "가지마!",
-              onTap: () {
-                controller.deleteAccount();
-              },
-            ),
-            // SettingTile(title: "계정 삭제", onTap: () {}),
-          ],
-        ),
+        ],
       );
     });
   }
