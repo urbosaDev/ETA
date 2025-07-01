@@ -19,6 +19,7 @@ abstract interface class FcmRepository {
     required String title,
     required String body,
     required String promiseId,
+    required String groupId,
   });
 }
 
@@ -64,13 +65,14 @@ class FcmRepositoryImpl implements FcmRepository {
     required String title,
     required String body,
     required String promiseId,
+    required String groupId,
   }) async {
     if (targetTokens.isEmpty) return;
     await _fcmService.sendFcmMessages(
       targetTokens: targetTokens,
       title: title,
       body: body,
-      data: {'type': 'promise', 'promiseId': promiseId},
+      data: {'type': 'promise', promiseId: promiseId, 'groupId': groupId},
     );
   }
 }
