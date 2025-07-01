@@ -221,23 +221,24 @@ class GroupViewModel extends GetxController {
 
   Future<void> leaveGroup() async {
     final uid = _authRepository.getCurrentUid();
-    if (uid == null) return;
-    if (isMyGroup) return;
+    if (uid == null || isMyGroup) return;
 
     try {
       isLoading.value = true;
 
-      // 1. 그룹에서 멤버 제거
+      final group = groupModel.value;
+      if (group == null) return;
+
+      // 1. 탈퇴 처리 (그룹에서 나 제거)
       await _groupRepository.removeUserFromGroup(
         groupId: group.id,
         userId: uid,
       );
 
-      // 2. 유저 문서에서 그룹 ID 제거
       await _userRepository.removeGroupId(userId: uid, groupId: group.id);
 
-      // 3. 약속들에서 사용자 제거
-      final currentId = groupModel.value?.currentPromiseId;
+      // 2. 약속에서 나 제거
+      final currentId = group.currentPromiseId;
       if (currentId != null) {
         await _promiseRepository.removeUserFromPromise(
           promiseId: currentId,
@@ -245,8 +246,15 @@ class GroupViewModel extends GetxController {
         );
       }
 
-      // 성공 메시지 등 추가 가능
+      // 3. 나를 제외한 실제 사용자 수 확인 (unknown 제외)
+      final remainingMembers =
+          group.memberIds.where((id) => id != uid && id != 'unknown').toList();
+
+      if (remainingMembers.isEmpty) {
+        await _groupRepository.deleteGroup(group.id);
+      }
     } catch (e) {
+      // 에러 핸들링
     } finally {
       isLoading.value = false;
     }
