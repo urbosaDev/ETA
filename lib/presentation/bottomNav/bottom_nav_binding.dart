@@ -33,6 +33,7 @@ class BottomNavBinding extends Bindings {
       SettingViewModel(
         authRepository: Get.find<AuthRepository>(),
         fcmTokenRepository: Get.find<FcmTokenRepository>(),
+        userRepository: Get.find<UserRepository>(),
       ),
     );
 

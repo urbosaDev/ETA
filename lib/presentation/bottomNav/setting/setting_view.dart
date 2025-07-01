@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/good_bye_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/setting/component/setting_tile.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/setting/setting_view_model.dart';
 
@@ -11,7 +12,11 @@ class SettingView extends GetView<SettingViewModel> {
     return Obx(() {
       if (controller.isSignedOut.value) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          Get.offNamed('/login');
+          Get.offAllNamed('/login');
+        });
+      } else if (controller.isDeleting.value) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          Get.offAll(() => const GoodbyeView());
         });
       }
 
@@ -43,7 +48,9 @@ class SettingView extends GetView<SettingViewModel> {
             SettingTile(
               title: "탈퇴하기",
               value: "가지마!",
-              onTap: controller.signOut,
+              onTap: () {
+                controller.deleteAccount();
+              },
             ),
             // SettingTile(title: "계정 삭제", onTap: () {}),
           ],

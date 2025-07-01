@@ -39,8 +39,22 @@ class AuthService {
 
   /// 계정 삭제
   Future<void> deleteAccount() async {
-    final user = _auth.currentUser;
-    if (user == null) throw Exception('로그인된 유저 없음');
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final googleSignIn = GoogleSignIn();
+    final googleUser = await googleSignIn.signInSilently();
+    if (googleUser == null) {
+      throw Exception('기존 Google 세션 없음 (재로그인 필요)');
+    }
+
+    final googleAuth = await googleUser.authentication;
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    await user.reauthenticateWithCredential(credential);
     await user.delete();
   }
 
