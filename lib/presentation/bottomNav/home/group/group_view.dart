@@ -465,7 +465,7 @@ Widget groupMemberList(GroupViewModel controller) {
                                     chatRoomId: chatRoomId!,
                                     friendUid: user.uid,
                                     chatRepository: Get.find<ChatRepository>(),
-                                    fcmRepository: Get.find<FcmRepository>(),
+                                    // fcmRepository: Get.find<FcmRepository>(),
                                     userRepository: Get.find<UserRepository>(),
                                     myUid: controller.currentUser!,
                                   ),

@@ -10,7 +10,7 @@ import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 class PrivateChatRoomViewModel extends GetxController {
   final ChatRepository _chatRepository;
   final UserRepository _userRepository;
-  final FcmRepository _fcmRepository;
+  // final FcmRepository _fcmRepository;
   final String chatRoomId;
 
   final String myUid;
@@ -20,13 +20,13 @@ class PrivateChatRoomViewModel extends GetxController {
   PrivateChatRoomViewModel({
     required ChatRepository chatRepository,
     required UserRepository userRepository,
-    required FcmRepository fcmRepository,
+    // required FcmRepository fcmRepository,
     required this.chatRoomId,
     required this.myUid,
     required this.friendUid,
   }) : _chatRepository = chatRepository,
-       _userRepository = userRepository,
-       _fcmRepository = fcmRepository;
+       _userRepository = userRepository;
+  //  _fcmRepository = fcmRepository;
 
   final RxList<MessageModel> messages = <MessageModel>[].obs;
   final Rxn<UserModel> friendModel = Rxn<UserModel>();
@@ -77,18 +77,18 @@ class PrivateChatRoomViewModel extends GetxController {
     );
 
     await _chatRepository.sendMessage(chatRoomId, message);
-    try {
-      final tokens = await _userRepository.getFcmTokens(friendUid);
+    // try {
+    //   final tokens = await _userRepository.getFcmTokens(friendUid);
 
-      if (tokens.isNotEmpty) {
-        await _fcmRepository.sendChatNotification(
-          targetTokens: tokens,
-          senderName: myModel.value!.name,
-          message: content.trim(),
-        );
-      }
-    } catch (e) {
-      return;
-    }
+    //   if (tokens.isNotEmpty) {
+    //     await _fcmRepository.sendChatNotification(
+    //       targetTokens: tokens,
+    //       senderName: myModel.value!.name,
+    //       message: content.trim(),
+    //     );
+    //   }
+    // } catch (e) {
+    //   return;
+    // }
   }
 }

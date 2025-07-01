@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
-import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/%08add_friend/add_friend_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view.dart';
@@ -122,7 +121,7 @@ class ProfileView extends GetView<ProfileViewModel> {
                                   chatRoomId: chatRoomId!,
                                   friendUid: user.uid,
                                   chatRepository: Get.find<ChatRepository>(),
-                                  fcmRepository: Get.find<FcmRepository>(),
+                                  // fcmRepository: Get.find<FcmRepository>(),
                                   userRepository: Get.find<UserRepository>(),
                                   myUid: controller.userModel.value!.uid,
                                 ),

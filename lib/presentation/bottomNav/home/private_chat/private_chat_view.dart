@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
-import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
+
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/%08add_friend/add_friend_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view.dart';
@@ -48,37 +48,34 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                                   final chatRoomId = await controller
                                       .createChatRoom(user.uid);
                                   if (controller.navigateToChat.value) {
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((_) {
-                                          controller.resetNavigateToChat();
-                                          Get.back(); // 다이얼로그 닫기
-                                          Get.to(
-                                            () => PrivateChatRoomView(),
-                                            binding: BindingsBuilder(() {
-                                              Get.put(
-                                                PrivateChatRoomViewModel(
-                                                  chatRoomId: chatRoomId!,
-                                                  friendUid: user.uid,
-                                                  chatRepository:
-                                                      Get.find<
-                                                        ChatRepository
-                                                      >(),
-                                                  fcmRepository:
-                                                      Get.find<FcmRepository>(),
-                                                  userRepository:
-                                                      Get.find<
-                                                        UserRepository
-                                                      >(),
-                                                  myUid:
-                                                      controller
-                                                          .userModel
-                                                          .value!
-                                                          .uid,
-                                                ),
-                                              );
-                                            }),
+                                    WidgetsBinding.instance.addPostFrameCallback((
+                                      _,
+                                    ) {
+                                      controller.resetNavigateToChat();
+                                      Get.back(); // 다이얼로그 닫기
+                                      Get.to(
+                                        () => PrivateChatRoomView(),
+                                        binding: BindingsBuilder(() {
+                                          Get.put(
+                                            PrivateChatRoomViewModel(
+                                              chatRoomId: chatRoomId!,
+                                              friendUid: user.uid,
+                                              chatRepository:
+                                                  Get.find<ChatRepository>(),
+                                              // fcmRepository:
+                                              //     Get.find<FcmRepository>(),
+                                              userRepository:
+                                                  Get.find<UserRepository>(),
+                                              myUid:
+                                                  controller
+                                                      .userModel
+                                                      .value!
+                                                      .uid,
+                                            ),
                                           );
-                                        });
+                                        }),
+                                      );
+                                    });
                                   }
                                 },
                               ),
@@ -121,7 +118,7 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                                   PrivateChatRoomViewModel(
                                     chatRepository: Get.find<ChatRepository>(),
                                     userRepository: Get.find<UserRepository>(),
-                                    fcmRepository: Get.find<FcmRepository>(),
+                                    // fcmRepository: Get.find<FcmRepository>(),
                                     chatRoomId: chatRoom.id,
                                     myUid: my.uid,
                                     friendUid: opponent.uid,
