@@ -51,7 +51,24 @@ class GroupView extends GetView<GroupViewModel> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(data.title, style: const TextStyle(fontSize: 20)),
-                    Text('그룹장 : ${controller.leaderModel.value?.name}'),
+                    Obx(() {
+                      final leader = controller.leaderModel.value;
+                      final isUnknown = leader?.uid == 'unknown';
+
+                      if (isUnknown) {
+                        return TextButton(
+                          onPressed: () {
+                            controller.changeLeader(
+                              leaderUid: controller.currentUser!,
+                            );
+                          },
+
+                          child: const Text('👑 내가 할래요'),
+                        );
+                      }
+
+                      return Text('그룹장 : ${leader?.name ?? '정보 없음'}');
+                    }),
                   ],
                 ),
                 Align(

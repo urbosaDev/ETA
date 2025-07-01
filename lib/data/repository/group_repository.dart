@@ -28,6 +28,10 @@ abstract class GroupRepository {
   });
   Future<void> clearCurrentPromiseId(String groupId);
   Future<bool> existsGroup(String groupId);
+  Future<void> forceUpdateGroupLeader({
+    required String groupId,
+    required String uid,
+  });
 }
 
 class GroupRepositoryImpl implements GroupRepository {
@@ -133,5 +137,13 @@ class GroupRepositoryImpl implements GroupRepository {
   @override
   Future<bool> existsGroup(String groupId) {
     return _service.existsGroup(groupId);
+  }
+
+  @override
+  Future<void> forceUpdateGroupLeader({
+    required String groupId,
+    required String uid,
+  }) async {
+    await _service.forceUpdateGroupLeader(groupId: groupId, uid: uid);
   }
 }

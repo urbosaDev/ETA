@@ -129,4 +129,15 @@ class GroupService {
     final doc = await _groupRef.doc(groupId).get();
     return doc.exists;
   }
+
+  Future<void> forceUpdateGroupLeader({
+    required String groupId,
+    required String uid,
+  }) async {
+    final docRef = _groupRef.doc(groupId);
+
+    await FirebaseFirestore.instance.runTransaction((transaction) async {
+      transaction.update(docRef, {'createrId': uid});
+    });
+  }
 }

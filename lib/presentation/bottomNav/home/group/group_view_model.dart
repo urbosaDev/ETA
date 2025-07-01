@@ -45,9 +45,11 @@ class GroupViewModel extends GetxController {
   final Rx<UserModel?> leaderModel = Rx<UserModel?>(null);
   final RxBool isParticipating = false.obs;
   String? get currentUser => _authRepository.getCurrentUser()?.uid;
+
   bool get isMyGroup => groupModel.value?.createrId == currentUser;
   bool isOtherUser(UserModel user) => user.uid != currentUser;
   final RxBool isPromiseExisted = false.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -108,6 +110,9 @@ class GroupViewModel extends GetxController {
       isPromiseExisted.value = group.currentPromiseId != null;
       _fetchMember(group.memberIds);
       _fetchPromise(group);
+      if (leaderModel.value?.uid != group.createrId) {
+        fetchLeaderInfo(group.createrId);
+      }
     });
   }
 
@@ -307,5 +312,23 @@ class GroupViewModel extends GetxController {
     currentPromise.value = null;
     isPromiseExisted.value = false;
     successEndPromise.value = true;
+  }
+
+  Future<void> changeLeader({required String leaderUid}) async {
+    final group = groupModel.value;
+    if (group == null || group.id.isEmpty) return;
+
+    try {
+      isLoading.value = true;
+
+      await _groupRepository.forceUpdateGroupLeader(
+        groupId: group.id,
+        uid: leaderUid,
+      );
+    } catch (e) {
+      // 로그 등 처리
+    } finally {
+      isLoading.value = false;
+    }
   }
 }
