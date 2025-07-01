@@ -155,16 +155,18 @@ class CreatePromiseViewModel extends GetxController {
       // FCM 발송
       try {
         final memberUids = selectedMemberIds.toList();
-        final allTokens = <String>[];
+        final tokenUidPairs = <Map<String, String>>[];
 
         for (final uid in memberUids) {
           final tokens = await _userRepository.getFcmTokens(uid);
-          allTokens.addAll(tokens);
+          for (final token in tokens) {
+            tokenUidPairs.add({'token': token, 'uid': uid});
+          }
         }
 
-        if (allTokens.isNotEmpty) {
+        if (tokenUidPairs.isNotEmpty) {
           await _fcmRepository.sendPromiseNotification(
-            targetTokens: allTokens,
+            targetTokens: tokenUidPairs,
             title: '${groupModel.value?.title ?? '그룹'} 약속 생성',
             body: '${promiseName.value} 약속이 생성되었습니다!',
             promiseId: createdId,

@@ -1,3 +1,4 @@
+import 'package:what_is_your_eta/data/model/notification_message_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/service/user_service.dart';
 
@@ -17,6 +18,10 @@ abstract class UserRepository {
   Future<void> addGroupId(String uid, String groupId); // 그룹생성시 유저 업데이트
   Future<List<String>> getFcmTokens(String uid);
   Future<void> removeGroupId({required String userId, required String groupId});
+  Future<void> addMessageToUser({
+    required String uid,
+    required NotificationMessageModel message,
+  });
 }
 
 class UserRepositoryImpl implements UserRepository {
@@ -105,5 +110,16 @@ class UserRepositoryImpl implements UserRepository {
     required String groupId,
   }) {
     return _userService.removeGroupId(uid: userId, groupId: groupId);
+  }
+
+  @override
+  Future<void> addMessageToUser({
+    required String uid,
+    required NotificationMessageModel message,
+  }) {
+    return _userService.addMessageToUser(
+      uid: uid,
+      messageData: message.toJson(),
+    );
   }
 }

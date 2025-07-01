@@ -116,4 +116,15 @@ class UserService {
       'groupIds': FieldValue.arrayRemove([groupId]),
     });
   }
+
+  Future<void> addMessageToUser({
+    required String uid,
+    required Map<String, dynamic> messageData,
+  }) async {
+    final userMessageRef = _userRef.doc(uid).collection('messages');
+    await userMessageRef.add({
+      ...messageData,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
 }

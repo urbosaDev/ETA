@@ -7,7 +7,7 @@ class FcmService {
   FcmService({required this.functionUrl});
 
   Future<void> sendFcmMessages({
-    required List<String> targetTokens,
+    required List<Map<String, String>> targetTokens,
     required String title,
     required String body,
     Map<String, String>? data,

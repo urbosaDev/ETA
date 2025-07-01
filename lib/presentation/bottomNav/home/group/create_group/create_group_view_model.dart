@@ -126,15 +126,17 @@ class CreateGroupViewModel extends GetxController {
       );
 
       final otherUids = finalSelectedUid.where((uid) => uid != currentUser);
-      final allTokens = <String>[];
+      final tokenUidPairs = <Map<String, String>>[];
       for (final uid in otherUids) {
         final tokens = await _userRepository.getFcmTokens(uid);
-        allTokens.addAll(tokens);
+        for (final token in tokens) {
+          tokenUidPairs.add({'token': token, 'uid': uid});
+        }
       }
 
-      if (allTokens.isNotEmpty) {
+      if (tokenUidPairs.isNotEmpty) {
         await _fcmRepository.sendGroupNotification(
-          targetTokens: allTokens,
+          targetTokens: tokenUidPairs,
           groupName: groupTitle.value,
           message: '채팅방이 생성되었습니다',
           groupId: groupId,
