@@ -43,14 +43,22 @@ class ProfileView extends GetView<ProfileViewModel> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildProfileHeader(user),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Get.to(() => AddFriendView(user: controller.userModel.value!));
-              },
-              child: Text('친구 추가'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildProfileHeader(user),
+                ElevatedButton(
+                  onPressed: () {
+                    Get.to(
+                      () => AddFriendView(user: controller.userModel.value!),
+                    );
+                  },
+                  child: Text('친구 추가'),
+                ),
+              ],
             ),
+            const SizedBox(height: 16),
+
             const SizedBox(height: 16),
             Text('탭해서 이동 스와이프해서 삭제'),
             Expanded(
@@ -74,9 +82,10 @@ class ProfileView extends GetView<ProfileViewModel> {
                         (m) => m.id == msg.id,
                       );
                     },
-                    child: ListTile(
-                      title: Text(msg.title),
-                      subtitle: Text(msg.body),
+                    child: _buildDiscordStyleNotification(
+                      title: msg.title,
+                      body: msg.body,
+                      timeText: msg.createdAt.toString(), // ex. "3분 전"
                       onTap: () async {
                         final groupId = msg.groupId;
                         await controller.markMessageAsRead(msg.id);
@@ -96,11 +105,13 @@ class ProfileView extends GetView<ProfileViewModel> {
               ),
             ),
             // 이후 요소 추가 예정
-            ElevatedButton(
-              onPressed: () async {
-                await controller.deleteAllMessagesAsRead();
-              },
-              child: const Text("알림 전체 읽음"),
+            Center(
+              child: ElevatedButton(
+                onPressed: () async {
+                  await controller.deleteAllMessagesAsRead();
+                },
+                child: const Text("알림 전체 읽음"),
+              ),
             ),
           ],
         );
@@ -138,6 +149,58 @@ class ProfileView extends GetView<ProfileViewModel> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDiscordStyleNotification({
+    required String title,
+    required String body,
+    required String timeText,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey[850],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.notifications, color: Colors.white70, size: 24),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    body,
+                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    timeText,
+                    style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
