@@ -22,6 +22,11 @@ abstract class UserRepository {
     required String uid,
     required NotificationMessageModel message,
   });
+  Stream<List<NotificationMessageModel>> streamNotificationMessages(String uid);
+  Future<void> markMessageAsRead({
+    required String uid,
+    required String messageId,
+  });
 }
 
 class UserRepositoryImpl implements UserRepository {
@@ -121,5 +126,25 @@ class UserRepositoryImpl implements UserRepository {
       uid: uid,
       messageData: message.toJson(),
     );
+  }
+
+  @override
+  Stream<List<NotificationMessageModel>> streamNotificationMessages(
+    String uid,
+  ) {
+    return _userService.streamMessageMapsForUser(uid).map((list) {
+      return list.map((map) {
+        final id = map['id'] as String;
+        return NotificationMessageModel.fromJson(id, map);
+      }).toList();
+    });
+  }
+
+  @override
+  Future<void> markMessageAsRead({
+    required String uid,
+    required String messageId,
+  }) {
+    return _userService.markMessageAsRead(uid: uid, messageId: messageId);
   }
 }

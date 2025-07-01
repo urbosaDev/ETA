@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/message_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
-import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
+
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 
 class PrivateChatRoomViewModel extends GetxController {
@@ -77,18 +77,5 @@ class PrivateChatRoomViewModel extends GetxController {
     );
 
     await _chatRepository.sendMessage(chatRoomId, message);
-    // try {
-    //   final tokens = await _userRepository.getFcmTokens(friendUid);
-
-    //   if (tokens.isNotEmpty) {
-    //     await _fcmRepository.sendChatNotification(
-    //       targetTokens: tokens,
-    //       senderName: myModel.value!.name,
-    //       message: content.trim(),
-    //     );
-    //   }
-    // } catch (e) {
-    //   return;
-    // }
   }
 }

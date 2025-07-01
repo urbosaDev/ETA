@@ -12,7 +12,6 @@ abstract interface class FcmRepository {
     required List<Map<String, String>> targetTokens,
     required String title,
     required String body,
-    required String promiseId,
     required String groupId,
   });
 }
@@ -44,7 +43,7 @@ class FcmRepositoryImpl implements FcmRepository {
     required List<Map<String, String>> targetTokens,
     required String title,
     required String body,
-    required String promiseId,
+
     required String groupId,
   }) async {
     if (targetTokens.isEmpty) return;
@@ -52,7 +51,7 @@ class FcmRepositoryImpl implements FcmRepository {
       targetTokens: targetTokens,
       title: title,
       body: body,
-      data: {'type': 'promise', promiseId: promiseId, 'groupId': groupId},
+      data: {'type': 'promise', 'groupId': groupId},
     );
   }
 }

@@ -127,4 +127,27 @@ class UserService {
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
+
+  Stream<List<Map<String, dynamic>>> streamMessageMapsForUser(String uid) {
+    final userMessageRef = _userRef.doc(uid).collection('messages');
+
+    return userMessageRef
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map(
+          (querySnapshot) =>
+              querySnapshot.docs.map((doc) {
+                final data = doc.data();
+                return {'id': doc.id, ...data};
+              }).toList(),
+        );
+  }
+
+  Future<void> markMessageAsRead({
+    required String uid,
+    required String messageId,
+  }) async {
+    final messageRef = _userRef.doc(uid).collection('messages').doc(messageId);
+    await messageRef.update({'isRead': true});
+  }
 }
