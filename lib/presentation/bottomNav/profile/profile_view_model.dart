@@ -166,6 +166,18 @@ class ProfileViewModel extends GetxController {
     canEnterGroup.value = true;
     isNavigating.value = false;
   }
+
+  Future<void> deleteAllMessagesAsRead() async {
+    final uid = userModel.value?.uid;
+    if (uid == null) return;
+
+    try {
+      await _userRepository.deleteAllMessagesFromUser(uid);
+      unreadMessages.clear(); // RxList 초기화
+    } catch (e) {
+      // errorMessage.value = '메시지 삭제 실패: $e';
+    }
+  }
 }
 // userModel fetch, stream 
 // 친구들도 fetch 

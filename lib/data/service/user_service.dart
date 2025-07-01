@@ -165,4 +165,13 @@ class UserService {
         .get()
         .then((doc) => doc.data()?['groupIds']?.contains(groupId) ?? false);
   }
+
+  Future<void> deleteAllMessagesFromUser(String uid) async {
+    final messagesRef = _userRef.doc(uid).collection('messages');
+    final messagesSnapshot = await messagesRef.get();
+
+    for (final messageDoc in messagesSnapshot.docs) {
+      await messageDoc.reference.delete();
+    }
+  }
 }

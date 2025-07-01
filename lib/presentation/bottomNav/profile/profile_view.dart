@@ -96,6 +96,12 @@ class ProfileView extends GetView<ProfileViewModel> {
               ),
             ),
             // 이후 요소 추가 예정
+            ElevatedButton(
+              onPressed: () async {
+                await controller.deleteAllMessagesAsRead();
+              },
+              child: const Text("알림 전체 읽음"),
+            ),
           ],
         );
       }),
