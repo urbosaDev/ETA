@@ -1,7 +1,6 @@
 import 'package:get/state_manager.dart';
 import 'package:what_is_your_eta/data/repository/fcm_token_repository.dart';
 
-
 class BottomNavViewModel extends GetxController {
   final currentIndex = 0.obs;
   final FcmTokenRepository _fcmTokenRepository;
@@ -25,5 +24,12 @@ class BottomNavViewModel extends GetxController {
   @override
   void onClose() {
     super.onClose();
+  }
+
+  final Rxn<String> pendingGroupId = Rxn<String>();
+
+  void requestGoToGroup(String groupId) {
+    pendingGroupId.value = groupId;
+    changeIndex(0); // 홈 탭으로 전환
   }
 }

@@ -27,6 +27,10 @@ abstract class UserRepository {
     required String uid,
     required String messageId,
   });
+  Future<void> deleteMessageFromUser({
+    required String uid,
+    required String messageId,
+  });
 }
 
 class UserRepositoryImpl implements UserRepository {
@@ -133,10 +137,13 @@ class UserRepositoryImpl implements UserRepository {
     String uid,
   ) {
     return _userService.streamMessageMapsForUser(uid).map((list) {
-      return list.map((map) {
-        final id = map['id'] as String;
-        return NotificationMessageModel.fromJson(id, map);
-      }).toList();
+      return list
+          .map((map) {
+            final id = map['id'] as String;
+            return NotificationMessageModel.fromJson(id, map);
+          })
+          .where((msg) => !msg.isRead) //isRead가 false인 메시지만 필터링
+          .toList();
     });
   }
 
@@ -146,5 +153,13 @@ class UserRepositoryImpl implements UserRepository {
     required String messageId,
   }) {
     return _userService.markMessageAsRead(uid: uid, messageId: messageId);
+  }
+
+  @override
+  Future<void> deleteMessageFromUser({
+    required String uid,
+    required String messageId,
+  }) {
+    return _userService.deleteMessageFromUser(uid: uid, messageId: messageId);
   }
 }

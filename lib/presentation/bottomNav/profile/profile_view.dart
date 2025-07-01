@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
-import 'package:what_is_your_eta/data/repository/chat_repository.dart';
-import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/%08add_friend/add_friend_view.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view_model.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/bottom_nav_view_model.dart';
+
 import 'package:what_is_your_eta/presentation/bottomNav/profile/profile_view_model.dart';
-import 'package:what_is_your_eta/presentation/core/dialog/user_info_dialog.dart';
-import 'package:what_is_your_eta/presentation/core/widget/user_tile.dart';
 
 class ProfileView extends GetView<ProfileViewModel> {
   const ProfileView({super.key});
@@ -36,7 +33,42 @@ class ProfileView extends GetView<ProfileViewModel> {
               child: Text('친구 추가'),
             ),
             const SizedBox(height: 16),
-            _buildFriendList(),
+            Text('탭해서 이동 스와이프해서 삭제'),
+            Expanded(
+              child: ListView.builder(
+                itemCount: controller.unreadMessages.length,
+                itemBuilder: (context, index) {
+                  final msg = controller.unreadMessages[index];
+
+                  return Dismissible(
+                    key: Key(msg.id), // 유일한 키 필수
+                    direction: DismissDirection.endToStart, // 오른쪽→왼쪽 스와이프
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: const Icon(Icons.delete, color: Colors.white),
+                    ),
+                    onDismissed: (direction) async {
+                      await controller.deleteMessage(msg.id);
+                      controller.unreadMessages.removeWhere(
+                        (m) => m.id == msg.id,
+                      );
+                    },
+                    child: ListTile(
+                      title: Text(msg.title),
+                      subtitle: Text(msg.body),
+                      onTap: () async {
+                        await controller.markMessageAsRead(msg.id);
+                        Get.find<BottomNavViewModel>().requestGoToGroup(
+                          msg.groupId,
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
             // 이후 요소 추가 예정
           ],
         );
@@ -76,69 +108,5 @@ class ProfileView extends GetView<ProfileViewModel> {
         ],
       ),
     );
-  }
-
-  Widget _buildFriendList() {
-    return Obx(() {
-      final friends = controller.friendList;
-
-      if (friends.isEmpty) {
-        return const Padding(
-          padding: EdgeInsets.symmetric(vertical: 24),
-          child: Center(
-            child: Text("아직 친구가 없습니다.", style: TextStyle(color: Colors.grey)),
-          ),
-        );
-      }
-
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "내 친구들",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          ...friends.map((user) {
-            return GestureDetector(
-              onTap: () {
-                Get.dialog(
-                  userInfoDialogView(
-                    targetUser: user,
-                    onChatPressed: () async {
-                      final chatRoomId = await controller.createChatRoom(
-                        user.uid,
-                      );
-                      if (controller.navigateToChat.value) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          controller.resetNavigateToChat();
-                          Get.back(); // 다이얼로그 닫기
-                          Get.to(
-                            () => PrivateChatRoomView(),
-                            binding: BindingsBuilder(() {
-                              Get.put(
-                                PrivateChatRoomViewModel(
-                                  chatRoomId: chatRoomId!,
-                                  friendUid: user.uid,
-                                  chatRepository: Get.find<ChatRepository>(),
-                                  // fcmRepository: Get.find<FcmRepository>(),
-                                  userRepository: Get.find<UserRepository>(),
-                                  myUid: controller.userModel.value!.uid,
-                                ),
-                              );
-                            }),
-                          );
-                        });
-                      }
-                    },
-                  ),
-                );
-              },
-              child: UserTile(user: user),
-            );
-          }).toList(),
-        ],
-      );
-    });
   }
 }

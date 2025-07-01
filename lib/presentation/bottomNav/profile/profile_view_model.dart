@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:get/get.dart';
+import 'package:what_is_your_eta/data/model/notification_message_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
@@ -24,6 +25,9 @@ class ProfileViewModel extends GetxController {
   final RxBool isLoading = true.obs;
   StreamSubscription<UserModel>? _userSub;
 
+  final RxList<NotificationMessageModel> unreadMessages =
+      <NotificationMessageModel>[].obs;
+  StreamSubscription<List<NotificationMessageModel>>? _messageSub;
   @override
   void onInit() {
     super.onInit();
@@ -35,6 +39,7 @@ class ProfileViewModel extends GetxController {
   void onClose() {
     // Clean up resources or subscriptions if needed
     _userSub?.cancel();
+    _messageSub?.cancel();
     super.onClose();
   }
 
@@ -56,6 +61,18 @@ class ProfileViewModel extends GetxController {
       userModel.value = user;
       await getUsersByUids(user.friendsUids);
     });
+    _messageSub = _userRepository.streamNotificationMessages(uid).listen((
+      messages,
+    ) {
+      unreadMessages.assignAll(messages); // RxList 업데이트
+    });
+  }
+
+  Future<void> markMessageAsRead(String messageId) async {
+    final uid = userModel.value?.uid;
+    if (uid != null) {
+      await _userRepository.markMessageAsRead(uid: uid, messageId: messageId);
+    }
   }
 
   Future<void> getUsersByUids(List<String> uids) async {
@@ -100,6 +117,16 @@ class ProfileViewModel extends GetxController {
     } catch (e) {
       navigateToChat.value = false;
       return null;
+    }
+  }
+
+  Future<void> deleteMessage(String messageId) async {
+    final uid = userModel.value?.uid;
+    if (uid != null) {
+      await _userRepository.deleteMessageFromUser(
+        uid: uid,
+        messageId: messageId,
+      );
     }
   }
 }

@@ -138,7 +138,7 @@ class CreateGroupViewModel extends GetxController {
         await _fcmRepository.sendGroupNotification(
           targetTokens: tokenUidPairs,
           groupName: groupTitle.value,
-          message: '채팅방이 생성되었습니다',
+          message: '그룹이 생성되었습니다',
           groupId: groupId,
         );
       }

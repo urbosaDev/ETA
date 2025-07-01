@@ -7,6 +7,7 @@ import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/bottom_nav_view_model.dart';
 
 class HomeViewModel extends GetxController {
   final UserRepository _userRepository;
@@ -27,11 +28,23 @@ class HomeViewModel extends GetxController {
   final selectedIndex = 0.obs; // 0: Chat, 1: Create
 
   StreamSubscription<UserModel>? _userSub;
-
+  final RxnString groupIdToOpen = RxnString();
   @override
   void onInit() {
     super.onInit();
     _initUser();
+    final bottomNavController = Get.find<BottomNavViewModel>();
+    ever<String?>(bottomNavController.pendingGroupId, (groupId) {
+      if (groupId == null) return;
+
+      final index = _groupList.indexWhere((g) => g.id == groupId);
+      if (index != -1) {
+        selectedIndex.value = index + 2;
+      }
+
+      // groupIdToOpen도 초기화 (한 번만 이동하게)
+      bottomNavController.pendingGroupId.value = null;
+    });
   }
 
   @override

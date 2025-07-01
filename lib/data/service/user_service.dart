@@ -150,4 +150,12 @@ class UserService {
     final messageRef = _userRef.doc(uid).collection('messages').doc(messageId);
     await messageRef.update({'isRead': true});
   }
+
+  Future<void> deleteMessageFromUser({
+    required String uid,
+    required String messageId,
+  }) async {
+    final messageRef = _userRef.doc(uid).collection('messages').doc(messageId);
+    await messageRef.delete();
+  }
 }
