@@ -62,6 +62,8 @@ class GroupViewModel extends GetxController {
     super.onClose();
   }
 
+  List<UserModel> get validFriends =>
+      friendList.where((f) => f.uid != 'unknown').toList();
   Future<void> _initialize() async {
     isLoading.value = true;
 

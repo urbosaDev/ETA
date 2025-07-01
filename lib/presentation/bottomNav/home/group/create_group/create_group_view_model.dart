@@ -45,7 +45,8 @@ class CreateGroupViewModel extends GetxController {
   }
 
   final RxString groupTitle = ''.obs;
-
+  List<UserModel> get validFriends =>
+      friendList.where((f) => f.uid != 'unknown').toList();
   bool get isReadyToCreate =>
       groupTitle.isNotEmpty && selectedFriends.isNotEmpty;
 

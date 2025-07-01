@@ -30,7 +30,7 @@ class CreateGroupView extends GetView<CreateGroupViewModel> {
             onTap: () {
               Get.dialog(
                 SelectFriendDialog(
-                  friendList: controller.friendList,
+                  friendList: controller.validFriends,
                   selectedFriends: controller.selectedFriends,
                   toggleFriend: controller.toggleFriend,
                   disabledUids: [], // ❗️CreateGroupView에서는 고정된 멤버 없음

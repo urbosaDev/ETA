@@ -89,7 +89,7 @@ class GroupView extends GetView<GroupViewModel> {
               onTap: () {
                 Get.dialog(
                   SelectFriendDialog(
-                    friendList: controller.friendList, // ✅ 전체 친구 목록
+                    friendList: controller.validFriends,
                     selectedFriends: controller.selectedFriends,
                     toggleFriend: controller.toggleFriend,
                     disabledUids:

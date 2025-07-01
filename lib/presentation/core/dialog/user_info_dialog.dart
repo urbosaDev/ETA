@@ -6,16 +6,21 @@ Widget userInfoDialogView({
   required UserModel targetUser,
   required VoidCallback onChatPressed,
 }) {
+  final isUnknown = targetUser.uid == UserModel.unknown.uid;
+
   return AlertDialog(
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-    // title: const Text("유저 정보", textAlign: TextAlign.center),
     content: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // 프로필 이미지
         CircleAvatar(
           radius: 40,
-          backgroundImage: NetworkImage(targetUser.photoUrl),
+          backgroundImage:
+              isUnknown
+                  ? const AssetImage('assets/imgs/default_profile.png')
+                      as ImageProvider
+                  : NetworkImage(targetUser.photoUrl),
         ),
         const SizedBox(height: 12),
 
@@ -24,20 +29,21 @@ Widget userInfoDialogView({
           targetUser.name,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        Text(
-          '@${targetUser.uniqueId}',
-          style: const TextStyle(fontSize: 14, color: Colors.grey),
-        ),
+        if (!isUnknown)
+          Text(
+            '@${targetUser.uniqueId}',
+            style: const TextStyle(fontSize: 14, color: Colors.grey),
+          ),
 
         const SizedBox(height: 24),
 
-        // 1:1 채팅 버튼
+        // 1:1 채팅 버튼 (unknown은 비활성화)
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
             icon: const Icon(Icons.chat_bubble_outline),
             label: const Text("1:1 채팅"),
-            onPressed: onChatPressed,
+            onPressed: isUnknown ? null : onChatPressed,
           ),
         ),
       ],
