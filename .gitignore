@@ -64,3 +64,5 @@ flutter_export_environment.sh
 
 # Service Account Key
 assets/keys/*.json
+
+assets/

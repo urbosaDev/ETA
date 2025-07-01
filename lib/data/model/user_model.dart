@@ -21,6 +21,17 @@ class UserModel {
     this.location,
   });
 
+  static const unknown = UserModel(
+    uid: 'unknown',
+    uniqueId: 'unknown',
+    name: '존재하지 않는 사용자',
+    photoUrl: 'assets/imgs/default_profile.png',
+    friendsUids: [],
+    groupIds: [],
+    privateChatIds: [],
+    location: null,
+  );
+
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       uid: json['uid'],

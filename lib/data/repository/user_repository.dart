@@ -63,9 +63,9 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<UserModel?> getUser(String uid) async {
+  Future<UserModel> getUser(String uid) async {
     final json = await _userService.getUserData(uid);
-    return json == null ? null : UserModel.fromJson(json);
+    return json == null ? UserModel.unknown : UserModel.fromJson(json);
   }
   // @override
   // Future<UserModel?> getUserByUniqueId(String uniqueId) async {
@@ -75,7 +75,9 @@ class UserRepositoryImpl implements UserRepository {
 
   @override
   Stream<UserModel> streamUser(String uid) {
-    return _userService.streamUserData(uid).map(UserModel.fromJson);
+    return _userService.streamUserData(uid).map((json) {
+      return json == null ? UserModel.unknown : UserModel.fromJson(json);
+    });
   }
 
   @override
@@ -98,10 +100,26 @@ class UserRepositoryImpl implements UserRepository {
     return _userService.isUniqueIdAvailable(uniqueId);
   }
 
+  // @override
+  // Future<List<UserModel>> getUsersByUids(List<String> uids) async {
+  //   final jsonList = await _userService.getUsersByUids(uids);
+  //   return jsonList.map((json) {
+  //     if (json == null) return UserModel.unknown;
+  //     return UserModel.fromJson(json);
+  //   }).toList();
+  // }
   @override
   Future<List<UserModel>> getUsersByUids(List<String> uids) async {
-    final jsonList = await _userService.getUsersByUids(uids);
-    return jsonList.map(UserModel.fromJson).toList();
+    final results = <UserModel>[];
+    for (final uid in uids) {
+      final json = await _userService.getUserData(uid);
+      if (json == null) {
+        results.add(UserModel.unknown);
+      } else {
+        results.add(UserModel.fromJson(json));
+      }
+    }
+    return results;
   }
 
   @override

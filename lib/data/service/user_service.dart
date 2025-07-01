@@ -49,7 +49,7 @@ class UserService {
   // }
 
   /// 유저 스트리밍
-  Stream<Map<String, dynamic>> streamUserData(String uid) {
+  Stream<Map<String, dynamic>?> streamUserData(String uid) {
     return _userRef
         .doc(uid)
         .snapshots()
