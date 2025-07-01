@@ -31,6 +31,7 @@ abstract class UserRepository {
     required String uid,
     required String messageId,
   });
+  Future<bool> userHasGroup({required String uid, required String groupId});
 }
 
 class UserRepositoryImpl implements UserRepository {
@@ -161,5 +162,13 @@ class UserRepositoryImpl implements UserRepository {
     required String messageId,
   }) {
     return _userService.deleteMessageFromUser(uid: uid, messageId: messageId);
+  }
+
+  @override
+  Future<bool> userHasGroup({
+    required String uid,
+    required String groupId,
+  }) async {
+    return _userService.userHasGroup(uid: uid, groupId: groupId);
   }
 }

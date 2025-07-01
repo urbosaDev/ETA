@@ -158,4 +158,11 @@ class UserService {
     final messageRef = _userRef.doc(uid).collection('messages').doc(messageId);
     await messageRef.delete();
   }
+
+  Future<bool> userHasGroup({required String uid, required String groupId}) {
+    return _userRef
+        .doc(uid)
+        .get()
+        .then((doc) => doc.data()?['groupIds']?.contains(groupId) ?? false);
+  }
 }

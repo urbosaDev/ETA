@@ -5,20 +5,24 @@ import 'package:what_is_your_eta/data/model/notification_message_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
+import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 
 class ProfileViewModel extends GetxController {
   final AuthRepository _authRepository;
   final UserRepository _userRepository;
   final ChatRepository _chatRepository;
+  final GroupRepository _groupRepository;
 
   ProfileViewModel({
     required AuthRepository authRepository,
     required UserRepository userRepository,
     required ChatRepository chatRepository,
+    required GroupRepository groupRepository,
   }) : _authRepository = authRepository,
        _userRepository = userRepository,
-       _chatRepository = chatRepository;
+       _chatRepository = chatRepository,
+       _groupRepository = groupRepository;
 
   final Rx<UserModel?> userModel = Rx<UserModel?>(null);
   final RxList<UserModel> friendList = <UserModel>[].obs;
@@ -128,6 +132,39 @@ class ProfileViewModel extends GetxController {
         messageId: messageId,
       );
     }
+  }
+
+  final RxnString errorMessage = RxnString(null); // 메시지용
+  final RxBool canEnterGroup = false.obs; // 이동 가능 여부
+  final RxBool isNavigating = false.obs;
+  Future<void> checkGroupNavigation(String groupId) async {
+    isNavigating.value = true;
+    final uid = userModel.value?.uid;
+    if (uid == null) {
+      canEnterGroup.value = false;
+      isNavigating.value = false;
+      return;
+    }
+
+    final exists = await _groupRepository.existsGroup(groupId);
+    if (!exists) {
+      errorMessage.value = '존재하지 않는 그룹입니다.';
+      canEnterGroup.value = false;
+      isNavigating.value = false;
+      return;
+    }
+
+    final has = await _userRepository.userHasGroup(uid: uid, groupId: groupId);
+    if (!has) {
+      errorMessage.value = '속해있지 않은 그룹입니다.';
+      canEnterGroup.value = false;
+      isNavigating.value = false;
+      return;
+    }
+    await Future.delayed(const Duration(milliseconds: 500));
+    errorMessage.value = null;
+    canEnterGroup.value = true;
+    isNavigating.value = false;
   }
 }
 // userModel fetch, stream 

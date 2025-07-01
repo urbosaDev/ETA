@@ -124,4 +124,9 @@ class GroupService {
       'currentPromiseId': FieldValue.delete(),
     });
   }
+
+  Future<bool> existsGroup(String groupId) async {
+    final doc = await _groupRef.doc(groupId).get();
+    return doc.exists;
+  }
 }

@@ -50,6 +50,7 @@ class BottomNavBinding extends Bindings {
         userRepository: Get.find<UserRepository>(),
         authRepository: Get.find<AuthRepository>(),
         chatRepository: Get.find<ChatRepository>(),
+        groupRepository: Get.find<GroupRepository>(),
       ),
     );
   }

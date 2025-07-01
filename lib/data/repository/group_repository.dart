@@ -27,6 +27,7 @@ abstract class GroupRepository {
     required String promiseId,
   });
   Future<void> clearCurrentPromiseId(String groupId);
+  Future<bool> existsGroup(String groupId);
 }
 
 class GroupRepositoryImpl implements GroupRepository {
@@ -127,5 +128,10 @@ class GroupRepositoryImpl implements GroupRepository {
   @override
   Future<void> clearCurrentPromiseId(String groupId) {
     return _service.clearCurrentPromiseId(groupId);
+  }
+
+  @override
+  Future<bool> existsGroup(String groupId) {
+    return _service.existsGroup(groupId);
   }
 }

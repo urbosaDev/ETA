@@ -16,6 +16,25 @@ class ProfileView extends GetView<ProfileViewModel> {
       child: Obx(() {
         final isLoading = controller.isLoading.value;
         final user = controller.userModel.value;
+        final message = controller.errorMessage.value;
+        final isNavigating = controller.isNavigating.value;
+        if (message != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Get.snackbar(
+              '알림',
+              message,
+              snackPosition: SnackPosition.TOP,
+              duration: const Duration(seconds: 2),
+              backgroundColor: Colors.black.withOpacity(0.8),
+              colorText: Colors.white,
+              margin: const EdgeInsets.all(12),
+            );
+            controller.errorMessage.value = null;
+          });
+        }
+        if (isNavigating) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
         if (isLoading || user == null) {
           return const Center(child: CircularProgressIndicator());
@@ -59,10 +78,17 @@ class ProfileView extends GetView<ProfileViewModel> {
                       title: Text(msg.title),
                       subtitle: Text(msg.body),
                       onTap: () async {
+                        final groupId = msg.groupId;
                         await controller.markMessageAsRead(msg.id);
-                        Get.find<BottomNavViewModel>().requestGoToGroup(
-                          msg.groupId,
-                        );
+                        await controller.checkGroupNavigation(groupId);
+
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (controller.canEnterGroup.value) {
+                            Get.find<BottomNavViewModel>().requestGoToGroup(
+                              groupId,
+                            );
+                          }
+                        });
                       },
                     ),
                   );
