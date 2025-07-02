@@ -10,6 +10,7 @@ import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/presentation/models/friend_info_model.dart';
 
 class CreateGroupViewModel extends GetxController {
   final GroupRepository _groupRepository;
@@ -29,24 +30,28 @@ class CreateGroupViewModel extends GetxController {
   // init 했을때 내 userModel 가져와야함
   final Rx<UserModel?> userModel = Rx<UserModel?>(null);
 
-  final RxList<UserModel> _friendList = <UserModel>[].obs;
-  List<UserModel> get friendList => _friendList;
+  final RxList<FriendInfoModel> friendList = <FriendInfoModel>[].obs;
 
   StreamSubscription<UserModel>? _userSub;
 
-  final RxList<UserModel> selectedFriends = <UserModel>[].obs;
+  final RxList<FriendInfoModel> selectedFriends = <FriendInfoModel>[].obs;
+
   final RxBool isCreating = false.obs;
-  void toggleFriend(UserModel user) {
-    if (selectedFriends.any((u) => u.uid == user.uid)) {
-      selectedFriends.removeWhere((u) => u.uid == user.uid);
+  void toggleFriend(FriendInfoModel friend) {
+    if (selectedFriends.any((f) => f.userModel.uid == friend.userModel.uid)) {
+      selectedFriends.removeWhere(
+        (f) => f.userModel.uid == friend.userModel.uid,
+      );
     } else {
-      selectedFriends.add(user);
+      selectedFriends.add(friend);
     }
   }
 
   final RxString groupTitle = ''.obs;
-  List<UserModel> get validFriends =>
-      friendList.where((f) => f.uniqueId != 'unknown').toList();
+
+  List<FriendInfoModel> get validFriends =>
+      friendList.where((f) => f.userModel.uniqueId != 'unknown').toList();
+
   bool get isReadyToCreate =>
       groupTitle.isNotEmpty && selectedFriends.isNotEmpty;
 
@@ -85,7 +90,14 @@ class CreateGroupViewModel extends GetxController {
   }
 
   Future<void> getUsersByUids(List<String> uids) async {
-    _friendList.value = await _userRepository.getUsersByUids(uids);
+    final users = await _userRepository.getUsersByUids(uids);
+    final blockedUids = userModel.value?.blockedUids ?? [];
+
+    friendList.value =
+        users.map((user) {
+          final isBlocked = blockedUids.contains(user.uid);
+          return FriendInfoModel(userModel: user, isBlocked: isBlocked);
+        }).toList();
   }
 
   final RxBool isGroupCreated = false.obs;
@@ -99,7 +111,7 @@ class CreateGroupViewModel extends GetxController {
 
     final finalSelectedUid = [
       currentUser,
-      ...selectedFriends.map((u) => u.uid),
+      ...selectedFriends.map((u) => u.userModel.uid),
     ];
 
     final group = GroupModel(

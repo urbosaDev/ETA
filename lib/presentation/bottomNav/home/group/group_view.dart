@@ -104,20 +104,22 @@ class GroupView extends GetView<GroupViewModel> {
             const SizedBox(height: 12),
             GestureDetector(
               onTap: () {
-                // Get.dialog(
-                //   SelectFriendDialog(
-                //     friendList: controller.friendList,
-                //     selectedFriends: controller.selectedFriends,
-                //     toggleFriend: controller.toggleFriend,
-                //     disabledUids:
-                //         controller.memberList.map((u) => u.uid).toList(),
-                //     confirmText: '초대하기',
-                //     onConfirm: () {
-                //       controller.invite();
-                //       Get.back();
-                //     },
-                //   ),
-                // );
+                Get.dialog(
+                  SelectFriendDialog(
+                    friendList: controller.friendList,
+                    selectedFriends: controller.selectedFriends,
+                    toggleFriend: controller.toggleFriend,
+                    disabledUids:
+                        controller.memberList
+                            .map((u) => u.userModel.uid)
+                            .toList(),
+                    confirmText: '초대하기',
+                    onConfirm: () {
+                      controller.invite();
+                      Get.back();
+                    },
+                  ),
+                );
               },
               child: const Text('친구 초대하기'),
             ),

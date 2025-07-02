@@ -30,7 +30,7 @@ class CreateGroupView extends GetView<CreateGroupViewModel> {
             onTap: () {
               Get.dialog(
                 SelectFriendDialog(
-                  friendList: controller.validFriends,
+                  friendList: controller.validFriends.obs,
                   selectedFriends: controller.selectedFriends,
                   toggleFriend: controller.toggleFriend,
                   disabledUids: [], // ❗️CreateGroupView에서는 고정된 멤버 없음
@@ -53,7 +53,7 @@ class CreateGroupView extends GetView<CreateGroupViewModel> {
                       spacing: 8,
                       children:
                           selected
-                              .map((f) => Chip(label: Text(f.name)))
+                              .map((f) => Chip(label: Text(f.userModel.name)))
                               .toList(),
                     );
                   }

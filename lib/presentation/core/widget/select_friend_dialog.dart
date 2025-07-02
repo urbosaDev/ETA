@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:what_is_your_eta/data/model/user_model.dart';
+
+import 'package:what_is_your_eta/presentation/models/friend_info_model.dart';
 
 class SelectFriendDialog extends StatelessWidget {
-  final List<UserModel> friendList;
-  final RxList<UserModel> selectedFriends;
-  final void Function(UserModel) toggleFriend;
+  final RxList<FriendInfoModel> friendList;
+  final RxList<FriendInfoModel> selectedFriends;
+  final void Function(FriendInfoModel) toggleFriend;
 
   final String confirmText;
   final VoidCallback onConfirm;
@@ -65,7 +66,7 @@ class SelectFriendDialog extends StatelessWidget {
                                     color: Colors.lime.shade400,
                                     borderRadius: BorderRadius.circular(16),
                                   ),
-                                  child: Text(f.name),
+                                  child: Text(f.userModel.name),
                                 );
                               }).toList(),
                         ),
@@ -74,18 +75,23 @@ class SelectFriendDialog extends StatelessWidget {
             const SizedBox(height: 12),
             Expanded(
               child: Obx(() {
-                final selectedUids = selectedFriends.map((f) => f.uid).toSet();
+                final selectedUids =
+                    selectedFriends.map((f) => f.userModel.uid).toSet();
 
                 return ListView.builder(
                   itemCount: friendList.length,
                   itemBuilder: (context, index) {
                     final friend = friendList[index];
-                    final isSelected = selectedUids.contains(friend.uid);
-                    final isDisabled = disabledUids.contains(friend.uid);
+                    final isSelected = selectedUids.contains(
+                      friend.userModel.uid,
+                    );
+                    final isDisabled = disabledUids.contains(
+                      friend.userModel.uid,
+                    );
 
                     return ListTile(
-                      title: Text(friend.name),
-                      subtitle: Text(friend.uniqueId),
+                      title: Text(friend.userModel.name),
+                      subtitle: Text(friend.userModel.uniqueId),
                       trailing: Icon(
                         isDisabled
                             ? Icons.check_circle_outline
