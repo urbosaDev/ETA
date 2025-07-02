@@ -13,6 +13,25 @@ Widget userInfoDialogView({
     content: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        Align(
+          alignment: Alignment.topRight,
+          child: PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) {
+              if (value == 'delete') {
+                Get.back();
+                deleteFriend();
+              }
+            },
+            itemBuilder:
+                (context) => [
+                  const PopupMenuItem<String>(
+                    value: 'delete',
+                    child: Text('친구 삭제'),
+                  ),
+                ],
+          ),
+        ),
         // 프로필 이미지
         CircleAvatar(
           radius: 40,

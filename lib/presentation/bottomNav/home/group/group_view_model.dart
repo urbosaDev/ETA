@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/group_model.dart';
 import 'package:what_is_your_eta/data/model/promise_model.dart';
@@ -35,7 +34,7 @@ class GroupViewModel extends GetxController {
   final Rx<GroupModel?> groupModel = Rx<GroupModel?>(null);
   final RxBool isLoading = true.obs;
   StreamSubscription<GroupModel>? _groupSub;
-
+  StreamSubscription<UserModel>? _userSub;
   final RxList<UserModel> memberList = <UserModel>[].obs;
   final RxList<UserModel> selectedFriends = <UserModel>[].obs;
   final RxList<UserModel> friendList = <UserModel>[].obs;
@@ -60,12 +59,10 @@ class GroupViewModel extends GetxController {
   @override
   void onClose() {
     _groupSub?.cancel();
-    debugPrint('🗑️ GroupViewModel deleted');
+    _userSub?.cancel();
     super.onClose();
   }
 
-  List<UserModel> get validFriends =>
-      friendList.where((f) => f.uniqueId != 'unknown').toList();
   Future<void> _initialize() async {
     isLoading.value = true;
 
@@ -86,6 +83,12 @@ class GroupViewModel extends GetxController {
     if (currentUser != null) {
       await _fetchFriendList(currentUser.uid);
     }
+    // 본인 정보 스트림 시작
+    _userSub = _userRepository.streamUser(currentUser?.uid ?? '').listen((
+      user,
+    ) {
+      _fetchFriendList(user.uid);
+    });
 
     _startGroupStream();
     isLoading.value = false;
