@@ -50,7 +50,12 @@ class CreateGroupViewModel extends GetxController {
   final RxString groupTitle = ''.obs;
 
   List<FriendInfoModel> get validFriends =>
-      friendList.where((f) => f.userModel.uniqueId != 'unknown').toList();
+      friendList
+          .where(
+            (f) =>
+                f.userModel.uniqueId != 'unknown' && !f.isBlocked, // 차단한 유저는 제외
+          )
+          .toList();
 
   bool get isReadyToCreate =>
       groupTitle.isNotEmpty && selectedFriends.isNotEmpty;

@@ -106,7 +106,7 @@ class GroupView extends GetView<GroupViewModel> {
               onTap: () {
                 Get.dialog(
                   SelectFriendDialog(
-                    friendList: controller.friendList,
+                    friendList: controller.validFriends.obs,
                     selectedFriends: controller.selectedFriends,
                     toggleFriend: controller.toggleFriend,
                     disabledUids:
