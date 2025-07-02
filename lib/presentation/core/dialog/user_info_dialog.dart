@@ -6,6 +6,9 @@ Widget userInfoDialogView({
   required UserModel targetUser,
   required VoidCallback onChatPressed,
   required VoidCallback deleteFriend,
+  required VoidCallback onBlockPressed,
+  required VoidCallback onUnblockPressed,
+  required bool isBlocked,
   required bool isUnknown,
 }) {
   return AlertDialog(
@@ -18,9 +21,13 @@ Widget userInfoDialogView({
           child: PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
             onSelected: (value) {
+              Get.back();
               if (value == 'delete') {
-                Get.back();
                 deleteFriend();
+              } else if (value == 'block') {
+                onBlockPressed();
+              } else if (value == 'unblock') {
+                onUnblockPressed();
               }
             },
             itemBuilder:
@@ -28,6 +35,10 @@ Widget userInfoDialogView({
                   const PopupMenuItem<String>(
                     value: 'delete',
                     child: Text('친구 삭제'),
+                  ),
+                  PopupMenuItem<String>(
+                    value: isBlocked ? 'unblock' : 'block',
+                    child: Text(isBlocked ? '차단 해제' : '차단하기'),
                   ),
                 ],
           ),
@@ -38,7 +49,6 @@ Widget userInfoDialogView({
           backgroundImage:
               isUnknown
                   ? const AssetImage('assets/imgs/default_profile.png')
-                      as ImageProvider
                   : NetworkImage(targetUser.photoUrl),
         ),
         const SizedBox(height: 12),
@@ -61,8 +71,8 @@ Widget userInfoDialogView({
           width: double.infinity,
           child: ElevatedButton.icon(
             icon: const Icon(Icons.chat_bubble_outline),
-            label: const Text("1:1 채팅"),
-            onPressed: isUnknown ? null : onChatPressed,
+            label: Text(isBlocked ? '차단한 유저입니다' : '1:1 채팅'),
+            onPressed: isBlocked || isUnknown ? null : onChatPressed,
           ),
         ),
       ],
