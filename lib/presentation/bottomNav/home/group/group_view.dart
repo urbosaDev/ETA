@@ -104,20 +104,20 @@ class GroupView extends GetView<GroupViewModel> {
             const SizedBox(height: 12),
             GestureDetector(
               onTap: () {
-                Get.dialog(
-                  SelectFriendDialog(
-                    friendList: controller.friendList,
-                    selectedFriends: controller.selectedFriends,
-                    toggleFriend: controller.toggleFriend,
-                    disabledUids:
-                        controller.memberList.map((u) => u.uid).toList(),
-                    confirmText: '초대하기',
-                    onConfirm: () {
-                      controller.invite();
-                      Get.back();
-                    },
-                  ),
-                );
+                // Get.dialog(
+                //   SelectFriendDialog(
+                //     friendList: controller.friendList,
+                //     selectedFriends: controller.selectedFriends,
+                //     toggleFriend: controller.toggleFriend,
+                //     disabledUids:
+                //         controller.memberList.map((u) => u.uid).toList(),
+                //     confirmText: '초대하기',
+                //     onConfirm: () {
+                //       controller.invite();
+                //       Get.back();
+                //     },
+                //   ),
+                // );
               },
               child: const Text('친구 초대하기'),
             ),
@@ -456,23 +456,37 @@ Widget groupMemberList(GroupViewModel controller) {
         itemCount: members.length,
         itemBuilder: (context, index) {
           final user = members[index];
-          final isSelf = user.uid == currentUid;
+          final isSelf = user.userModel.uid == currentUid;
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: GestureDetector(
               onTap: () {
-                if (controller.isOtherUser(user)) {
+                if (controller.isOtherUser(user.userModel)) {
                   Get.dialog(
                     userInfoDialogView(
-                      isUnknown: user.uniqueId == 'unknown',
-                      targetUser: user,
+                      isBlocked: user.isBlocked,
+                      onBlockPressed: () async {
+                        await controller.blockUserId(
+                          friendUid: user.userModel.uid,
+                        );
+                      },
+                      onUnblockPressed: () async {
+                        await controller.unblockUserId(
+                          friendUid: user.userModel.uid,
+                        );
+                      },
+
+                      isUnknown: user.userModel.uniqueId == 'unknown',
+                      targetUser: user.userModel,
                       deleteFriend: () async {
-                        await controller.removeFriend(friendUid: user.uid);
+                        await controller.removeFriend(
+                          friendUid: user.userModel.uid,
+                        );
                       },
                       onChatPressed: () async {
                         final chatRoomId = await controller.createChatRoom(
-                          user.uid,
+                          user.userModel.uid,
                         );
                         if (controller.navigateToChat.value) {
                           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -484,7 +498,7 @@ Widget groupMemberList(GroupViewModel controller) {
                                 Get.put(
                                   PrivateChatRoomViewModel(
                                     chatRoomId: chatRoomId!,
-                                    friendUid: user.uid,
+                                    friendUid: user.userModel.uid,
                                     chatRepository: Get.find<ChatRepository>(),
                                     // fcmRepository: Get.find<FcmRepository>(),
                                     userRepository: Get.find<UserRepository>(),
@@ -504,8 +518,13 @@ Widget groupMemberList(GroupViewModel controller) {
                 opacity: isSelf ? 0.4 : 1.0, // 본인은 반투명하게
                 child: Column(
                   children: [
-                    CircleAvatar(backgroundImage: NetworkImage(user.photoUrl)),
-                    Text(user.name, style: const TextStyle(fontSize: 12)),
+                    CircleAvatar(
+                      backgroundImage: NetworkImage(user.userModel.photoUrl),
+                    ),
+                    Text(
+                      user.userModel.name,
+                      style: const TextStyle(fontSize: 12),
+                    ),
                   ],
                 ),
               ),

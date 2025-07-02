@@ -9,6 +9,7 @@ import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/presentation/models/friend_info_model.dart';
 
 class GroupViewModel extends GetxController {
   final GroupModel group;
@@ -35,9 +36,10 @@ class GroupViewModel extends GetxController {
   final RxBool isLoading = true.obs;
   StreamSubscription<GroupModel>? _groupSub;
   StreamSubscription<UserModel>? _userSub;
-  final RxList<UserModel> memberList = <UserModel>[].obs;
-  final RxList<UserModel> selectedFriends = <UserModel>[].obs;
-  final RxList<UserModel> friendList = <UserModel>[].obs;
+  final Rx<UserModel?> userModel = Rx<UserModel?>(null);
+  final RxList<FriendInfoModel> memberList = <FriendInfoModel>[].obs;
+  final RxList<FriendInfoModel> selectedFriends = <FriendInfoModel>[].obs;
+  final RxList<FriendInfoModel> friendList = <FriendInfoModel>[].obs;
 
   final Rx<String?> snackbarMessage = Rx<String?>(null);
   final Rx<PromiseModel?> currentPromise = Rx<PromiseModel?>(null);
@@ -76,18 +78,26 @@ class GroupViewModel extends GetxController {
     }
 
     groupModel.value = fetchedGroup;
-    await _fetchMember(fetchedGroup.memberIds);
+
     await _fetchPromise(fetchedGroup);
     await fetchLeaderInfo(fetchedGroup.createrId);
     final currentUser = _authRepository.getCurrentUser();
     if (currentUser != null) {
-      await _fetchFriendList(currentUser.uid);
+      final user = await _userRepository.getUser(currentUser.uid);
+      if (user != null) {
+        userModel.value = user;
+        await getUsersByUids(user.friendsUids);
+        await _fetchMember(fetchedGroup.memberIds);
+      }
     }
+
     // 본인 정보 스트림 시작
     _userSub = _userRepository.streamUser(currentUser?.uid ?? '').listen((
       user,
     ) {
-      _fetchFriendList(user.uid);
+      userModel.value = user;
+      getUsersByUids(user.friendsUids);
+      _fetchMember(groupModel.value?.memberIds ?? []);
     });
 
     _startGroupStream();
@@ -99,12 +109,15 @@ class GroupViewModel extends GetxController {
     leaderModel.value = user;
   }
 
-  Future<void> _fetchFriendList(String uid) async {
-    final user = await _userRepository.getUser(uid);
-    if (user != null) {
-      final friends = await _userRepository.getUsersByUids(user.friendsUids);
-      friendList.value = friends;
-    }
+  Future<void> getUsersByUids(List<String> uids) async {
+    final users = await _userRepository.getUsersByUids(uids);
+    final blockedUids = userModel.value?.blockedUids ?? [];
+
+    friendList.value =
+        users.map((user) {
+          final isBlocked = blockedUids.contains(user.uid);
+          return FriendInfoModel(userModel: user, isBlocked: isBlocked);
+        }).toList();
   }
 
   void _startGroupStream() {
@@ -121,19 +134,29 @@ class GroupViewModel extends GetxController {
 
   Future<void> _fetchMember(List<String> memberIds) async {
     final users = await _userRepository.getUsersByUids(memberIds);
-    memberList.value = users;
+    final blockedUids = userModel.value?.blockedUids ?? [];
 
-    selectedFriends.removeWhere((f) => memberIds.contains(f.uid));
+    memberList.value =
+        users.map((user) {
+          final isBlocked = blockedUids.contains(user.uid);
+          return FriendInfoModel(userModel: user, isBlocked: isBlocked);
+        }).toList();
+
+    selectedFriends.removeWhere((f) => memberIds.contains(f.userModel.uid));
   }
 
-  void toggleFriend(UserModel user) {
-    final isExistingMember = memberList.any((u) => u.uid == user.uid);
+  void toggleFriend(FriendInfoModel friend) {
+    final isExistingMember = memberList.any(
+      (f) => f.userModel.uid == friend.userModel.uid,
+    );
     if (isExistingMember) return;
 
-    if (selectedFriends.any((u) => u.uid == user.uid)) {
-      selectedFriends.removeWhere((u) => u.uid == user.uid);
+    if (selectedFriends.any((f) => f.userModel.uid == friend.userModel.uid)) {
+      selectedFriends.removeWhere(
+        (f) => f.userModel.uid == friend.userModel.uid,
+      );
     } else {
-      selectedFriends.add(user);
+      selectedFriends.add(friend);
     }
   }
 
@@ -143,11 +166,14 @@ class GroupViewModel extends GetxController {
 
     final groupId = group.id;
     final updatedMemberIds =
-        {...group.memberIds, ...selectedFriends.map((u) => u.uid)}.toList();
+        {
+          ...group.memberIds,
+          ...selectedFriends.map((f) => f.userModel.uid),
+        }.toList();
 
     await _groupRepository.updateGroupMembers(groupId, updatedMemberIds);
-    for (final user in selectedFriends) {
-      await _userRepository.addGroupId(user.uid, groupId);
+    for (final friend in selectedFriends) {
+      await _userRepository.addGroupId(friend.userModel.uid, groupId);
     }
 
     selectedFriends.clear();
@@ -354,6 +380,33 @@ class GroupViewModel extends GetxController {
       await _userRepository.removeFriendUid(
         currentUid: currentUser.uid,
         friendUid: friendUid,
+      );
+    } catch (e) {
+      return;
+    }
+  }
+
+  Future<void> blockUserId({required String friendUid}) async {
+    final currentUser = _authRepository.getCurrentUser();
+    if (currentUser == null) return;
+
+    try {
+      await _userRepository.addBlockFriendUid(
+        currentUid: currentUser.uid,
+        blockFriendUid: friendUid,
+      );
+    } catch (e) {
+      return;
+    }
+  }
+
+  Future<void> unblockUserId({required String friendUid}) async {
+    final currentUser = _authRepository.getCurrentUser();
+    if (currentUser == null) return;
+    try {
+      await _userRepository.removeBlockFriendUid(
+        currentUid: currentUser.uid,
+        blockFriendUid: friendUid,
       );
     } catch (e) {
       return;
