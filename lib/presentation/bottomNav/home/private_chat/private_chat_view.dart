@@ -41,12 +41,13 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                       : controller.friendList.map((user) {
                         return GestureDetector(
                           onTap: () {
-                            print(user.uid);
-                            print(user.uniqueId);
                             Get.dialog(
                               userInfoDialogView(
                                 isUnknown: user.uniqueId == 'unknown',
                                 targetUser: user,
+                                deleteFriend: () async {
+                                  controller.removeFriend(friendUid: user.uid);
+                                },
                                 onChatPressed: () async {
                                   final chatRoomId = await controller
                                       .createChatRoom(user.uid);

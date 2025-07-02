@@ -467,6 +467,9 @@ Widget groupMemberList(GroupViewModel controller) {
                     userInfoDialogView(
                       isUnknown: user.uniqueId == 'unknown',
                       targetUser: user,
+                      deleteFriend: () async {
+                        await controller.removeFriend(friendUid: user.uid);
+                      },
                       onChatPressed: () async {
                         final chatRoomId = await controller.createChatRoom(
                           user.uid,

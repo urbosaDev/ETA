@@ -342,4 +342,18 @@ class GroupViewModel extends GetxController {
       isLoading.value = false;
     }
   }
+
+  Future<void> removeFriend({required String friendUid}) async {
+    final currentUser = _authRepository.getCurrentUser();
+    if (currentUser == null) return;
+
+    try {
+      await _userRepository.removeFriendUid(
+        currentUid: currentUser.uid,
+        friendUid: friendUid,
+      );
+    } catch (e) {
+      return;
+    }
+  }
 }

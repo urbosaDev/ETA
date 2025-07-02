@@ -174,4 +174,13 @@ class UserService {
       await messageDoc.reference.delete();
     }
   }
+
+  Future<void> removeFriendUid({
+    required String currentUid,
+    required String friendUid,
+  }) async {
+    await _userRef.doc(currentUid).update({
+      'friendsUids': FieldValue.arrayRemove([friendUid]),
+    });
+  }
 }
