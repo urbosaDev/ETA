@@ -53,8 +53,6 @@ class SettingView extends GetView<SettingViewModel> {
                   value: "가지마!",
                   onTap: controller.deleteAccount,
                 ),
-                const Divider(),
-                SettingTile(title: "차단한 유저", onTap: () {}),
               ],
             ),
           ),
