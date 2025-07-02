@@ -34,6 +34,26 @@ class UserService {
     });
   }
 
+  // 유저 차단
+  Future<void> addBlockFriendUid({
+    required String currentUid,
+    required String blockFriendUid,
+  }) async {
+    await _userRef.doc(currentUid).update({
+      'blockFriendsUids': FieldValue.arrayUnion([blockFriendUid]),
+    });
+  }
+
+  //유저 차단 해제
+  Future<void> removeBlockFriendUid({
+    required String currentUid,
+    required String blockFriendUid,
+  }) async {
+    await _userRef.doc(currentUid).update({
+      'blockFriendsUids': FieldValue.arrayRemove([blockFriendUid]),
+    });
+  }
+
   /// 유저 조회
   Future<Map<String, dynamic>?> getUserData(String uid) async {
     final doc = await _userRef.doc(uid).get();

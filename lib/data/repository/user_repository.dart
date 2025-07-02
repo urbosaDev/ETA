@@ -37,6 +37,16 @@ abstract class UserRepository {
     required String currentUid,
     required String friendUid,
   });
+  //유저차단
+  Future<void> addBlockFriendUid({
+    required String currentUid,
+    required String blockFriendUid,
+  });
+  //유저 차단해제
+  Future<void> removeBlockFriendUid({
+    required String currentUid,
+    required String blockFriendUid,
+  });
 }
 
 class UserRepositoryImpl implements UserRepository {
@@ -212,6 +222,28 @@ class UserRepositoryImpl implements UserRepository {
     return _userService.removeFriendUid(
       currentUid: currentUid,
       friendUid: friendUid,
+    );
+  }
+
+  @override
+  Future<void> addBlockFriendUid({
+    required String currentUid,
+    required String blockFriendUid,
+  }) async {
+    return _userService.addBlockFriendUid(
+      currentUid: currentUid,
+      blockFriendUid: blockFriendUid,
+    );
+  }
+
+  @override
+  Future<void> removeBlockFriendUid({
+    required String currentUid,
+    required String blockFriendUid,
+  }) async {
+    return _userService.removeBlockFriendUid(
+      currentUid: currentUid,
+      blockFriendUid: blockFriendUid,
     );
   }
 }
