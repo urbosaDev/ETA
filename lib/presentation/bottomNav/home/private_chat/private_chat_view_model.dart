@@ -6,6 +6,7 @@ import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/presentation/models/friend_info_model.dart';
 
 class PrivateChatViewModel extends GetxController {
   final UserRepository _userRepository;
@@ -21,7 +22,7 @@ class PrivateChatViewModel extends GetxController {
        _chatRepository = chatRepository;
 
   final Rx<UserModel?> userModel = Rx<UserModel?>(null);
-  final RxList<UserModel> friendList = <UserModel>[].obs;
+  final RxList<FriendInfoModel> friendList = <FriendInfoModel>[].obs;
   final RxList<PrivateChatModel> chatRoomList = <PrivateChatModel>[].obs;
   final RxBool isLoading = true.obs;
 
@@ -66,12 +67,35 @@ class PrivateChatViewModel extends GetxController {
   }
 
   Future<void> getUsersByUids(List<String> uids) async {
-    friendList.value = await _userRepository.getUsersByUids(uids);
+    final users = await _userRepository.getUsersByUids(uids);
+    final blockedUids = userModel.value?.blockedUids ?? [];
+
+    friendList.value =
+        users.map((user) {
+          final isBlocked = blockedUids.contains(user.uid);
+          return FriendInfoModel(userModel: user, isBlocked: isBlocked);
+        }).toList();
   }
 
   Future<void> getChatRoomIds(List<String> chatRoomIds) async {
     chatRoomList.clear();
+    final myUid = userModel.value?.uid;
+    final blockedUids = userModel.value?.blockedUids ?? [];
+
     for (final id in chatRoomIds) {
+      final parts = id.split('_');
+      if (parts.length != 2) continue;
+
+      final uid1 = parts[0];
+      final uid2 = parts[1];
+
+      final opponentUid = uid1 == myUid ? uid2 : uid1;
+
+      if (blockedUids.contains(opponentUid)) {
+        // 차단한 유저면 이 방은 스킵
+        continue;
+      }
+
       final chatRoom = await _chatRepository.getChatRoom(id);
       if (chatRoom != null) {
         chatRoomList.add(PrivateChatModel.fromJson(chatRoom));
@@ -147,6 +171,33 @@ class PrivateChatViewModel extends GetxController {
       await _userRepository.removeFriendUid(
         currentUid: currentUser.uid,
         friendUid: friendUid,
+      );
+    } catch (e) {
+      return;
+    }
+  }
+
+  Future<void> blockUserId({required String friendUid}) async {
+    final currentUser = _authRepository.getCurrentUser();
+    if (currentUser == null) return;
+
+    try {
+      await _userRepository.addBlockFriendUid(
+        currentUid: currentUser.uid,
+        blockFriendUid: friendUid,
+      );
+    } catch (e) {
+      return;
+    }
+  }
+
+  Future<void> unblockUserId({required String friendUid}) async {
+    final currentUser = _authRepository.getCurrentUser();
+    if (currentUser == null) return;
+    try {
+      await _userRepository.removeBlockFriendUid(
+        currentUid: currentUser.uid,
+        blockFriendUid: friendUid,
       );
     } catch (e) {
       return;

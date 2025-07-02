@@ -43,14 +43,27 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                           onTap: () {
                             Get.dialog(
                               userInfoDialogView(
-                                isUnknown: user.uniqueId == 'unknown',
-                                targetUser: user,
+                                isBlocked: user.isBlocked,
+                                onBlockPressed: () async {
+                                  await controller.blockUserId(
+                                    friendUid: user.userModel.uid,
+                                  );
+                                },
+                                onUnblockPressed: () async {
+                                  await controller.unblockUserId(
+                                    friendUid: user.userModel.uid,
+                                  );
+                                },
+                                isUnknown: user.userModel.uniqueId == 'unknown',
+                                targetUser: user.userModel,
                                 deleteFriend: () async {
-                                  controller.removeFriend(friendUid: user.uid);
+                                  await controller.removeFriend(
+                                    friendUid: user.userModel.uid,
+                                  );
                                 },
                                 onChatPressed: () async {
                                   final chatRoomId = await controller
-                                      .createChatRoom(user.uid);
+                                      .createChatRoom(user.userModel.uid);
                                   if (controller.navigateToChat.value) {
                                     WidgetsBinding.instance.addPostFrameCallback((
                                       _,
@@ -63,7 +76,7 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                                           Get.put(
                                             PrivateChatRoomViewModel(
                                               chatRoomId: chatRoomId!,
-                                              friendUid: user.uid,
+                                              friendUid: user.userModel.uid,
                                               chatRepository:
                                                   Get.find<ChatRepository>(),
                                               // fcmRepository:
@@ -89,7 +102,7 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                             width: 60,
                             height: 60,
                             color: Colors.yellow,
-                            child: Text(user.name),
+                            child: Text(user.userModel.name),
                           ),
                         );
                       }).toList(),
