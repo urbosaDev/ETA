@@ -53,7 +53,7 @@ class GroupView extends GetView<GroupViewModel> {
                     Text(data.title, style: const TextStyle(fontSize: 20)),
                     Obx(() {
                       final leader = controller.leaderModel.value;
-                      final isUnknown = leader?.uid == 'unknown';
+                      final isUnknown = leader?.uniqueId == 'unknown';
 
                       if (isUnknown) {
                         return TextButton(
@@ -465,6 +465,7 @@ Widget groupMemberList(GroupViewModel controller) {
                 if (controller.isOtherUser(user)) {
                   Get.dialog(
                     userInfoDialogView(
+                      isUnknown: user.uniqueId == 'unknown',
                       targetUser: user,
                       onChatPressed: () async {
                         final chatRoomId = await controller.createChatRoom(

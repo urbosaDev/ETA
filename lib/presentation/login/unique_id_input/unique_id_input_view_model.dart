@@ -43,7 +43,8 @@ class UniqueIdInputViewModel extends GetxController {
     }
 
     // 금지 아이디 체크
-    if (trimmedId.toLowerCase() == 'system') {
+    if (trimmedId.toLowerCase() == 'system' ||
+        trimmedId.toLowerCase() == 'unknown') {
       uniqueIdCheck.value = UniqueIdCheck.notAvailable;
       isConfirmEnabled.value = false;
       selectedId.value = '';

@@ -65,7 +65,7 @@ class GroupViewModel extends GetxController {
   }
 
   List<UserModel> get validFriends =>
-      friendList.where((f) => f.uid != 'unknown').toList();
+      friendList.where((f) => f.uniqueId != 'unknown').toList();
   Future<void> _initialize() async {
     isLoading.value = true;
 
@@ -246,9 +246,8 @@ class GroupViewModel extends GetxController {
         );
       }
 
-      // 3. 나를 제외한 실제 사용자 수 확인 (unknown 제외)
       final remainingMembers =
-          group.memberIds.where((id) => id != uid && id != 'unknown').toList();
+          group.memberIds.where((id) => id != uid).toList();
 
       if (remainingMembers.isEmpty) {
         final currentId = group.currentPromiseId;

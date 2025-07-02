@@ -22,16 +22,17 @@ class UserModel {
     this.location,
   });
 
-  static final unknown = UserModel(
-    uid: 'unknown',
-    uniqueId: 'unknown',
-    name: '존재하지 않는 사용자',
-    photoUrl: dotenv.env['DEFAULT_IMAGE']!,
-    friendsUids: [],
-    groupIds: [],
-    privateChatIds: [],
-    location: null,
-  );
+  UserModel.unknownWithUid(String uid)
+    : this(
+        uid: uid,
+        uniqueId: 'unknown',
+        name: '존재하지 않는 사용자',
+        photoUrl: dotenv.env['DEFAULT_IMAGE']!,
+        friendsUids: const [],
+        groupIds: const [],
+        privateChatIds: const [],
+        location: null,
+      );
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(

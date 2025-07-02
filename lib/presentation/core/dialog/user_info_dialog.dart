@@ -5,9 +5,9 @@ import 'package:what_is_your_eta/data/model/user_model.dart';
 Widget userInfoDialogView({
   required UserModel targetUser,
   required VoidCallback onChatPressed,
+  required VoidCallback deleteFriend,
+  required bool isUnknown,
 }) {
-  final isUnknown = targetUser.uid == UserModel.unknown.uid;
-
   return AlertDialog(
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     content: Column(
