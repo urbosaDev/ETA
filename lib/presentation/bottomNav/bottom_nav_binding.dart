@@ -3,6 +3,7 @@ import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/fcm_token_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
+import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 
@@ -34,6 +35,8 @@ class BottomNavBinding extends Bindings {
         authRepository: Get.find<AuthRepository>(),
         fcmTokenRepository: Get.find<FcmTokenRepository>(),
         userRepository: Get.find<UserRepository>(),
+        groupRepository: Get.find<GroupRepository>(),
+        promiseRepository: Get.find<PromiseRepository>(),
       ),
     );
 

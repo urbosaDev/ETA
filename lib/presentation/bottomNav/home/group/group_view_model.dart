@@ -251,6 +251,10 @@ class GroupViewModel extends GetxController {
           group.memberIds.where((id) => id != uid && id != 'unknown').toList();
 
       if (remainingMembers.isEmpty) {
+        final currentId = group.currentPromiseId;
+        if (currentId != null) {
+          await _promiseRepository.deletePromise(currentId);
+        }
         await _groupRepository.deleteGroup(group.id);
       }
     } catch (e) {

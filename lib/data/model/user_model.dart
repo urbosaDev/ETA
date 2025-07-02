@@ -1,3 +1,4 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:what_is_your_eta/data/model/location_model/user_location_model.dart';
 
 class UserModel {
@@ -21,11 +22,11 @@ class UserModel {
     this.location,
   });
 
-  static const unknown = UserModel(
+  static final unknown = UserModel(
     uid: 'unknown',
     uniqueId: 'unknown',
     name: '존재하지 않는 사용자',
-    photoUrl: 'assets/imgs/default_profile.png',
+    photoUrl: dotenv.env['DEFAULT_IMAGE']!,
     friendsUids: [],
     groupIds: [],
     privateChatIds: [],
