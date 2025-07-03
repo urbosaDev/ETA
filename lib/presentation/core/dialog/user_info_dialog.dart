@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import 'package:what_is_your_eta/data/model/user_model.dart';
+import 'package:what_is_your_eta/data/repository/auth_repository.dart';
+import 'package:what_is_your_eta/data/repository/report_repository.dart';
+
+import 'package:what_is_your_eta/presentation/report/report_view.dart';
+import 'package:what_is_your_eta/presentation/report/report_view_model.dart';
 
 Widget userInfoDialogView({
   required UserModel targetUser,
@@ -28,6 +34,19 @@ Widget userInfoDialogView({
                 onBlockPressed();
               } else if (value == 'unblock') {
                 onUnblockPressed();
+              } else if (value == 'report') {
+                Get.to(
+                  () => ReportView(),
+                  binding: BindingsBuilder(() {
+                    Get.put(
+                      ReportViewModel(
+                        reportedId: targetUser.uid,
+                        reportRepository: Get.find<ReportRepository>(),
+                        authRepository: Get.find<AuthRepository>(),
+                      ),
+                    );
+                  }),
+                );
               }
             },
             itemBuilder:
@@ -39,6 +58,10 @@ Widget userInfoDialogView({
                   PopupMenuItem<String>(
                     value: isBlocked ? 'unblock' : 'block',
                     child: Text(isBlocked ? '차단 해제' : '차단하기'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'report',
+                    child: Text('report user'),
                   ),
                 ],
           ),

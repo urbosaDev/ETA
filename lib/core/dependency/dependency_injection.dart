@@ -8,6 +8,7 @@ import 'package:what_is_your_eta/data/repository/fcm_token_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
+import 'package:what_is_your_eta/data/repository/report_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/data/service/auth_service.dart';
@@ -19,6 +20,7 @@ import 'package:what_is_your_eta/data/service/group_service.dart';
 import 'package:what_is_your_eta/data/service/local_map_api_service.dart';
 
 import 'package:what_is_your_eta/data/service/promise_service.dart';
+import 'package:what_is_your_eta/data/service/report_service.dart';
 import 'package:what_is_your_eta/data/service/user_service.dart';
 import 'package:what_is_your_eta/domain/usecase/calculate_distance_usecase.dart';
 
@@ -37,7 +39,7 @@ class DependencyInjection {
     Get.put<PrivateChatService>(PrivateChatService(), permanent: true);
     Get.put<GroupChatService>(GroupChatService(), permanent: true);
     Get.put<PromiseChatService>(PromiseChatService(), permanent: true);
-
+    Get.put<ReportService>(ReportService(), permanent: true);
     Get.put<FcmRepository>(
       FcmRepositoryImpl(fcmService: Get.find<FcmService>()),
       permanent: true,
@@ -82,6 +84,10 @@ class DependencyInjection {
     );
     Get.put<PromiseRepository>(
       PromiseRepositoryImpl(Get.find<PromiseService>()),
+      permanent: true,
+    );
+    Get.put<ReportRepository>(
+      ReportRepositoryImpl(Get.find<ReportService>()),
       permanent: true,
     );
     Get.put<CalculateDistanceUseCase>(

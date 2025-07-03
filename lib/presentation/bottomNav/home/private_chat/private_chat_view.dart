@@ -65,34 +65,36 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                                   final chatRoomId = await controller
                                       .createChatRoom(user.userModel.uid);
                                   if (controller.navigateToChat.value) {
-                                    WidgetsBinding.instance.addPostFrameCallback((
-                                      _,
-                                    ) {
-                                      controller.resetNavigateToChat();
-                                      Get.back(); // 다이얼로그 닫기
-                                      Get.to(
-                                        () => PrivateChatRoomView(),
-                                        binding: BindingsBuilder(() {
-                                          Get.put(
-                                            PrivateChatRoomViewModel(
-                                              chatRoomId: chatRoomId!,
-                                              friendUid: user.userModel.uid,
-                                              chatRepository:
-                                                  Get.find<ChatRepository>(),
-                                              // fcmRepository:
-                                              //     Get.find<FcmRepository>(),
-                                              userRepository:
-                                                  Get.find<UserRepository>(),
-                                              myUid:
-                                                  controller
-                                                      .userModel
-                                                      .value!
-                                                      .uid,
-                                            ),
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                          controller.resetNavigateToChat();
+                                          Get.back(); // 다이얼로그 닫기
+                                          Get.to(
+                                            () => PrivateChatRoomView(),
+                                            binding: BindingsBuilder(() {
+                                              Get.put(
+                                                PrivateChatRoomViewModel(
+                                                  chatRoomId: chatRoomId!,
+                                                  friendUid: user.userModel.uid,
+                                                  chatRepository:
+                                                      Get.find<
+                                                        ChatRepository
+                                                      >(),
+
+                                                  userRepository:
+                                                      Get.find<
+                                                        UserRepository
+                                                      >(),
+                                                  myUid:
+                                                      controller
+                                                          .userModel
+                                                          .value!
+                                                          .uid,
+                                                ),
+                                              );
+                                            }),
                                           );
-                                        }),
-                                      );
-                                    });
+                                        });
                                   }
                                 },
                               ),

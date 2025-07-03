@@ -51,7 +51,27 @@ class SettingView extends GetView<SettingViewModel> {
                 SettingTile(
                   title: "탈퇴하기",
                   value: "가지마!",
-                  onTap: controller.deleteAccount,
+                  onTap: () {
+                    Get.dialog(
+                      AlertDialog(
+                        title: const Text("정말 탈퇴하시겠어요?"),
+                        content: const Text("탈퇴하면 모든 데이터가 삭제됩니다."),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Get.back(), // 닫기만
+                            child: const Text("아니오"),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Get.back(); // 먼저 다이얼로그 닫고
+                              controller.deleteAccount(); // 그 후 탈퇴 실행
+                            },
+                            child: const Text("네"),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
