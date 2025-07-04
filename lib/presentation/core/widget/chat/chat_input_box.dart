@@ -20,12 +20,6 @@ class ChatInputBox extends StatelessWidget {
             Expanded(
               child: TextField(
                 controller: controller,
-                onSubmitted: (value) {
-                  final trimmed = value.trim();
-                  if (trimmed.isNotEmpty) {
-                    onSend(trimmed);
-                  }
-                },
                 decoration: const InputDecoration(
                   hintText: '메세지를 입력하세요',
                   border: OutlineInputBorder(),

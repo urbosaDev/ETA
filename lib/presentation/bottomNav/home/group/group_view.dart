@@ -134,7 +134,7 @@ class GroupView extends GetView<GroupViewModel> {
             GestureDetector(
               onTap: () {
                 Get.to(
-                  () => const LoungeInGroupView(),
+                  () => LoungeInGroupView(),
                   arguments: controller.group.id,
                   binding: BindingsBuilder(() {
                     Get.put(

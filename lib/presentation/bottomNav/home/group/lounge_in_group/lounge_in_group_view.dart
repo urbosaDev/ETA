@@ -7,12 +7,11 @@ import 'package:what_is_your_eta/presentation/core/widget/chat/chat_input_box.da
 import 'package:what_is_your_eta/presentation/core/widget/chat/chat_message_list_view.dart';
 
 class LoungeInGroupView extends GetView<LoungeInGroupViewModel> {
-  const LoungeInGroupView({super.key});
+  final messageController = TextEditingController();
+  LoungeInGroupView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final messageController = TextEditingController();
-
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -55,22 +54,25 @@ class LoungeInGroupView extends GetView<LoungeInGroupViewModel> {
       ),
       body: Column(
         children: [
-          Expanded(
-            child: Obx(() {
-              if (controller.memberMap.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
-              }
+          // Expanded(
+          //   child: Obx(() {
+          //     if (controller.memberMap.isEmpty) {
+          //       return const Center(child: CircularProgressIndicator());
+          //     }
 
-              final msgs = controller.messages;
-              return Expanded(
-                child: ChatMessageListView(
-                  messages: msgs,
-                  userMap: controller.memberMap,
-                  myUid: controller.userModel.value?.uid ?? '',
-                ),
-              );
-            }),
-          ),
+          //     final msgs = controller.messages;
+          //     return Expanded(
+          //       child: ChatMessageListView(
+          //         messages: msgs,
+          //         userMap: controller.memberMap,
+          //         myUid: controller.userModel.value?.uid ?? '',
+          //         onReachedTop: () {
+          //           // controller.loadMore();
+          //         },
+          //       ),
+          //     );
+          //   }),
+          // ),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),

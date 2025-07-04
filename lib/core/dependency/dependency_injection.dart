@@ -37,8 +37,7 @@ class DependencyInjection {
     Get.put<GroupService>(GroupService(), permanent: true);
 
     Get.put<PrivateChatService>(PrivateChatService(), permanent: true);
-    Get.put<GroupChatService>(GroupChatService(), permanent: true);
-    Get.put<PromiseChatService>(PromiseChatService(), permanent: true);
+
     Get.put<ReportService>(ReportService(), permanent: true);
     Get.put<FcmRepository>(
       FcmRepositoryImpl(fcmService: Get.find<FcmService>()),

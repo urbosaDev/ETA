@@ -89,7 +89,7 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                         return GestureDetector(
                           onTap: () {
                             Get.to(
-                              () => const PrivateChatRoomView(),
+                              () => PrivateChatRoomView(),
                               arguments: chatRoom.id,
                               binding: BindingsBuilder(() {
                                 Get.put(
