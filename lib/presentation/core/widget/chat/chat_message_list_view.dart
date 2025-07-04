@@ -27,8 +27,12 @@ class ChatMessageListView extends StatefulWidget {
 
 class _ChatMessageListViewState extends State<ChatMessageListView> {
   final ScrollController _scrollController = ScrollController();
+  final RxBool _showScrollToBottomButton = false.obs;
 
-  void _scrollToBottom() {
+  bool _isUserAtBottom = true;
+
+  void _scrollToBottom({bool force = false}) {
+    if (!force && !_isUserAtBottom) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
@@ -43,61 +47,93 @@ class _ChatMessageListViewState extends State<ChatMessageListView> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToBottom();
-    });
-    widget.messages.listen((_) => _scrollToBottom());
-  }
 
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom(force: true);
+    });
+
+    widget.messages.listen((list) {
+      if (list.isEmpty) return;
+      final latestMsg = list.last;
+      final isMe = latestMsg.senderId == widget.myUid;
+
+      if (isMe || _isUserAtBottom) {
+        _scrollToBottom(force: true);
+      }
+    });
+
+    _scrollController.addListener(() {
+      final maxScroll = _scrollController.position.maxScrollExtent;
+      final currentScroll = _scrollController.offset;
+      const threshold = 80.0;
+
+      _isUserAtBottom = (maxScroll - currentScroll) <= threshold;
+      _showScrollToBottomButton.value = !_isUserAtBottom;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      final messages = widget.messages;
-      return ListView.builder(
-        controller: _scrollController,
-        itemCount: messages.length,
-        itemBuilder: (context, index) {
-          final msg = messages[index];
-          final isMe = msg.senderId == widget.myUid;
-          final sender =
-              msg.type == MessageType.system
-                  ? null
-                  : widget.userMap[msg.senderId];
+    return Stack(
+      children: [
+        Obx(() {
+          final messages = widget.messages;
+          return ListView.builder(
+            controller: _scrollController,
+            itemCount: messages.length,
+            itemBuilder: (context, index) {
+              final msg = messages[index];
+              final isMe = msg.senderId == widget.myUid;
+              final sender =
+                  msg.type == MessageType.system
+                      ? null
+                      : widget.userMap[msg.senderId];
 
-          if (sender == null && msg.type != MessageType.system) {
-            return const SizedBox();
-          }
+              if (sender == null && msg.type != MessageType.system) {
+                return const SizedBox();
+              }
 
-          return MessageBubble(
-            msg: msg,
-            isMe: isMe,
-            sender: sender,
-            onUserTap: () {
-              Get.to(
-                () => const UserProfileView(),
-                fullscreenDialog: true,
-                transition: Transition.downToUp,
-                binding: BindingsBuilder(() {
-                  Get.put(
-                    UserProfileViewModel(
-                      userRepository: Get.find<UserRepository>(),
-                      authRepository: Get.find<AuthRepository>(),
-                      chatRepository: Get.find<ChatRepository>(),
-                      targetUserUid: sender!.uid,
-                    ),
+              return MessageBubble(
+                msg: msg,
+                isMe: isMe,
+                sender: sender,
+                onUserTap: () {
+                  Get.to(
+                    () => const UserProfileView(),
+                    fullscreenDialog: true,
+                    transition: Transition.downToUp,
+                    binding: BindingsBuilder(() {
+                      Get.put(
+                        UserProfileViewModel(
+                          userRepository: Get.find<UserRepository>(),
+                          authRepository: Get.find<AuthRepository>(),
+                          chatRepository: Get.find<ChatRepository>(),
+                          targetUserUid: sender!.uid,
+                        ),
+                      );
+                    }),
                   );
-                }),
+                },
               );
             },
           );
-        },
-      );
-    });
+        }),
+        Obx(() {
+          if (!_showScrollToBottomButton.value) return const SizedBox();
+          return Positioned(
+            right: 16,
+            bottom: 16,
+            child: FloatingActionButton(
+              mini: true,
+              backgroundColor: Colors.grey.shade800,
+              onPressed: () {
+                _scrollToBottom(force: true);
+              },
+              child: const Icon(Icons.arrow_downward),
+            ),
+          );
+        }),
+      ],
+    );
   }
 }
