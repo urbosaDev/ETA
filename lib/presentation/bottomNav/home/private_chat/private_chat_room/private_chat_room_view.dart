@@ -14,12 +14,24 @@ class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, // 기존 뒤로가기 버튼 제거
         title: Obx(() {
           final friend = controller.friendModel.value;
           if (friend == null) return const Text('로딩 중...');
 
           return Row(
             children: [
+              // 새로 만든 수동 뒤로가기 버튼
+              IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  // Get.back(); // 채팅방 뷰 pop
+                  // final homeViewModel = Get.find<HomeViewModel>();
+                  // homeViewModel.changeSideTabIndex(0);
+                  Get.offAllNamed('/main');
+                },
+              ),
+              const SizedBox(width: 8),
               CircleAvatar(backgroundImage: NetworkImage(friend.photoUrl)),
               const SizedBox(width: 8),
               Text(friend.name),

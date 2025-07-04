@@ -53,7 +53,6 @@ class BottomNavBinding extends Bindings {
       ProfileViewModel(
         userRepository: Get.find<UserRepository>(),
         authRepository: Get.find<AuthRepository>(),
-        chatRepository: Get.find<ChatRepository>(),
         groupRepository: Get.find<GroupRepository>(),
       ),
     );

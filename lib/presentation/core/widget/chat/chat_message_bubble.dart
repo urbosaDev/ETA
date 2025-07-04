@@ -9,12 +9,13 @@ class MessageBubble extends StatelessWidget {
   final MessageModel msg;
   final bool isMe;
   final UserModel? sender; // nullable로 변경
-
+  final VoidCallback onUserTap;
   const MessageBubble({
     super.key,
     required this.msg,
     required this.isMe,
     required this.sender,
+    required this.onUserTap,
   });
 
   @override
@@ -41,9 +42,12 @@ class MessageBubble extends StatelessWidget {
           if (!isMe)
             Row(
               children: [
-                CircleAvatar(
-                  radius: 12,
-                  backgroundImage: NetworkImage(sender!.photoUrl),
+                GestureDetector(
+                  onTap: onUserTap,
+                  child: CircleAvatar(
+                    radius: 12,
+                    backgroundImage: NetworkImage(sender!.photoUrl),
+                  ),
                 ),
                 const SizedBox(width: 4),
                 Text(sender!.name, style: const TextStyle(fontSize: 12)),

@@ -39,17 +39,11 @@ abstract class MessageModel {
 
 class TextMessageModel extends MessageModel {
   TextMessageModel({
-    required String senderId,
-    required String text,
-    required DateTime sentAt,
-    List<String> readBy = const [],
-  }) : super(
-         senderId: senderId,
-         text: text,
-         sentAt: sentAt,
-         type: MessageType.text,
-         readBy: readBy,
-       );
+    required super.senderId,
+    required super.text,
+    required super.sentAt,
+    super.readBy,
+  }) : super(type: MessageType.text);
 
   factory TextMessageModel.fromJson(Map<String, dynamic> json) {
     return TextMessageModel(
@@ -73,17 +67,8 @@ class TextMessageModel extends MessageModel {
 }
 
 class SystemMessageModel extends MessageModel {
-  SystemMessageModel({
-    required String text,
-    required DateTime sentAt,
-    List<String> readBy = const [],
-  }) : super(
-         senderId: 'system',
-         text: text,
-         sentAt: sentAt,
-         type: MessageType.system,
-         readBy: readBy,
-       );
+  SystemMessageModel({required super.text, required super.sentAt, super.readBy})
+    : super(senderId: 'system', type: MessageType.system);
 
   factory SystemMessageModel.fromJson(Map<String, dynamic> json) {
     return SystemMessageModel(
@@ -109,19 +94,13 @@ class LocationMessageModel extends MessageModel {
   final UserLocationModel location;
 
   LocationMessageModel({
-    required String senderId,
-    required String text,
-    required DateTime sentAt,
+    required super.senderId,
+    required super.text,
+    required super.sentAt,
     required UserLocationModel location,
-    List<String> readBy = const [],
+    super.readBy,
   }) : location = location,
-       super(
-         senderId: senderId,
-         text: text,
-         sentAt: sentAt,
-         type: MessageType.location,
-         readBy: readBy,
-       );
+       super(type: MessageType.location);
   factory LocationMessageModel.fromJson(Map<String, dynamic> json) {
     return LocationMessageModel(
       senderId: json['senderId'],

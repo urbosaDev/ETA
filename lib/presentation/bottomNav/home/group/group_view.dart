@@ -16,12 +16,11 @@ import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/pr
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise_log/promise_log_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise_log/promise_log_view_model.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view_model.dart';
-import 'package:what_is_your_eta/presentation/core/dialog/user_info_dialog.dart';
 import 'package:what_is_your_eta/presentation/core/widget/select_friend_dialog.dart';
+import 'package:what_is_your_eta/presentation/user_profile/user_profile_view.dart';
+import 'package:what_is_your_eta/presentation/user_profile/user_profile_view_model.dart';
 
 class GroupView extends GetView<GroupViewModel> {
   final String groupTag;
@@ -464,57 +463,21 @@ Widget groupMemberList(GroupViewModel controller) {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: GestureDetector(
               onTap: () {
-                if (controller.isOtherUser(user.userModel)) {
-                  Get.dialog(
-                    userInfoDialogView(
-                      isBlocked: user.isBlocked,
-                      onBlockPressed: () async {
-                        await controller.blockUserId(
-                          friendUid: user.userModel.uid,
-                        );
-                      },
-                      onUnblockPressed: () async {
-                        await controller.unblockUserId(
-                          friendUid: user.userModel.uid,
-                        );
-                      },
-
-                      isUnknown: user.userModel.uniqueId == 'unknown',
-                      targetUser: user.userModel,
-                      deleteFriend: () async {
-                        await controller.removeFriend(
-                          friendUid: user.userModel.uid,
-                        );
-                      },
-                      onChatPressed: () async {
-                        final chatRoomId = await controller.createChatRoom(
-                          user.userModel.uid,
-                        );
-                        if (controller.navigateToChat.value) {
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            controller.resetNavigateToChat();
-                            Get.back(); // 다이얼로그 닫기
-                            Get.to(
-                              () => PrivateChatRoomView(),
-                              binding: BindingsBuilder(() {
-                                Get.put(
-                                  PrivateChatRoomViewModel(
-                                    chatRoomId: chatRoomId!,
-                                    friendUid: user.userModel.uid,
-                                    chatRepository: Get.find<ChatRepository>(),
-                                    // fcmRepository: Get.find<FcmRepository>(),
-                                    userRepository: Get.find<UserRepository>(),
-                                    myUid: controller.currentUser!,
-                                  ),
-                                );
-                              }),
-                            );
-                          });
-                        }
-                      },
-                    ),
-                  );
-                }
+                Get.to(
+                  () => const UserProfileView(),
+                  fullscreenDialog: true,
+                  transition: Transition.downToUp,
+                  binding: BindingsBuilder(() {
+                    Get.put(
+                      UserProfileViewModel(
+                        userRepository: Get.find<UserRepository>(),
+                        authRepository: Get.find<AuthRepository>(),
+                        chatRepository: Get.find<ChatRepository>(),
+                        targetUserUid: user.userModel.uid,
+                      ),
+                    );
+                  }),
+                );
               },
               child: Opacity(
                 opacity: isSelf ? 0.4 : 1.0, // 본인은 반투명하게

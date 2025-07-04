@@ -47,6 +47,10 @@ class HomeViewModel extends GetxController {
     });
   }
 
+  void changeSideTabIndex(int index) {
+    selectedIndex.value = index;
+  }
+
   @override
   void onClose() {
     _userSub?.cancel();

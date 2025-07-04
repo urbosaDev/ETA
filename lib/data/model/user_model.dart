@@ -85,7 +85,7 @@ class UserModel {
       name: name ?? this.name,
       photoUrl: photoUrl ?? this.photoUrl,
       friendsUids: friendsUids ?? this.friendsUids,
-      blockedUids: blockFriendsUids ?? this.blockedUids,
+      blockedUids: blockFriendsUids ?? blockedUids,
       groupIds: groupIds ?? this.groupIds,
       privateChatIds: privateChatIds ?? this.privateChatIds,
       location: location ?? this.location,

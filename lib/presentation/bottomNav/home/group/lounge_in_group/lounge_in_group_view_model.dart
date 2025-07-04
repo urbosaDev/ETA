@@ -44,6 +44,7 @@ class LoungeInGroupViewModel extends GetxController {
   void onClose() {
     _userSub?.cancel();
     _groupSub?.cancel();
+
     super.onClose();
   }
 

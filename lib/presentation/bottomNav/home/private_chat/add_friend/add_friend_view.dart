@@ -47,8 +47,9 @@ class AddFriendView extends GetView<AddFriendViewModel> {
               ],
             ),
             Obx(() {
-              if (controller.isLoading.value)
+              if (controller.isLoading.value) {
                 return CircularProgressIndicator();
+              }
               if (controller.isMe.value) {
                 return const Text('자기 자신은 친구로 추가할 수 없습니다.');
               }

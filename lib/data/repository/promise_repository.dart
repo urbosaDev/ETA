@@ -57,6 +57,7 @@ class PromiseRepositoryImpl implements PromiseRepository {
     await _service.deletePromise(promiseId);
   }
 
+  @override
   Future<List<PromiseModel>> getPromisesByIds(List<String> ids) async {
     final futures = ids.map(getPromise); // 기존 단일 getPromise 사용
     final results = await Future.wait(futures);

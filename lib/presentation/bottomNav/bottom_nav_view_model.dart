@@ -21,15 +21,14 @@ class BottomNavViewModel extends GetxController {
     _fcmTokenRepository.saveFcmToken();
   }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
   final Rxn<String> pendingGroupId = Rxn<String>();
 
   void requestGoToGroup(String groupId) {
     pendingGroupId.value = groupId;
+    changeIndex(0); // 홈 탭으로 전환
+  }
+
+  void requestGoToHome() {
     changeIndex(0); // 홈 탭으로 전환
   }
 }

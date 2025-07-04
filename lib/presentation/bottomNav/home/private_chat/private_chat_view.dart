@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
+import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
@@ -9,7 +10,8 @@ import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/pri
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view_model.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_view_model.dart';
-import 'package:what_is_your_eta/presentation/core/dialog/user_info_dialog.dart';
+import 'package:what_is_your_eta/presentation/user_profile/user_profile_view.dart';
+import 'package:what_is_your_eta/presentation/user_profile/user_profile_view_model.dart';
 
 class PrivateChatView extends GetView<PrivateChatViewModel> {
   const PrivateChatView({super.key});
@@ -41,63 +43,20 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                       : controller.friendList.map((user) {
                         return GestureDetector(
                           onTap: () {
-                            Get.dialog(
-                              userInfoDialogView(
-                                isBlocked: user.isBlocked,
-                                onBlockPressed: () async {
-                                  await controller.blockUserId(
-                                    friendUid: user.userModel.uid,
-                                  );
-                                },
-                                onUnblockPressed: () async {
-                                  await controller.unblockUserId(
-                                    friendUid: user.userModel.uid,
-                                  );
-                                },
-                                isUnknown: user.userModel.uniqueId == 'unknown',
-                                targetUser: user.userModel,
-                                deleteFriend: () async {
-                                  await controller.removeFriend(
-                                    friendUid: user.userModel.uid,
-                                  );
-                                },
-                                onChatPressed: () async {
-                                  final chatRoomId = await controller
-                                      .createChatRoom(user.userModel.uid);
-                                  if (controller.navigateToChat.value) {
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((_) {
-                                          controller.resetNavigateToChat();
-                                          Get.back(); // 다이얼로그 닫기
-                                          Get.to(
-                                            () => PrivateChatRoomView(),
-                                            binding: BindingsBuilder(() {
-                                              Get.put(
-                                                PrivateChatRoomViewModel(
-                                                  chatRoomId: chatRoomId!,
-                                                  friendUid: user.userModel.uid,
-                                                  chatRepository:
-                                                      Get.find<
-                                                        ChatRepository
-                                                      >(),
-
-                                                  userRepository:
-                                                      Get.find<
-                                                        UserRepository
-                                                      >(),
-                                                  myUid:
-                                                      controller
-                                                          .userModel
-                                                          .value!
-                                                          .uid,
-                                                ),
-                                              );
-                                            }),
-                                          );
-                                        });
-                                  }
-                                },
-                              ),
+                            Get.to(
+                              () => const UserProfileView(),
+                              fullscreenDialog: true,
+                              transition: Transition.downToUp,
+                              binding: BindingsBuilder(() {
+                                Get.put(
+                                  UserProfileViewModel(
+                                    userRepository: Get.find<UserRepository>(),
+                                    authRepository: Get.find<AuthRepository>(),
+                                    chatRepository: Get.find<ChatRepository>(),
+                                    targetUserUid: user.userModel.uid,
+                                  ),
+                                );
+                              }),
                             );
                           },
                           child: Container(
@@ -137,7 +96,6 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                                   PrivateChatRoomViewModel(
                                     chatRepository: Get.find<ChatRepository>(),
                                     userRepository: Get.find<UserRepository>(),
-                                    // fcmRepository: Get.find<FcmRepository>(),
                                     chatRoomId: chatRoom.id,
                                     myUid: my.uid,
                                     friendUid: opponent.uid,

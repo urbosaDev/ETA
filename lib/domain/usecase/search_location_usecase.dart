@@ -65,8 +65,9 @@ class SearchLocationUseCase {
   }
 
   Future<void> loadNextPage() async {
-    if (_isFetching || _isLastPage || _currentSearchType != SearchType.keyword)
+    if (_isFetching || _isLastPage || _currentSearchType != SearchType.keyword) {
       return;
+    }
 
     _isFetching = true;
 

@@ -328,7 +328,6 @@ class GroupViewModel extends GetxController {
       await _groupRepository.deleteGroup(group.id);
 
       // 성공 메시지 등 추가 가능
-    } catch (e) {
     } finally {
       isLoading.value = false;
     }
