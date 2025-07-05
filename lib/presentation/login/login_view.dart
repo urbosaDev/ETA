@@ -9,30 +9,43 @@ class LoginView extends GetView<LoginViewModel> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Login View'),
-            ElevatedButton(
-              onPressed: () async {
-                final success = await controller.signInWithGoogle();
-                if (!success) return; // 실패했으면 아무 화면 이동도 하지 않음
-
-                controller.idExist
-                    ? Get.offNamed('/main')
-                    : Get.to(
-                      () => UniqueIdInputView(),
-                      binding: UniqueIdInputBinding(),
-                    );
-              },
-              child: const Text('Login'),
-            ),
-          ],
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      if (controller.systemMessage.isNotEmpty) {
+        final msg = controller.systemMessage.value;
+        controller.systemMessage.value = '';
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Get.snackbar('알림', msg, snackPosition: SnackPosition.TOP);
+        });
+      }
+      if (controller.idExist.value != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (controller.idExist.value == true) {
+            Get.offNamed('/main');
+          } else {
+            Get.to(() => UniqueIdInputView(), binding: UniqueIdInputBinding());
+          }
+          controller.idExist.value = null;
+        });
+      }
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('Login View'),
+              ElevatedButton(
+                onPressed: () async {
+                  await controller.signInWithGoogle();
+                },
+                child: const Text('Login'),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
