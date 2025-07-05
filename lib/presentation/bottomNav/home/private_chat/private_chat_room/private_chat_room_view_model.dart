@@ -1,6 +1,4 @@
 import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/message_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
@@ -31,9 +29,9 @@ class PrivateChatRoomViewModel extends GetxController {
 
   StreamSubscription<UserModel>? _friendSub;
   StreamSubscription<UserModel>? _mySub;
-  StreamSubscription<List<DocumentSnapshot>>? _messageStreamSub;
+  StreamSubscription<List<MessageWithSnapshot>>? _messageStreamSub;
 
-  DocumentSnapshot? _lastDoc;
+  MessageWithSnapshot? _lastMessage;
 
   final RxBool isLoadingMore = false.obs;
 
@@ -48,31 +46,33 @@ class PrivateChatRoomViewModel extends GetxController {
   }
 
   Future<void> loadInitial() async {
-    final docs = await _chatRepository.fetchInitialMessageDocs(chatRoomId);
-    final msgs = _chatRepository.convertDocsToMessages(docs);
+    final messagesWithSnapshots = await _chatRepository.fetchInitialMessageDocs(
+      chatRoomId,
+    );
+    final msgs = messagesWithSnapshots.map((e) => e.model).toList();
 
-    if (docs.isNotEmpty) {
-      _lastDoc = docs.last;
+    if (messagesWithSnapshots.isNotEmpty) {
+      _lastMessage = messagesWithSnapshots.last;
     }
 
-    messages.assignAll(msgs); // 오름차순
+    messages.assignAll(msgs);
   }
 
   Future<void> loadMore() async {
-    if (isLoadingMore.value || _lastDoc == null) return;
+    if (isLoadingMore.value || _lastMessage == null) return;
 
     isLoadingMore.value = true;
     try {
-      final docs = await _chatRepository.fetchMoreMessageDocs(
+      final messagesWithSnapshots = await _chatRepository.fetchMoreMessageDocs(
         chatRoomId,
-        _lastDoc!,
+        _lastMessage!,
       );
-      if (docs.isEmpty) return;
+      if (messagesWithSnapshots.isEmpty) return;
 
-      final msgs = _chatRepository.convertDocsToMessages(docs);
-      messages.addAll(msgs); // 추가할 땐 오름차순
+      final msgs = messagesWithSnapshots.map((e) => e.model).toList();
+      messages.addAll(msgs);
 
-      _lastDoc = docs.last;
+      _lastMessage = messagesWithSnapshots.last;
     } finally {
       isLoadingMore.value = false;
     }
@@ -81,12 +81,12 @@ class PrivateChatRoomViewModel extends GetxController {
   final RxBool shouldScrollToBottom = false.obs;
   void listenToNewMessages() {
     _messageStreamSub = _chatRepository.streamLatestMessages(chatRoomId).listen(
-      (docs) {
-        if (docs.isEmpty) return;
+      (messagesWithSnapshots) {
+        if (messagesWithSnapshots.isEmpty) return;
 
-        final msgs = _chatRepository.convertDocsToMessages(docs);
-        messages.assignAll(msgs); // 최신순 → 오름차순으로
-        _lastDoc = docs.last;
+        final msgs = messagesWithSnapshots.map((e) => e.model).toList();
+        messages.assignAll(msgs);
+        _lastMessage = messagesWithSnapshots.last;
         shouldScrollToBottom.value = true;
       },
     );

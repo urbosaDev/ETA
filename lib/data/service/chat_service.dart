@@ -4,7 +4,6 @@ abstract class ChatService {
   // 채팅방 관련
   Future<String> create(Map<String, dynamic> data, {String? customId});
   Future<Map<String, dynamic>?> get(String roomId);
-  // Stream<Map<String, dynamic>> stream(String roomId);
   Future<void> update(String roomId, Map<String, dynamic> data);
   Future<void> delete(String roomId);
   Future<bool> exists(String roomId);
@@ -17,7 +16,6 @@ abstract class ChatService {
     DocumentSnapshot lastDoc,
   );
   Stream<List<DocumentSnapshot>> streamLatestMessages(String roomId);
-  List<Map<String, dynamic>> convertDocsToData(List<DocumentSnapshot> docs);
 }
 
 class PrivateChatService implements ChatService {
@@ -35,11 +33,6 @@ class PrivateChatService implements ChatService {
     final doc = await _ref.doc(roomId).get();
     return doc.data();
   }
-
-  // @override
-  // Stream<Map<String, dynamic>> stream(String roomId) {
-  //   return _ref.doc(roomId).snapshots().map((doc) => doc.data()!);
-  // }
 
   @override
   Future<void> update(String roomId, Map<String, dynamic> data) async {
@@ -103,10 +96,5 @@ class PrivateChatService implements ChatService {
         .limit(20)
         .snapshots()
         .map((snapshot) => snapshot.docs);
-  }
-
-  @override
-  List<Map<String, dynamic>> convertDocsToData(List<DocumentSnapshot> docs) {
-    return docs.map((d) => d.data() as Map<String, dynamic>).toList();
   }
 }

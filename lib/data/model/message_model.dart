@@ -3,6 +3,18 @@ import 'package:what_is_your_eta/data/model/location_model/user_location_model.d
 
 enum MessageType { text, system, location }
 
+class MessageWithSnapshot {
+  final MessageModel model;
+  final DocumentSnapshot _snapshot; // 내부 캡슐화
+
+  MessageWithSnapshot({required this.model, required DocumentSnapshot snapshot})
+    : _snapshot = snapshot;
+
+  DateTime get sentAt => model.sentAt;
+
+  DocumentSnapshot getSnapshot() => _snapshot;
+}
+
 abstract class MessageModel {
   final String senderId;
   final String text;

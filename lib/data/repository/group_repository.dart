@@ -13,7 +13,7 @@ abstract class GroupRepository {
   Stream<List<GroupModel>> streamGroupsByIds(List<String> groupIds);
   Future<void> updateGroupMembers(String groupId, List<String> memberIds);
   Future<void> sendGroupMessage(String groupId, MessageModel message);
-  Stream<List<MessageModel>> streamGroupMessages(String groupId);
+
   Future<void> addPromiseIdToGroup({
     required String groupId,
     required String promiseId,
@@ -32,6 +32,12 @@ abstract class GroupRepository {
     required String groupId,
     required String uid,
   });
+  Future<List<MessageWithSnapshot>> fetchInitialMessageDocs(String groupId);
+  Future<List<MessageWithSnapshot>> fetchMoreMessageDocs(
+    String groupId,
+    MessageWithSnapshot lastMessage,
+  );
+  Stream<List<MessageWithSnapshot>> streamLatestMessages(String groupId);
 }
 
 class GroupRepositoryImpl implements GroupRepository {
@@ -91,10 +97,56 @@ class GroupRepositoryImpl implements GroupRepository {
   }
 
   @override
-  Stream<List<MessageModel>> streamGroupMessages(String groupId) {
+  Future<List<MessageWithSnapshot>> fetchInitialMessageDocs(
+    String groupId,
+  ) async {
+    final docs = await _service.fetchInitialMessageDocs(groupId);
+    return docs
+        .map(
+          (doc) => MessageWithSnapshot(
+            model: MessageModel.fromJson(doc.data()! as Map<String, dynamic>),
+            snapshot: doc,
+          ),
+        )
+        .toList();
+  }
+
+  @override
+  Future<List<MessageWithSnapshot>> fetchMoreMessageDocs(
+    String roomId,
+    MessageWithSnapshot lastMessage,
+  ) async {
+    final docs = await _service.fetchMoreMessagesAfterDoc(
+      roomId,
+      lastMessage.getSnapshot(),
+    );
+    return docs
+        .map(
+          (doc) => MessageWithSnapshot(
+            model: MessageModel.fromJson(doc.data()! as Map<String, dynamic>),
+            snapshot: doc,
+          ),
+        )
+        .toList();
+  }
+
+  @override
+  Stream<List<MessageWithSnapshot>> streamLatestMessages(String groupId) {
     return _service
-        .streamGroupMessages(groupId)
-        .map((list) => list.map(MessageModel.fromJson).toList());
+        .streamLatestMessages(groupId)
+        .map(
+          (docs) =>
+              docs
+                  .map(
+                    (doc) => MessageWithSnapshot(
+                      model: MessageModel.fromJson(
+                        doc.data()! as Map<String, dynamic>,
+                      ),
+                      snapshot: doc,
+                    ),
+                  )
+                  .toList(),
+        );
   }
 
   @override

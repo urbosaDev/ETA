@@ -33,36 +33,71 @@ class MessageBubble extends StatelessWidget {
   Widget _buildTextBubble() {
     if (sender == null) return const SizedBox();
 
-    return Align(
-      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Column(
-        crossAxisAlignment:
-            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+    final bubbleColor =
+        isMe
+            ? const Color(0xFF333333).withOpacity(0.95) // 내가 보낸 메시지 (더 진하게)
+            : const Color(0xFF222222).withOpacity(0.75);
+
+    final textColor = Colors.white;
+
+    final screenWidth =
+        MediaQueryData.fromView(WidgetsBinding.instance.window).size.width;
+    final maxWidth = screenWidth * 0.7;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment:
+            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
-          if (!isMe)
-            Row(
+          /// ❌ isMe일 때는 프로필, 닉네임 없이 말풍선만
+          if (!isMe) ...[
+            GestureDetector(
+              onTap: onUserTap,
+              child: CircleAvatar(
+                radius: 16,
+                backgroundImage: NetworkImage(sender!.photoUrl),
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
+
+          /// 채팅 내용 (isMe에 따라 이름/프로필 포함 여부 달라짐)
+          Flexible(
+            child: Column(
+              crossAxisAlignment:
+                  isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
-                GestureDetector(
-                  onTap: onUserTap,
-                  child: CircleAvatar(
-                    radius: 12,
-                    backgroundImage: NetworkImage(sender!.photoUrl),
+                if (!isMe)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: Text(
+                      sender!.name,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  constraints: BoxConstraints(maxWidth: maxWidth),
+                  decoration: BoxDecoration(
+                    color: bubbleColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    msg.text,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: textColor,
+                      height: 1.4,
+                    ),
                   ),
                 ),
-                const SizedBox(width: 4),
-                Text(sender!.name, style: const TextStyle(fontSize: 12)),
               ],
-            ),
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 4),
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: isMe ? Colors.blueAccent : Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              msg.text,
-              style: TextStyle(color: isMe ? Colors.white : Colors.black87),
             ),
           ),
         ],
@@ -72,13 +107,14 @@ class MessageBubble extends StatelessWidget {
 
   Widget _buildSystemBubble() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Center(
         child: Text(
           msg.text,
+          textAlign: TextAlign.center,
           style: const TextStyle(
-            color: Colors.redAccent,
-            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+            fontSize: 12,
             fontStyle: FontStyle.italic,
           ),
         ),
@@ -90,124 +126,95 @@ class MessageBubble extends StatelessWidget {
     if (sender == null) return const SizedBox();
 
     final locationMsg = msg as LocationMessageModel;
+    final maxWidth =
+        MediaQueryData.fromView(WidgetsBinding.instance.window).size.width *
+        0.8;
 
     return Align(
-      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        constraints: BoxConstraints(
-          maxWidth:
-              MediaQueryData.fromView(
-                WidgetsBinding.instance.window,
-              ).size.width *
-              0.7, // 💥 화면 70% 제한
-        ),
-        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color:
-              isMe ? Colors.blueAccent.withOpacity(0.8) : Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment:
-              isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          children: [
-            // 프로필
-            if (!isMe)
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 12,
-                    backgroundImage: NetworkImage(sender!.photoUrl),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(sender!.name, style: const TextStyle(fontSize: 12)),
-                ],
-              ),
-            const SizedBox(height: 8),
-
-            // 공유 텍스트
-            Text(
-              '${sender!.name}님이 현재 위치를 공유하셨습니다.',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: isMe ? Colors.white : Colors.black87,
-              ),
+      alignment: Alignment.center,
+      child: Column(
+        children: [
+          Text(
+            '${sender!.name}님이 현재 위치를 공유하셨습니다.',
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.white70,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(height: 4),
-
-            // 주소
-            Text(
-              '주소: ${locationMsg.location.address}',
-              style: TextStyle(
-                fontSize: 13,
-                color: isMe ? Colors.white70 : Colors.black87,
-              ),
+          ),
+          Container(
+            constraints: BoxConstraints(maxWidth: maxWidth),
+            margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white30),
             ),
-            const SizedBox(height: 2),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
 
-            // 거리 (text 필드에 "거리: ~m" 포함됨 → 그대로 사용)
-            Text(
-              locationMsg.text, // ex: '위치공유 (주소, 거리: 7.4 m)'
-              style: TextStyle(
-                fontSize: 13,
-                color: isMe ? Colors.white70 : Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 2),
-
-            // 시간
-            Text(
-              '시간: ${_formatDateTime(locationMsg.sentAt)}',
-              style: TextStyle(
-                fontSize: 12,
-                fontStyle: FontStyle.italic,
-                color: isMe ? Colors.white60 : Colors.black54,
-              ),
-            ),
-            const SizedBox(height: 8),
-
-            // NaverMap
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: SizedBox(
-                height: 150,
-                child: NaverMap(
-                  options: NaverMapViewOptions(
-                    initialCameraPosition: NCameraPosition(
-                      target: NLatLng(
-                        locationMsg.location.latitude,
-                        locationMsg.location.longitude,
-                      ),
-                      zoom: 16,
-                    ),
-                    indoorEnable: false,
-                    locationButtonEnable: false,
-                    scaleBarEnable: false,
-                  ),
-                  onMapReady: (controller) async {
-                    final marker = NMarker(
-                      id:
-                          'location_marker_${DateTime.now().millisecondsSinceEpoch}',
-                      position: NLatLng(
-                        locationMsg.location.latitude,
-                        locationMsg.location.longitude,
-                      ),
-                    );
-                    controller.addOverlay(marker);
-                  },
+              children: [
+                const SizedBox(height: 4),
+                Text(
+                  '주소: ${locationMsg.location.address}',
+                  style: const TextStyle(fontSize: 13, color: Colors.white70),
                 ),
-              ),
+                const SizedBox(height: 2),
+                Text(
+                  locationMsg.text,
+                  style: const TextStyle(fontSize: 13, color: Colors.white70),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '시간: ${_formatDateTime(locationMsg.sentAt)}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontStyle: FontStyle.italic,
+                    color: Colors.white60,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: SizedBox(
+                    height: 150,
+                    child: NaverMap(
+                      options: NaverMapViewOptions(
+                        initialCameraPosition: NCameraPosition(
+                          target: NLatLng(
+                            locationMsg.location.latitude,
+                            locationMsg.location.longitude,
+                          ),
+                          zoom: 16,
+                        ),
+                        indoorEnable: false,
+                        locationButtonEnable: false,
+                        scaleBarEnable: false,
+                      ),
+                      onMapReady: (controller) async {
+                        final marker = NMarker(
+                          id:
+                              'location_marker_${DateTime.now().millisecondsSinceEpoch}',
+                          position: NLatLng(
+                            locationMsg.location.latitude,
+                            locationMsg.location.longitude,
+                          ),
+                        );
+                        controller.addOverlay(marker);
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
-}
 
-String _formatDateTime(DateTime dateTime) {
-  return '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} '
-      '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  String _formatDateTime(DateTime dateTime) {
+    return '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} '
+        '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
 }

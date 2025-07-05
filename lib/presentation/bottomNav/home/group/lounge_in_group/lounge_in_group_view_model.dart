@@ -33,18 +33,24 @@ class LoungeInGroupViewModel extends GetxController {
   StreamSubscription<GroupModel>? _groupSub;
   final RxList<UserModel> memberList = <UserModel>[].obs;
   final RxnString currentPromiseId = RxnString();
+
+  StreamSubscription<List<MessageWithSnapshot>>? _messageStreamSub;
+  MessageWithSnapshot? _lastMessage;
+  final RxBool isLoadingMore = false.obs;
   @override
   void onInit() {
     super.onInit();
-    listenToMessages();
     _initialize();
+    loadInitial().then((_) {
+      listenToNewMessages();
+    });
   }
 
   @override
   void onClose() {
     _userSub?.cancel();
     _groupSub?.cancel();
-
+    _messageStreamSub?.cancel();
     super.onClose();
   }
 
@@ -68,7 +74,7 @@ class LoungeInGroupViewModel extends GetxController {
     groupModel.value = fetchedGroup;
     currentPromiseId.value = fetchedGroup.currentPromiseId;
     await _fetchMember(fetchedGroup.memberIds); // 먼저 memberMap 초기화
-    listenToMessages(); //그 후 메시지 받기 시작
+
     _startGroupStream();
 
     isLoading.value = false;
@@ -98,12 +104,6 @@ class LoungeInGroupViewModel extends GetxController {
   // groupId 로 그룹모델을 불러오고 ,그룹모델 stream,
   //
 
-  void listenToMessages() {
-    _groupRepository.streamGroupMessages(groupId).listen((msgs) {
-      messages.value = msgs;
-    });
-  }
-
   Future<void> sendMessage(String content) async {
     final msg = TextMessageModel(
       senderId: userModel.value!.uid,
@@ -112,5 +112,51 @@ class LoungeInGroupViewModel extends GetxController {
       readBy: [userModel.value!.uid],
     );
     await _groupRepository.sendGroupMessage(groupId, msg);
+  }
+
+  Future<void> loadInitial() async {
+    final messagesWithSnapshots = await _groupRepository
+        .fetchInitialMessageDocs(groupId);
+    final msgs = messagesWithSnapshots.map((e) => e.model).toList();
+
+    if (messagesWithSnapshots.isNotEmpty) {
+      _lastMessage = messagesWithSnapshots.last;
+    }
+
+    messages.assignAll(msgs);
+  }
+
+  Future<void> loadMore() async {
+    if (isLoadingMore.value || _lastMessage == null) return;
+
+    isLoadingMore.value = true;
+    try {
+      final messagesWithSnapshots = await _groupRepository.fetchMoreMessageDocs(
+        groupId,
+        _lastMessage!,
+      );
+      if (messagesWithSnapshots.isEmpty) return;
+
+      final msgs = messagesWithSnapshots.map((e) => e.model).toList();
+      messages.addAll(msgs);
+
+      _lastMessage = messagesWithSnapshots.last;
+    } finally {
+      isLoadingMore.value = false;
+    }
+  }
+
+  final RxBool shouldScrollToBottom = false.obs;
+  void listenToNewMessages() {
+    _messageStreamSub = _groupRepository.streamLatestMessages(groupId).listen((
+      messagesWithSnapshots,
+    ) {
+      if (messagesWithSnapshots.isEmpty) return;
+
+      final msgs = messagesWithSnapshots.map((e) => e.model).toList();
+      messages.assignAll(msgs);
+      _lastMessage = messagesWithSnapshots.last;
+      shouldScrollToBottom.value = true;
+    });
   }
 }

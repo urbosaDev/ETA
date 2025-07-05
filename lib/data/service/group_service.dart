@@ -24,13 +24,44 @@ class GroupService {
     await doc.set({...json, 'id': doc.id});
   }
 
-  Stream<List<Map<String, dynamic>>> streamGroupMessages(String groupId) {
+  Future<List<DocumentSnapshot>> fetchInitialMessageDocs(String groupId) async {
+    final snapshot =
+        await _groupRef
+            .doc(groupId)
+            .collection('messages')
+            .orderBy('sentAt', descending: true)
+            .limit(20)
+            .get();
+    return snapshot.docs;
+  }
+
+  /// 다음 페이지 메시지
+
+  Future<List<DocumentSnapshot>> fetchMoreMessagesAfterDoc(
+    String groupId,
+    DocumentSnapshot lastDoc,
+  ) async {
+    final snapshot =
+        await _groupRef
+            .doc(groupId)
+            .collection('messages')
+            .orderBy('sentAt', descending: true)
+            .startAfterDocument(lastDoc)
+            .limit(20)
+            .get();
+    return snapshot.docs;
+  }
+
+  /// 새로운 메시지 실시간 스트리밍
+
+  Stream<List<DocumentSnapshot>> streamLatestMessages(String groupId) {
     return _groupRef
         .doc(groupId)
         .collection('messages')
-        .orderBy('sentAt')
+        .orderBy('sentAt', descending: true)
+        .limit(20)
         .snapshots()
-        .map((snap) => snap.docs.map((doc) => doc.data()).toList());
+        .map((snapshot) => snapshot.docs);
   }
 
   // 멤버만 업데이트

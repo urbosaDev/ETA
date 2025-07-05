@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:what_is_your_eta/data/model/message_model.dart';
 import 'package:what_is_your_eta/data/service/chat_service.dart';
 
@@ -17,20 +16,13 @@ abstract class ChatRepository {
   // 메시지
   Future<void> sendMessage(String roomId, MessageModel message);
 
-  /// 초기 메시지 (20개 + DocumentSnapshot 목록)
-  Future<List<DocumentSnapshot>> fetchInitialMessageDocs(String roomId);
-
   /// 더 불러오기
-  Future<List<DocumentSnapshot>> fetchMoreMessageDocs(
+  Future<List<MessageWithSnapshot>> fetchInitialMessageDocs(String roomId);
+  Future<List<MessageWithSnapshot>> fetchMoreMessageDocs(
     String roomId,
-    DocumentSnapshot lastDoc,
+    MessageWithSnapshot lastMessage,
   );
-
-  /// 실시간 스트리밍 (마지막 메시지 이후)
-  Stream<List<DocumentSnapshot>> streamLatestMessages(String roomId);
-
-  /// helper (보통 ViewModel에서 호출)
-  List<MessageModel> convertDocsToMessages(List<DocumentSnapshot> docs);
+  Stream<List<MessageWithSnapshot>> streamLatestMessages(String roomId);
 }
 
 class ChatRepositoryImpl implements ChatRepository {
@@ -74,29 +66,55 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Future<List<DocumentSnapshot>> fetchInitialMessageDocs(String roomId) {
-    return _service.fetchInitialMessageDocs(roomId);
-  }
-
-  @override
-  Future<List<DocumentSnapshot>> fetchMoreMessageDocs(
+  Future<List<MessageWithSnapshot>> fetchInitialMessageDocs(
     String roomId,
-    DocumentSnapshot lastDoc,
-  ) {
-    return _service.fetchMoreMessagesAfterDoc(roomId, lastDoc);
-  }
-
-  @override
-  Stream<List<DocumentSnapshot>> streamLatestMessages(String roomId) {
-    return _service.streamLatestMessages(roomId);
-  }
-
-  @override
-  List<MessageModel> convertDocsToMessages(List<DocumentSnapshot> docs) {
+  ) async {
+    final docs = await _service.fetchInitialMessageDocs(roomId);
     return docs
         .map(
-          (doc) => MessageModel.fromJson(doc.data()! as Map<String, dynamic>),
+          (doc) => MessageWithSnapshot(
+            model: MessageModel.fromJson(doc.data()! as Map<String, dynamic>),
+            snapshot: doc,
+          ),
         )
         .toList();
+  }
+
+  @override
+  Future<List<MessageWithSnapshot>> fetchMoreMessageDocs(
+    String roomId,
+    MessageWithSnapshot lastMessage,
+  ) async {
+    final docs = await _service.fetchMoreMessagesAfterDoc(
+      roomId,
+      lastMessage.getSnapshot(),
+    );
+    return docs
+        .map(
+          (doc) => MessageWithSnapshot(
+            model: MessageModel.fromJson(doc.data()! as Map<String, dynamic>),
+            snapshot: doc,
+          ),
+        )
+        .toList();
+  }
+
+  @override
+  Stream<List<MessageWithSnapshot>> streamLatestMessages(String roomId) {
+    return _service
+        .streamLatestMessages(roomId)
+        .map(
+          (docs) =>
+              docs
+                  .map(
+                    (doc) => MessageWithSnapshot(
+                      model: MessageModel.fromJson(
+                        doc.data()! as Map<String, dynamic>,
+                      ),
+                      snapshot: doc,
+                    ),
+                  )
+                  .toList(),
+        );
   }
 }

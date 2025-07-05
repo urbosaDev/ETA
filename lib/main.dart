@@ -88,7 +88,34 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'What is your ETA',
-      theme: ThemeData(primarySwatch: Colors.blue),
+
+      theme: ThemeData(
+        scaffoldBackgroundColor: const Color(0xff111111), // 기본 배경색
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(color: Colors.white),
+          bodyMedium: TextStyle(color: Colors.white),
+          bodySmall: TextStyle(color: Colors.white),
+          titleLarge: TextStyle(color: Colors.white),
+          titleMedium: TextStyle(color: Colors.white),
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xff111111),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          hintStyle: TextStyle(color: Colors.white70),
+          labelStyle: TextStyle(color: Colors.white),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFA8216B)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFA8216B), width: 2),
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       initialRoute: Routes.splash,
       getPages: getPages,
     );

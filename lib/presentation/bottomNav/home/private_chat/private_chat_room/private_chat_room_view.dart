@@ -35,12 +35,15 @@ class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
 
   @override
   Widget build(BuildContext context) {
-    ever(controller.shouldScrollToBottom, (bool shouldScroll) {
-      if (shouldScroll && scrollController.hasClients) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          scrollController.jumpTo(scrollController.position.minScrollExtent);
-          controller.shouldScrollToBottom.value = false;
-        });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (controller.shouldScrollToBottom.value &&
+          scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.minScrollExtent,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+        );
+        controller.shouldScrollToBottom.value = false;
       }
     });
     return Scaffold(
@@ -69,99 +72,89 @@ class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
       ),
       body: Column(
         children: [
-          Obx(() {
-            final friend = controller.friendModel.value;
-            if (friend == null) {
-              return const Center(child: CircularProgressIndicator());
-            }
+          Expanded(
+            child: GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: Obx(() {
+                final msgs = controller.messages;
+                final friend = controller.friendModel.value;
+                if (friend == null) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-            return Expanded(
-              child: GestureDetector(
-                onTap: () => FocusScope.of(context).unfocus(),
-                child: Obx(() {
-                  final msgs = controller.messages;
-                  final friend = controller.friendModel.value;
-                  if (friend == null) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+                final userMap = {
+                  controller.myUid: controller.myModel.value!,
+                  friend.uid: friend,
+                };
 
-                  final userMap = {
-                    controller.myUid: controller.myModel.value!,
-                    friend.uid: friend,
-                  };
+                return Align(
+                  alignment: Alignment.topCenter,
+                  child: CustomScrollView(
+                    shrinkWrap: true,
+                    reverse: true,
+                    controller: scrollController,
+                    slivers: [
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          final msg = msgs[index];
+                          final isMe = msg.senderId == controller.myUid;
+                          final sender =
+                              msg.type == MessageType.system
+                                  ? null
+                                  : userMap[msg.senderId];
 
-                  return Align(
-                    alignment: Alignment.topCenter,
-                    child: CustomScrollView(
-                      shrinkWrap: true,
-                      reverse: true,
-                      controller: scrollController,
-                      slivers: [
-                        SliverList(
-                          delegate: SliverChildBuilderDelegate((
-                            context,
-                            index,
-                          ) {
-                            final msg = msgs[index];
-                            final isMe = msg.senderId == controller.myUid;
-                            final sender =
-                                msg.type == MessageType.system
-                                    ? null
-                                    : userMap[msg.senderId];
+                          if (sender == null &&
+                              msg.type != MessageType.system) {
+                            return const SizedBox();
+                          }
 
-                            if (sender == null &&
-                                msg.type != MessageType.system) {
-                              return const SizedBox();
-                            }
-
-                            return MessageBubble(
-                              msg: msg,
-                              isMe: isMe,
-                              sender: sender,
-                              onUserTap: () {
-                                Get.to(
-                                  () => const UserProfileView(),
-                                  fullscreenDialog: true,
-                                  transition: Transition.downToUp,
-                                  binding: BindingsBuilder(() {
-                                    Get.put(
-                                      UserProfileViewModel(
-                                        userRepository:
-                                            Get.find<UserRepository>(),
-                                        authRepository:
-                                            Get.find<AuthRepository>(),
-                                        chatRepository:
-                                            Get.find<ChatRepository>(),
-                                        targetUserUid: sender!.uid,
-                                      ),
-                                    );
-                                  }),
-                                );
-                              },
-                            );
-                          }, childCount: msgs.length),
-                        ),
-                        Obx(() {
-                          return controller.isLoadingMore.value
-                              ? SliverToBoxAdapter(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
-                                  child: Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
+                          return MessageBubble(
+                            msg: msg,
+                            isMe: isMe,
+                            sender: sender,
+                            onUserTap: () {
+                              Get.to(
+                                () => const UserProfileView(),
+                                fullscreenDialog: true,
+                                transition: Transition.downToUp,
+                                binding: BindingsBuilder(() {
+                                  Get.put(
+                                    UserProfileViewModel(
+                                      userRepository:
+                                          Get.find<UserRepository>(),
+                                      authRepository:
+                                          Get.find<AuthRepository>(),
+                                      chatRepository:
+                                          Get.find<ChatRepository>(),
+                                      targetUserUid: sender!.uid,
+                                    ),
+                                  );
+                                }),
+                              );
+                            },
+                          );
+                        }, childCount: msgs.length),
+                      ),
+                      Obx(() {
+                        return controller.isLoadingMore.value
+                            ? SliverToBoxAdapter(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
                                 ),
-                              )
-                              : const SliverToBoxAdapter(child: SizedBox());
-                        }),
-                      ],
-                    ),
-                  );
-                }),
-              ),
-            );
-          }),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ),
+                            )
+                            : const SliverToBoxAdapter(child: SizedBox());
+                      }),
+                    ],
+                  ),
+                );
+              }),
+            ),
+          ),
           ChatInputBox(
             controller: messageController,
             onSend: (value) async {
