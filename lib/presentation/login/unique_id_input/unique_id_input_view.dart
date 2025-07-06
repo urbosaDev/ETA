@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:what_is_your_eta/presentation/core/loading/common_loading_lottie.dart';
+import 'package:what_is_your_eta/presentation/core/widget/common_text_field.dart';
 import 'package:what_is_your_eta/presentation/login/unique_id_input/unique_id_input_view_model.dart';
 
 //
@@ -11,47 +13,176 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('아이디 설정')),
-      body: Obx(() {
-        return Stack(
-          children: [
-            if (controller.isLoading.value)
-              Container(
-                color: Colors.black.withOpacity(0.3),
-                child: const Center(child: CircularProgressIndicator()),
+    ever(controller.systemMessage, (message) {
+      if (message.isNotEmpty) {
+        Get.snackbar('알림', message, snackPosition: SnackPosition.TOP);
+
+        controller.systemMessage.value = '';
+      }
+    });
+
+    ever(controller.shouldClearNameInput, (shouldClear) {
+      if (shouldClear) {
+        textNameController.clear();
+
+        controller.shouldClearNameInput.value = false;
+      }
+    });
+
+    ever(controller.shouldClearIdInput, (shouldClear) {
+      if (shouldClear) {
+        textIdController.clear();
+
+        controller.shouldClearIdInput.value = false;
+      }
+    });
+
+    once(controller.isCreated, (isCreated) {
+      if (isCreated) {
+        Get.offAllNamed('/main');
+      }
+    });
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    final horizontalPadding = screenWidth * 0.05;
+    final verticalPadding = screenHeight * 0.08;
+
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(child: CommonLoadingLottie());
+      }
+      return Stack(
+        children: [
+          Scaffold(
+            appBar: AppBar(),
+            body: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                horizontal: horizontalPadding,
+                vertical: verticalPadding,
               ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildUniqueIdInput(),
-                    const SizedBox(height: 8),
-                    _buildUniqueIdStatusText(),
-                    const SizedBox(height: 8),
-                    _buildUniqueIdButtons(),
-                    const SizedBox(height: 16),
-                    _buildSelectedIdText(),
-                    _buildNameInput(),
-                    const SizedBox(height: 24),
-                    _buildSubmitButton(),
-                  ],
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '아이디와 이름을 입력해주세요',
+                    style: TextStyle(
+                      fontFamily: 'NotoSansKR',
+                      fontSize: 17,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Text(
+                        '아이디를 입력해주세요',
+                        style: TextStyle(
+                          fontFamily: 'NotoSansKR',
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Obx(() {
+                        return Checkbox(
+                          value: controller.selectedId.value.isNotEmpty,
+                          onChanged: null,
+
+                          checkColor: Colors.greenAccent,
+                        );
+                      }),
+                    ],
+                  ),
+
+                  _buildUniqueIdInput(),
+                  _buildIdFormatStatus(),
+                  const SizedBox(height: 8),
+                  _buildUniqueIdStatusText(),
+                  const SizedBox(height: 8),
+                  Center(child: _buildUniqueIdButtons()),
+                  const SizedBox(height: 16),
+
+                  Row(
+                    children: [
+                      const Text(
+                        '이름을 입력해주세요',
+                        style: TextStyle(
+                          fontFamily: 'NotoSansKR',
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Obx(() {
+                        return Checkbox(
+                          value: controller.selectedName.isNotEmpty,
+                          onChanged: null,
+
+                          checkColor: Colors.greenAccent,
+                        );
+                      }),
+                    ],
+                  ),
+                  _buildNameInput(),
+                  _buildNameStatusText(),
+                  Center(child: _buildNameCheckButtons()),
+                  const SizedBox(height: 24),
+                  Center(child: _buildSubmitButton()),
+                  Text(
+                    '⚠️ 이름 또는 아이디에 부적절한 단어(욕설, 사회적으로 부적절한 표현 등)가 포함될 경우 제재를 받을 수 있습니다.',
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
+          if (controller.isCheckLoading.value)
+            IgnorePointer(
+              ignoring: true,
+              child: Container(
+                color: Colors.black.withOpacity(0.6), // 반투명 배경
+                child: const Center(child: CommonLoadingLottie()),
+              ),
+            ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildIdFormatStatus() {
+    return Obx(() {
+      if (controller.uniqueId.value.isEmpty) {
+        return const Text(
+          '아이디는 영문 소문자로 시작하고, \n숫자 포함가능 8~12자여야 합니다.',
+          style: TextStyle(color: Colors.white),
         );
-      }),
-    );
+      }
+
+      if (controller.isUniqueIdValid.value) {
+        return const Text(
+          '✅ 사용 가능한 아이디 형식입니다. \n중복 확인을 눌러주세요.',
+          style: TextStyle(color: Colors.green),
+        );
+      } else {
+        return const Text(
+          '❌ 아이디는 영문 소문자로 시작하고, \n숫자 포함가능 8~12자여야 합니다.',
+          style: TextStyle(color: Colors.redAccent),
+        );
+      }
+    });
   }
 
   Widget _buildUniqueIdInput() {
-    return TextField(
+    return CommonTextField(
       controller: textIdController,
-      onChanged: controller.onUniqueIdChanged,
-      decoration: const InputDecoration(labelText: '아이디 입력'),
+      hintText: '아이디 입력',
+      keyboardType: TextInputType.text,
+      onChanged: (value) {
+        controller.onUniqueIdChanged(value);
+      },
+      maxLength: 12,
     );
   }
 
@@ -72,68 +203,96 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
 
   Widget _buildUniqueIdButtons() {
     return Obx(() {
-      return Row(
-        children: [
-          ElevatedButton(
-            onPressed:
-                () => controller.checkUniqueId(controller.uniqueId.value),
-            child: const Text('중복 확인'),
-          ),
-          const SizedBox(width: 12),
-          ElevatedButton(
-            onPressed:
-                controller.uniqueIdCheck.value == UniqueIdCheck.available
-                    ? () =>
-                        controller.selectedId.value = controller.uniqueId.value
-                    : null,
-            child: const Text('확정'),
-          ),
-        ],
+      final isValid = controller.isUniqueIdValid.value;
+      final isAlreadySelected = controller.selectedId.value.isNotEmpty;
+
+      final isButtonEnabled = isValid && !isAlreadySelected;
+
+      return ElevatedButton(
+        onPressed:
+            isButtonEnabled
+                ? () => controller.checkUniqueId(controller.uniqueId.value)
+                : () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor:
+              isButtonEnabled ? null : Colors.grey.withOpacity(0.4),
+          foregroundColor: isButtonEnabled ? null : Colors.black38,
+        ),
+        child: const Text('중복 확인'),
       );
     });
   }
 
-  Widget _buildSelectedIdText() {
+  Widget _buildNameInput() {
+    return CommonTextField(
+      controller: textNameController,
+      hintText: '이름 입력',
+      maxLength: 10,
+      keyboardType: TextInputType.name,
+      onChanged: (value) {
+        controller.name.value = value.trim();
+        controller.selectedName.value = '';
+      },
+    );
+  }
+
+  Widget _buildNameStatusText() {
     return Obx(() {
-      if (controller.selectedId.value.isNotEmpty) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Text(
-            '✔ 확정된 아이디: ${controller.selectedId.value}',
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.green,
-            ),
-          ),
-        );
-      } else {
-        return const SizedBox.shrink();
-      }
+      final trimmed = controller.name.value.trim();
+      if (trimmed.isEmpty) return const Text('⚠ 이름을 입력해주세요.');
+      if (trimmed.length < 2) return const Text('⚠ 이름은 최소 2자 이상입니다.');
+      if (trimmed.length > 10) return const Text('⚠ 이름은 최대 10자까지 입력 가능합니다.');
+      return const SizedBox.shrink();
     });
   }
 
-  Widget _buildNameInput() {
-    return TextField(
-      controller: textNameController,
-      decoration: const InputDecoration(labelText: '이름 입력'),
-      onChanged: (val) => controller.name.value = val,
-    );
+  Widget _buildNameCheckButtons() {
+    return Obx(() {
+      final nameInput = controller.name.value;
+      final isLengthValid = nameInput.length >= 2 && nameInput.length <= 10;
+      final isAlreadySelected =
+          controller.selectedName.value.isNotEmpty &&
+          controller.isNameValid.value;
+      return ElevatedButton(
+        onPressed:
+            isLengthValid && !isAlreadySelected
+                ? () => controller.validateNameAndCheckFiltering(
+                  controller.name.value,
+                )
+                : () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor:
+              isLengthValid && !isAlreadySelected
+                  ? null
+                  : Colors.grey.withOpacity(0.4),
+          foregroundColor:
+              isLengthValid && !isAlreadySelected ? null : Colors.black38,
+        ),
+        child: const Text('이름 확인'),
+      );
+    });
   }
 
   Widget _buildSubmitButton() {
     return Obx(() {
       return ElevatedButton(
         onPressed:
-            controller.isFormValid
+            controller.isUniqueIdValid.value &&
+                    controller.uniqueIdCheck.value == UniqueIdCheck.available &&
+                    controller.isNameValid.value
                 ? () async {
                   await controller.createUser();
-                  if (controller.isCreated.value) {
-                    Get.offAllNamed('/main');
-                  } else if (controller.errorMessage.isNotEmpty) {
-                    Get.snackbar('오류', controller.errorMessage.value);
-                  }
                 }
-                : null,
+                : () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor:
+              controller.isUniqueIdValid.value &&
+                      controller.uniqueIdCheck.value ==
+                          UniqueIdCheck.available &&
+                      controller.isNameValid.value
+                  ? null
+                  : Colors.grey.withOpacity(0.4),
+        ),
         child: const Text('아이디 생성하기'),
       );
     });

@@ -16,9 +16,6 @@ class LoginView extends GetView<LoginViewModel> {
     const maxContentWidth = 320.0;
 
     return Obx(() {
-      if (controller.isLoading.value) {
-        return Center(child: CommonLoadingLottie());
-      }
       if (controller.systemMessage.isNotEmpty) {
         final msg = controller.systemMessage.value;
         controller.systemMessage.value = '';
@@ -33,10 +30,13 @@ class LoginView extends GetView<LoginViewModel> {
           } else {
             Get.to(() => UniqueIdInputView(), binding: UniqueIdInputBinding());
           }
-          controller.idExist.value = null;
         });
+        controller.idExist.value = null;
+        return Center(child: CommonLoadingLottie());
       }
-
+      if (controller.isLoading.value) {
+        return Center(child: CommonLoadingLottie());
+      }
       return Scaffold(
         body: Center(
           child: ConstrainedBox(

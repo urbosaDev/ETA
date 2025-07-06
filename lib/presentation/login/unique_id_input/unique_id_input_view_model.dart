@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/filter_words.dart';
 
 enum UniqueIdCheck { none, available, notAvailable, blank }
 
@@ -14,73 +15,158 @@ class UniqueIdInputViewModel extends GetxController {
     required UserRepository userRepository,
   }) : _authRepository = authRepository,
        _userRepository = userRepository;
+  @override
+  void onInit() {
+    // TODO: implement onInit
+    super.onInit();
+  }
 
-  final uniqueId = ''.obs;
   final name = ''.obs;
-  final uniqueIdCheck = UniqueIdCheck.none.obs;
-  final selectedId = ''.obs;
-  final isCreated = false.obs;
-  final errorMessage = ''.obs;
-  final isConfirmEnabled = false.obs;
+  final selectedName = ''.obs;
+  final RxBool isNameValid = false.obs;
 
-  bool get isFormValid =>
-      selectedId.value.isNotEmpty && name.value.trim().isNotEmpty;
+  final isCreated = false.obs;
+
   final RxBool isLoading = false.obs;
+
+  final selectedId = ''.obs;
+  final uniqueId = ''.obs;
+  final RxBool isUniqueIdValid = false.obs;
+  void resetUniqueId() {
+    uniqueId.value = '';
+    selectedId.value = '';
+    isUniqueIdValid.value = false;
+    uniqueIdCheck.value = UniqueIdCheck.none;
+  }
+
+  void resetName() {
+    name.value = '';
+    selectedName.value = '';
+    isNameValid.value = false;
+  }
+
+  final RxBool isCheckLoading = false.obs;
+  final uniqueIdCheck = UniqueIdCheck.none.obs;
+
   void onUniqueIdChanged(String value) {
     uniqueId.value = value;
     uniqueIdCheck.value = UniqueIdCheck.none;
+    isUniqueIdValid.value = isValidUniqueIdFormat(value);
     selectedId.value = '';
-    isConfirmEnabled.value = false;
   }
 
+  bool isValidUniqueIdFormat(String id) {
+    final trimmed = id.trim();
+    if (trimmed.length < 8 || trimmed.length > 12) return false;
+
+    final regex = RegExp(r'^[a-z][a-z0-9]{7,11}$');
+    if (!regex.hasMatch(trimmed)) return false;
+
+    final lowered = trimmed.toLowerCase();
+    const reservedWords = ['unknown', 'system', 'admin'];
+
+    for (final word in reservedWords) {
+      if (lowered == word) return false;
+    }
+
+    return true;
+  }
+
+  final RxString systemMessage = ''.obs;
+
+  final RxBool shouldClearIdInput = false.obs;
+
   Future<void> checkUniqueId(String id) async {
+    isCheckLoading.value = true;
     final trimmedId = id.trim();
+    final lowered = trimmedId.toLowerCase();
 
     if (trimmedId.isEmpty) {
       uniqueIdCheck.value = UniqueIdCheck.blank;
-      isConfirmEnabled.value = false;
+      isLoading.value = false;
+
       return;
     }
-
-    // 금지 아이디 체크
-    if (trimmedId.toLowerCase() == 'system' ||
-        trimmedId.toLowerCase() == 'unknown') {
-      uniqueIdCheck.value = UniqueIdCheck.notAvailable;
-      isConfirmEnabled.value = false;
-      selectedId.value = '';
+    if (FilterWords.containsBlockedWord(trimmedId.toLowerCase())) {
+      systemMessage.value = '⚠️ 아이디에 부적절한 단어가 포함되어 있습니다.';
+      uniqueIdCheck.value = UniqueIdCheck.none;
+      isCheckLoading.value = false;
+      shouldClearIdInput.value = true;
+      resetUniqueId();
       return;
     }
-
+    const reservedWords = ['unknown', 'system', 'admin'];
+    if (reservedWords.contains(lowered)) {
+      systemMessage.value = '⚠️ 해당 아이디는 사용할 수 없습니다.';
+      uniqueIdCheck.value = UniqueIdCheck.none;
+      isCheckLoading.value = false;
+      shouldClearIdInput.value = true;
+      resetUniqueId();
+      return;
+    }
     try {
       final available = await _userRepository.isUniqueIdAvailable(trimmedId);
-      uniqueIdCheck.value =
-          available ? UniqueIdCheck.available : UniqueIdCheck.notAvailable;
-      isConfirmEnabled.value = available;
-      if (!available) selectedId.value = '';
+      if (available) {
+        uniqueIdCheck.value = UniqueIdCheck.available;
+        selectedId.value = trimmedId;
+      } else {
+        uniqueIdCheck.value = UniqueIdCheck.notAvailable;
+        shouldClearIdInput.value = true;
+        resetUniqueId();
+      }
     } catch (_) {
       uniqueIdCheck.value = UniqueIdCheck.none;
-      isConfirmEnabled.value = false;
-      selectedId.value = '';
+      systemMessage.value = '아이디 중복 확인 중 오류가 발생했습니다.';
+      shouldClearIdInput.value = true;
+      resetUniqueId();
+    } finally {
+      isCheckLoading.value = false;
     }
   }
 
-  void confirmSelectedId() {
-    selectedId.value = uniqueId.value;
+  final RxBool shouldClearNameInput = false.obs;
+  void validateNameAndCheckFiltering(String nameInput) {
+    final trimmedName = nameInput.trim();
+
+    if (trimmedName.length < 2 || trimmedName.length > 10) {
+      systemMessage.value = '⚠️ 이름은 2자 이상 10자 이하로 입력해주세요.';
+      isNameValid.value = false;
+      shouldClearNameInput.value = true;
+      resetName();
+      return;
+    }
+
+    final lower = trimmedName.toLowerCase();
+    if (FilterWords.containsBlockedWord(lower)) {
+      systemMessage.value = '⚠️ 이름에 부적절한 단어가 포함되어 있습니다.';
+      isNameValid.value = false;
+      shouldClearNameInput.value = true;
+      resetName();
+      return;
+    }
+
+    selectedName.value = trimmedName;
+    isNameValid.value = true;
+    return;
   }
 
   Future<void> createUser() async {
     isLoading.value = true;
+
     final user = _authRepository.getCurrentUser();
+    final id = selectedId.value.trim();
+    final nameValue = name.value.trim();
+
     if (user == null) {
-      errorMessage.value = '로그인 상태가 아닙니다';
+      systemMessage.value = '로그인 상태가 아닙니다';
       isLoading.value = false;
       return;
     }
 
     final userModel = UserModel(
       uid: user.uid,
-      uniqueId: selectedId.value,
-      name: name.value,
+      uniqueId: id,
+      name: nameValue,
       photoUrl: user.photoURL ?? '',
     );
 
@@ -89,7 +175,7 @@ class UniqueIdInputViewModel extends GetxController {
       isCreated.value = await _userRepository.userExists(userModel.uid);
     } catch (e) {
       isCreated.value = false;
-      errorMessage.value = '사용자 생성에 실패했습니다';
+      systemMessage.value = '사용자 생성에 실패했습니다';
     } finally {
       isLoading.value = false;
     }
