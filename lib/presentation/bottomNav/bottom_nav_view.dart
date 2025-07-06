@@ -19,17 +19,30 @@ class BottomNavView extends GetView<BottomNavViewModel> {
           index: index,
           children: [HomeView(), ProfileView(), SettingView()],
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: index,
-          onTap: controller.changeIndex,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.emoji_people_rounded),
-              label: '프로필',
-            ),
-            BottomNavigationBarItem(icon: Icon(Icons.settings), label: '설정'),
-          ],
+
+        bottomNavigationBar: Material(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(height: 0.5, color: Colors.white38),
+              BottomNavigationBar(
+                currentIndex: index,
+                onTap: controller.changeIndex,
+                type: BottomNavigationBarType.fixed,
+                items: const [
+                  BottomNavigationBarItem(icon: Icon(Icons.person), label: '홈'),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.notifications),
+                    label: '알림',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.settings),
+                    label: '설정',
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       );
     });

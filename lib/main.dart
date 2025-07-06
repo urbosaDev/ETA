@@ -90,6 +90,15 @@ class MyApp extends StatelessWidget {
       title: 'What is your ETA',
 
       theme: ThemeData(
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Color(0xff1a1a1a), // 바텀 네비게이션 배경색
+          selectedItemColor: Colors.white, // 선택된 아이템 색상
+          unselectedItemColor: Colors.white54, // 선택되지 않은 아이템 색상
+          selectedLabelStyle: TextStyle(fontSize: 12), // 선택된 라벨 스타일
+          unselectedLabelStyle: TextStyle(fontSize: 12), // 선택되지 않은 라벨 스타일
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+        ),
         scaffoldBackgroundColor: const Color(0xff111111), // 기본 배경색
         textTheme: const TextTheme(
           bodyLarge: TextStyle(color: Colors.white),
