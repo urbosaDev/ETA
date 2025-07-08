@@ -88,7 +88,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'What is your ETA',
-
+      themeMode: ThemeMode.dark,
       theme: ThemeData(
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           backgroundColor: Color(0xff1a1a1a), // 바텀 네비게이션 배경색
@@ -99,13 +99,39 @@ class MyApp extends StatelessWidget {
           showSelectedLabels: true,
           showUnselectedLabels: true,
         ),
+        navigationRailTheme: NavigationRailThemeData(
+          backgroundColor: const Color(0xff1a1a1a),
+          selectedIconTheme: const IconThemeData(color: Colors.white),
+
+          unselectedIconTheme: const IconThemeData(color: Colors.white54),
+          selectedLabelTextStyle: const TextStyle(color: Colors.white),
+          unselectedLabelTextStyle: const TextStyle(color: Colors.white54),
+          elevation: 2,
+          indicatorColor: Colors.grey[800], // 선택된 탭의 배경 느낌
+        ),
+
         scaffoldBackgroundColor: const Color(0xff111111), // 기본 배경색
         textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: Colors.white),
-          bodyMedium: TextStyle(color: Colors.white),
-          bodySmall: TextStyle(color: Colors.white),
-          titleLarge: TextStyle(color: Colors.white),
-          titleMedium: TextStyle(color: Colors.white),
+          titleLarge: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: 24.0, // 충분히 큰 크기
+            fontWeight: FontWeight.w700, // Bold (NotoSansKR-Bold.ttf)
+            color: Colors.white, // 기본 색상
+          ),
+
+          bodyMedium: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: 16.0, // 읽기 편한 본문 크기
+            fontWeight: FontWeight.w400, // Regular (NotoSansKR-Regular.ttf)
+            color: Colors.white, // 기본 색상
+          ),
+
+          bodySmall: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: 12.0, // 작은 보조 텍스트 크기
+            fontWeight: FontWeight.w400, // Regular
+            color: Colors.white70, // 조금 연한 흰색 (보조적인 느낌)
+          ),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xff111111),
@@ -113,6 +139,7 @@ class MyApp extends StatelessWidget {
           elevation: 0,
           scrolledUnderElevation: 0,
         ),
+
         inputDecorationTheme: const InputDecorationTheme(
           hintStyle: TextStyle(color: Colors.white70),
           labelStyle: TextStyle(color: Colors.white),

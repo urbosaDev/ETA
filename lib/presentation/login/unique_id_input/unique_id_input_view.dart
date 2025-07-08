@@ -13,36 +13,6 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
 
   @override
   Widget build(BuildContext context) {
-    ever(controller.systemMessage, (message) {
-      if (message.isNotEmpty) {
-        Get.snackbar('알림', message, snackPosition: SnackPosition.TOP);
-
-        controller.systemMessage.value = '';
-      }
-    });
-
-    ever(controller.shouldClearNameInput, (shouldClear) {
-      if (shouldClear) {
-        textNameController.clear();
-
-        controller.shouldClearNameInput.value = false;
-      }
-    });
-
-    ever(controller.shouldClearIdInput, (shouldClear) {
-      if (shouldClear) {
-        textIdController.clear();
-
-        controller.shouldClearIdInput.value = false;
-      }
-    });
-
-    once(controller.isCreated, (isCreated) {
-      if (isCreated) {
-        Get.offAllNamed('/main');
-      }
-    });
-
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -50,105 +20,149 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
     final verticalPadding = screenHeight * 0.08;
 
     return Obx(() {
-      if (controller.isLoading.value) {
+      final isLoading = controller.isLoading.value;
+      final message = controller.systemMessage.value;
+      final clearIdInput = controller.shouldClearIdInput.value;
+      final clearNameInput = controller.shouldClearNameInput.value;
+      final toNavigate = controller.isCreated.value;
+      if (isLoading) {
         return const Center(child: CommonLoadingLottie());
       }
-      return Stack(
-        children: [
-          Scaffold(
-            appBar: AppBar(),
-            body: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(
-                horizontal: horizontalPadding,
-                vertical: verticalPadding,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '아이디와 이름을 입력해주세요',
-                    style: TextStyle(
-                      fontFamily: 'NotoSansKR',
-                      fontSize: 17,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
+      if (message.isNotEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Get.snackbar('알림', message, snackPosition: SnackPosition.TOP);
+          controller.systemMessage.value = '';
+        });
+      }
+      if (clearIdInput) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          textIdController.clear();
+          controller.shouldClearIdInput.value = false;
+        });
+      }
+      if (clearNameInput) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          textNameController.clear();
+          controller.shouldClearNameInput.value = false;
+        });
+      }
+      if (toNavigate) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Get.offNamed('/main');
+          controller.isCreated.value = false;
+        });
+      }
+
+      return GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Stack(
+          children: [
+            Scaffold(
+              appBar: AppBar(),
+              body: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
+                  vertical: verticalPadding,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(),
+                    const SizedBox(height: 8),
+                    _buildIdHeader(),
+                    _buildUniqueIdInput(),
+                    _buildIdFormatStatus(),
+                    const SizedBox(height: 8),
+                    _buildUniqueIdStatusText(),
+                    const SizedBox(height: 8),
+                    Center(child: _buildUniqueIdButtons()),
+                    const SizedBox(height: 16),
+                    _buildeNameHeader(),
+                    _buildNameInput(),
+                    _buildNameStatusText(),
+                    Center(child: _buildNameCheckButtons()),
+                    const SizedBox(height: 24),
+                    Center(child: _buildSubmitButton()),
+                    Text(
+                      '⚠️ 이름 또는 아이디에 부적절한 단어(욕설, 사회적으로 부적절한 표현 등)가 포함될 경우 제재를 받을 수 있습니다.',
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Text(
-                        '아이디를 입력해주세요',
-                        style: TextStyle(
-                          fontFamily: 'NotoSansKR',
-                          fontSize: 18,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      Obx(() {
-                        return Checkbox(
-                          value: controller.selectedId.value.isNotEmpty,
-                          onChanged: null,
-
-                          checkColor: Colors.greenAccent,
-                        );
-                      }),
-                    ],
-                  ),
-
-                  _buildUniqueIdInput(),
-                  _buildIdFormatStatus(),
-                  const SizedBox(height: 8),
-                  _buildUniqueIdStatusText(),
-                  const SizedBox(height: 8),
-                  Center(child: _buildUniqueIdButtons()),
-                  const SizedBox(height: 16),
-
-                  Row(
-                    children: [
-                      const Text(
-                        '이름을 입력해주세요',
-                        style: TextStyle(
-                          fontFamily: 'NotoSansKR',
-                          fontSize: 18,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      Obx(() {
-                        return Checkbox(
-                          value: controller.selectedName.isNotEmpty,
-                          onChanged: null,
-
-                          checkColor: Colors.greenAccent,
-                        );
-                      }),
-                    ],
-                  ),
-                  _buildNameInput(),
-                  _buildNameStatusText(),
-                  Center(child: _buildNameCheckButtons()),
-                  const SizedBox(height: 24),
-                  Center(child: _buildSubmitButton()),
-                  Text(
-                    '⚠️ 이름 또는 아이디에 부적절한 단어(욕설, 사회적으로 부적절한 표현 등)가 포함될 경우 제재를 받을 수 있습니다.',
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          if (controller.isCheckLoading.value)
-            IgnorePointer(
-              ignoring: true,
-              child: Container(
-                color: Colors.black.withOpacity(0.6), // 반투명 배경
-                child: const Center(child: CommonLoadingLottie()),
+            if (controller.isCheckLoading.value)
+              IgnorePointer(
+                ignoring: true, // 상호작용 막기 위해 false
+                child: Container(
+                  color: Colors.black.withOpacity(0.6), // 반투명 배경
+                  child: const Center(child: CommonLoadingLottie()),
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       );
     });
+  }
+
+  Widget _buildHeader() {
+    return const Text(
+      '아이디와 이름을 입력해주세요',
+      style: TextStyle(
+        fontFamily: 'NotoSansKR',
+        fontSize: 17,
+        color: Colors.white,
+        fontWeight: FontWeight.w700,
+      ),
+    );
+  }
+
+  Widget _buildIdHeader() {
+    return Row(
+      children: [
+        const Text(
+          '아이디를 입력해주세요',
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: 18,
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        Obx(() {
+          return Checkbox(
+            value: controller.selectedId.value.isNotEmpty,
+            onChanged: null,
+
+            checkColor: Colors.greenAccent,
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildeNameHeader() {
+    return Row(
+      children: [
+        const Text(
+          '이름을 입력해주세요',
+          style: TextStyle(
+            fontFamily: 'NotoSansKR',
+            fontSize: 18,
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        Obx(() {
+          return Checkbox(
+            value: controller.selectedName.isNotEmpty,
+            onChanged: null,
+            checkColor: Colors.greenAccent,
+          );
+        }),
+      ],
+    );
   }
 
   Widget _buildIdFormatStatus() {

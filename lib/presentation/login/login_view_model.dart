@@ -31,9 +31,8 @@ class LoginViewModel extends GetxController {
         isLoading.value = false;
         return;
       }
-
       final exist = await _userRepository.userExists(uid);
-      exist ? idExist.value = true : idExist.value = false;
+      idExist.value = exist;
     } catch (_) {
       systemMessage.value = '로그인 실패: 알 수 없는 오류가 발생했습니다.\n 다시 시도해주세요.';
       isLoading.value = false;

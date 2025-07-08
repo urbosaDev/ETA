@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,40 +19,85 @@ class HomeView extends GetView<HomeViewModel> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    final double leftTabWidth = min(screenWidth * 0.18, 72.0);
     return SafeArea(
       child: Row(
         children: [
           // 사이드바
           SizedBox(
-            width: 72,
+            width: leftTabWidth,
             child: Obx(() {
-              return NavigationRail(
-                selectedIndex: controller.selectedIndex.value,
-                onDestinationSelected: (index) {
-                  if (index == 1) {
-                    showCreateGroupDialog(context);
-                    return;
-                  }
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height,
+                  ),
+                  child: IntrinsicHeight(
+                    child: NavigationRail(
+                      backgroundColor: Color(0xff111111),
+                      selectedIndex: controller.selectedIndex.value,
+                      selectedLabelTextStyle: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: Colors.white),
+                      unselectedLabelTextStyle: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: Colors.white54),
+                      onDestinationSelected: (index) {
+                        if (index == 1) {
+                          showCreateGroupDialog(context);
+                          return;
+                        }
 
-                  controller.selectedIndex.value = index;
-                },
-                labelType: NavigationRailLabelType.all,
-                destinations: [
-                  const NavigationRailDestination(
-                    icon: Icon(Icons.chat),
-                    label: Text('Chat'),
-                  ),
-                  const NavigationRailDestination(
-                    icon: Icon(Icons.add),
-                    label: Text('Create'),
-                  ),
-                  ...controller.groupList.map(
-                    (group) => NavigationRailDestination(
-                      icon: const Icon(Icons.groups),
-                      label: Text(group.title),
+                        controller.selectedIndex.value = index;
+                      },
+
+                      labelType: NavigationRailLabelType.all,
+                      destinations: [
+                        const NavigationRailDestination(
+                          icon: Icon(Icons.chat),
+                          label: Text('채팅'),
+                        ),
+                        NavigationRailDestination(
+                          icon: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.pinkAccent.withOpacity(
+                                0.15,
+                              ), // 커스텀 배경
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.all(6),
+                            child: const Icon(
+                              Icons.add,
+                              color: Colors.pinkAccent,
+                            ), // 커스텀 색상
+                          ),
+                          label: Text(
+                            '그룹생성',
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: Colors.pinkAccent),
+                          ),
+                        ),
+                        ...controller.groupList.map((group) {
+                          String displayText = group.title;
+                          if (displayText.length > 3) {
+                            displayText = '${displayText.substring(0, 3)}..';
+                          }
+
+                          return NavigationRailDestination(
+                            icon: const Icon(Icons.groups),
+                            label: Text(
+                              displayText,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          );
+                        }).toList(),
+                      ],
                     ),
                   ),
-                ],
+                ),
               );
             }),
           ),
@@ -59,11 +106,10 @@ class HomeView extends GetView<HomeViewModel> {
           Expanded(
             child: Obx(() {
               final index = controller.selectedIndex.value;
-
+              Widget innerView;
               if (index == 0) {
-                return const PrivateChatView();
-              }
-              if (index >= 2) {
+                innerView = const PrivateChatView();
+              } else if (index >= 2) {
                 final group = controller.groupList[index - 2];
                 final tag = group.id;
 
@@ -82,12 +128,27 @@ class HomeView extends GetView<HomeViewModel> {
                   );
                 }
 
-                return GetBuilder<GroupViewModel>(
+                innerView = GetBuilder<GroupViewModel>(
                   tag: tag,
                   builder: (_) => GroupView(groupTag: tag),
                 );
+              } else {
+                innerView = const Center(child: Text('그룹은 별도 화면에서 열립니다.'));
               }
-              return const Center(child: Text('그룹은 별도 화면에서 열립니다.'));
+
+              return Container(
+                margin: const EdgeInsets.only(top: 24),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF2C2C2C),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                  child: innerView,
+                ),
+              );
             }),
           ),
         ],

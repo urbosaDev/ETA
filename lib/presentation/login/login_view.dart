@@ -24,14 +24,15 @@ class LoginView extends GetView<LoginViewModel> {
         });
       }
       if (controller.idExist.value != null) {
+        final exist = controller.idExist.value!;
+        controller.idExist.value = null;
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (controller.idExist.value == true) {
+          if (exist) {
             Get.offNamed('/main');
           } else {
             Get.to(() => UniqueIdInputView(), binding: UniqueIdInputBinding());
           }
         });
-        controller.idExist.value = null;
         return Center(child: CommonLoadingLottie());
       }
       if (controller.isLoading.value) {

@@ -21,6 +21,7 @@ class CommonTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      keyboardAppearance: Brightness.dark,
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
