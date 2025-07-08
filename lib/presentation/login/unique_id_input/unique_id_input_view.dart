@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/presentation/core/loading/common_loading_lottie.dart';
 import 'package:what_is_your_eta/presentation/core/widget/common_text_field.dart';
+
 import 'package:what_is_your_eta/presentation/login/unique_id_input/unique_id_input_view_model.dart';
 
 //
@@ -15,6 +16,7 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final textTheme = Theme.of(context).textTheme;
 
     final horizontalPadding = screenWidth * 0.05;
     final verticalPadding = screenHeight * 0.08;
@@ -25,9 +27,11 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
       final clearIdInput = controller.shouldClearIdInput.value;
       final clearNameInput = controller.shouldClearNameInput.value;
       final toNavigate = controller.isCreated.value;
+
       if (isLoading) {
         return const Center(child: CommonLoadingLottie());
       }
+
       if (message.isNotEmpty) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Get.snackbar('알림', message, snackPosition: SnackPosition.TOP);
@@ -69,24 +73,27 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeader(),
+                    _buildHeader(textTheme),
                     const SizedBox(height: 8),
-                    _buildIdHeader(),
+                    _buildIdHeader(textTheme),
                     _buildUniqueIdInput(),
-                    _buildIdFormatStatus(),
+                    _buildIdFormatStatus(textTheme),
                     const SizedBox(height: 8),
-                    _buildUniqueIdStatusText(),
+                    _buildUniqueIdStatusText(textTheme),
                     const SizedBox(height: 8),
                     Center(child: _buildUniqueIdButtons()),
                     const SizedBox(height: 16),
-                    _buildeNameHeader(),
+                    _buildeNameHeader(textTheme),
                     _buildNameInput(),
-                    _buildNameStatusText(),
+                    _buildNameStatusText(textTheme),
                     Center(child: _buildNameCheckButtons()),
                     const SizedBox(height: 24),
                     Center(child: _buildSubmitButton()),
                     Text(
                       '⚠️ 이름 또는 아이디에 부적절한 단어(욕설, 사회적으로 부적절한 표현 등)가 포함될 경우 제재를 받을 수 있습니다.',
+                      style: textTheme.bodySmall?.copyWith(
+                        color: Colors.white70,
+                      ),
                     ),
                   ],
                 ),
@@ -94,9 +101,9 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
             ),
             if (controller.isCheckLoading.value)
               IgnorePointer(
-                ignoring: true, // 상호작용 막기 위해 false
+                ignoring: true,
                 child: Container(
-                  color: Colors.black.withOpacity(0.6), // 반투명 배경
+                  color: Colors.black.withOpacity(0.6),
                   child: const Center(child: CommonLoadingLottie()),
                 ),
               ),
@@ -106,35 +113,21 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
     });
   }
 
-  Widget _buildHeader() {
-    return const Text(
-      '아이디와 이름을 입력해주세요',
-      style: TextStyle(
-        fontFamily: 'NotoSansKR',
-        fontSize: 17,
-        color: Colors.white,
-        fontWeight: FontWeight.w700,
-      ),
-    );
+  Widget _buildHeader(TextTheme textTheme) {
+    return Text('아이디와 이름을 입력해주세요', style: textTheme.titleLarge);
   }
 
-  Widget _buildIdHeader() {
+  Widget _buildIdHeader(TextTheme textTheme) {
     return Row(
       children: [
-        const Text(
+        Text(
           '아이디를 입력해주세요',
-          style: TextStyle(
-            fontFamily: 'NotoSansKR',
-            fontSize: 18,
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-          ),
+          style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
         ),
         Obx(() {
           return Checkbox(
             value: controller.selectedId.value.isNotEmpty,
             onChanged: null,
-
             checkColor: Colors.greenAccent,
           );
         }),
@@ -142,17 +135,12 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
     );
   }
 
-  Widget _buildeNameHeader() {
+  Widget _buildeNameHeader(TextTheme textTheme) {
     return Row(
       children: [
-        const Text(
+        Text(
           '이름을 입력해주세요',
-          style: TextStyle(
-            fontFamily: 'NotoSansKR',
-            fontSize: 18,
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-          ),
+          style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
         ),
         Obx(() {
           return Checkbox(
@@ -165,24 +153,24 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
     );
   }
 
-  Widget _buildIdFormatStatus() {
+  Widget _buildIdFormatStatus(TextTheme textTheme) {
     return Obx(() {
       if (controller.uniqueId.value.isEmpty) {
-        return const Text(
+        return Text(
           '아이디는 영문 소문자로 시작하고, \n숫자 포함가능 8~12자여야 합니다.',
-          style: TextStyle(color: Colors.white),
+          style: textTheme.bodySmall,
         );
       }
 
       if (controller.isUniqueIdValid.value) {
-        return const Text(
+        return Text(
           '✅ 사용 가능한 아이디 형식입니다. \n중복 확인을 눌러주세요.',
-          style: TextStyle(color: Colors.green),
+          style: textTheme.bodySmall?.copyWith(color: Colors.green),
         );
       } else {
-        return const Text(
+        return Text(
           '❌ 아이디는 영문 소문자로 시작하고, \n숫자 포함가능 8~12자여야 합니다.',
-          style: TextStyle(color: Colors.redAccent),
+          style: textTheme.bodySmall?.copyWith(color: Colors.redAccent),
         );
       }
     });
@@ -200,15 +188,24 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
     );
   }
 
-  Widget _buildUniqueIdStatusText() {
+  Widget _buildUniqueIdStatusText(TextTheme textTheme) {
     return Obx(() {
       switch (controller.uniqueIdCheck.value) {
         case UniqueIdCheck.available:
-          return const Text('✅ 사용 가능한 아이디입니다.');
+          return Text(
+            '✅ 사용 가능한 아이디입니다.',
+            style: textTheme.bodySmall?.copyWith(color: Colors.green),
+          );
         case UniqueIdCheck.notAvailable:
-          return const Text('❌ 이미 사용 중인 아이디입니다.');
+          return Text(
+            '❌ 이미 사용 중인 아이디입니다.',
+            style: textTheme.bodySmall?.copyWith(color: Colors.redAccent),
+          );
         case UniqueIdCheck.blank:
-          return const Text('⚠️ 아이디를 입력해주세요.');
+          return Text(
+            '⚠️ 아이디를 입력해주세요.',
+            style: textTheme.bodySmall?.copyWith(color: Colors.orange),
+          );
         default:
           return const SizedBox.shrink();
       }
@@ -250,12 +247,24 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
     );
   }
 
-  Widget _buildNameStatusText() {
+  Widget _buildNameStatusText(TextTheme textTheme) {
     return Obx(() {
       final trimmed = controller.name.value.trim();
-      if (trimmed.isEmpty) return const Text('⚠ 이름을 입력해주세요.');
-      if (trimmed.length < 2) return const Text('⚠ 이름은 최소 2자 이상입니다.');
-      if (trimmed.length > 10) return const Text('⚠ 이름은 최대 10자까지 입력 가능합니다.');
+      if (trimmed.isEmpty)
+        return Text(
+          '⚠ 이름을 입력해주세요.',
+          style: textTheme.bodySmall?.copyWith(color: Colors.orange),
+        );
+      if (trimmed.length < 2)
+        return Text(
+          '⚠ 이름은 최소 2자 이상입니다.',
+          style: textTheme.bodySmall?.copyWith(color: Colors.orange),
+        );
+      if (trimmed.length > 10)
+        return Text(
+          '⚠ 이름은 최대 10자까지 입력 가능합니다.',
+          style: textTheme.bodySmall?.copyWith(color: Colors.orange),
+        );
       return const SizedBox.shrink();
     });
   }

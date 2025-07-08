@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -25,16 +26,24 @@ class LoginView extends GetView<LoginViewModel> {
       }
       if (controller.idExist.value != null) {
         final exist = controller.idExist.value!;
-        controller.idExist.value = null;
+
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (exist) {
             Get.offNamed('/main');
           } else {
-            Get.to(() => UniqueIdInputView(), binding: UniqueIdInputBinding());
+            Get.to(
+              () => UniqueIdInputView(),
+              binding: UniqueIdInputBinding(),
+            )?.then((_) {
+              controller.idExist.value = null;
+              controller.isLoading.value = false;
+            });
           }
         });
+
         return Center(child: CommonLoadingLottie());
       }
+
       if (controller.isLoading.value) {
         return Center(child: CommonLoadingLottie());
       }
@@ -82,7 +91,7 @@ class LoginView extends GetView<LoginViewModel> {
                         ),
                       ),
                       child: const Text(
-                        'Goog1e로 로그인',
+                        'Google로 로그인',
                         style: TextStyle(
                           fontFamily: 'Inconsolata',
                           fontSize: 16,
@@ -93,15 +102,7 @@ class LoginView extends GetView<LoginViewModel> {
                     ),
                   ),
                   SizedBox(height: height * 0.03),
-                  const Text(
-                    '로그인 또는 회원가입을 하시면\n개인정보 처리방침에 동의하게 됩니다.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'NotoSansKR',
-                      fontSize: 12,
-                      color: Colors.white38,
-                    ),
-                  ),
+                  _buildPolicyText(context),
                   SizedBox(height: height * 0.08),
                 ],
               ),
@@ -110,5 +111,37 @@ class LoginView extends GetView<LoginViewModel> {
         ),
       );
     });
+  }
+
+  Widget _buildPolicyText(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Text.rich(
+      TextSpan(
+        text: '로그인 또는 회원가입을 하시면\n',
+        style: textTheme.bodySmall?.copyWith(
+          color: Colors.white38,
+          height: 1.5,
+        ),
+        children: [
+          TextSpan(
+            text: '개인정보 처리방침',
+            style: textTheme.bodySmall?.copyWith(
+              color: Colors.white38,
+              fontWeight: FontWeight.bold,
+            ),
+            recognizer:
+                TapGestureRecognizer()
+                  ..onTap = () {
+                    Get.toNamed('/privacy-policy');
+                  },
+          ),
+          TextSpan(
+            text: '에 동의하게 됩니다.',
+            style: textTheme.bodySmall?.copyWith(color: Colors.white38),
+          ),
+        ],
+      ),
+      textAlign: TextAlign.center,
+    );
   }
 }

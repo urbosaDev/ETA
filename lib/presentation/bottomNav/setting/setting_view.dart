@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/good_bye_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/setting/component/setting_tile.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/setting/setting_view_model.dart';
+import 'package:what_is_your_eta/presentation/core/loading/common_loading_lottie.dart';
 
 class SettingView extends GetView<SettingViewModel> {
   const SettingView({super.key});
@@ -24,29 +25,39 @@ class SettingView extends GetView<SettingViewModel> {
       return Stack(
         children: [
           SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Column(
               children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    "설정하기",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      '설정',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
+                SettingTile(title: "화면 테마", value: "구현중입니다", onTap: () {}),
+                const Divider(color: Colors.grey, thickness: 0.2),
                 SettingTile(
-                  title: "화면 테마",
-                  value: Get.isDarkMode ? "어두운 모드" : "밝은 모드",
-                  onTap: () {},
+                  title: "개인정보 처리방침",
+                  value: "＞",
+                  onTap: () {
+                    Get.toNamed('/privacy-policy');
+                  },
                 ),
-                const Divider(),
-                SettingTile(title: "개인정보 처리방침", onTap: () {}),
-                SettingTile(title: "서비스 이용약관", onTap: () {}),
-                const Divider(),
+                SettingTile(
+                  title: "서비스 이용약관",
+                  value: "＞",
+                  onTap: () {
+                    Get.toNamed('/terms-of-service');
+                  },
+                ),
+                const Divider(color: Colors.grey, thickness: 0.2),
                 SettingTile(title: "사용자 리뷰", value: "부탁드려요!", onTap: () {}),
                 SettingTile(title: "앱 버전", value: "1.0.0", onTap: () {}),
-                const Divider(),
+                const Divider(color: Colors.grey, thickness: 0.2),
                 SettingTile(title: "로그아웃", onTap: controller.signOut),
                 SettingTile(
                   title: "탈퇴하기",
@@ -79,7 +90,7 @@ class SettingView extends GetView<SettingViewModel> {
           if (controller.isLoading.value)
             Container(
               color: Colors.black.withOpacity(0.3),
-              child: const Center(child: CircularProgressIndicator()),
+              child: const Center(child: CommonLoadingLottie()),
             ),
         ],
       );

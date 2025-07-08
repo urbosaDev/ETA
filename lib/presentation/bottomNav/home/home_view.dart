@@ -157,38 +157,48 @@ class HomeView extends GetView<HomeViewModel> {
   }
 
   void showCreateGroupDialog(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     Get.dialog(
       Dialog(
-        backgroundColor: Colors.black87,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Colors.black.withOpacity(0.7),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: Colors.white12, width: 0.5),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Align(
-                alignment: Alignment.topLeft,
-                child: Icon(Icons.close, color: Colors.white),
+              Align(
+                alignment: Alignment.topRight,
+                child: GestureDetector(
+                  onTap: () {
+                    Get.back();
+                  },
+                  child: const Icon(Icons.close, color: Colors.white),
+                ),
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 '그룹 채널을 만들어봐요',
-                style: TextStyle(color: Colors.white, fontSize: 18),
+                style: textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 '그룹 채널 내에서 친구들과 함께 약속을\n만들어볼까요 🌸',
-                style: TextStyle(color: Colors.pinkAccent),
+                style: textTheme.bodySmall?.copyWith(color: Colors.pinkAccent),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[800],
-                ),
                 onPressed: () {
                   Get.to(
-                    () => const CreateGroupView(),
+                    () => CreateGroupView(),
                     binding: BindingsBuilder(() {
                       Get.put(
                         CreateGroupViewModel(
@@ -201,7 +211,13 @@ class HomeView extends GetView<HomeViewModel> {
                     }),
                   );
                 },
-                child: const Text('⭐채널 생성하기'),
+                child: Text(
+                  '⭐채널 생성하기',
+                  style: textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ],
           ),

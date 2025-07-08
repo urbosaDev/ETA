@@ -8,20 +8,37 @@ class SettingTile extends StatelessWidget {
   const SettingTile({
     super.key,
     required this.title,
-    required this.onTap,
     this.value,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-      title: Text(title, style: const TextStyle(fontSize: 16)),
-      trailing:
-          value != null
-              ? Text(value!, style: TextStyle(color: Colors.grey[500]))
-              : const Icon(Icons.chevron_right, color: Colors.grey),
+    final textTheme = Theme.of(context).textTheme;
+
+    return InkWell(
+      // 탭 효과를 위해 InkWell 사용
       onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ), // 패딩 조정
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: textTheme.bodySmall),
+            if (value != null)
+              Flexible(
+                child: Text(
+                  value!,
+                  textAlign: TextAlign.end,
+                  style: textTheme.bodySmall?.copyWith(color: Colors.grey),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

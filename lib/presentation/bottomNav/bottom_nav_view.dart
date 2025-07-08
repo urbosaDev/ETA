@@ -24,7 +24,7 @@ class BottomNavView extends GetView<BottomNavViewModel> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(height: 0.5, color: Colors.grey),
+              Container(height: 0.2, color: Colors.grey),
               BottomNavigationBar(
                 currentIndex: index,
                 onTap: controller.changeIndex,

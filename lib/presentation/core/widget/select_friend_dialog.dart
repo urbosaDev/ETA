@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:what_is_your_eta/presentation/core/widget/%08user_card.dart';
 
 import 'package:what_is_your_eta/presentation/models/friend_info_model.dart';
 
@@ -10,8 +11,6 @@ class SelectFriendDialog extends StatelessWidget {
 
   final String confirmText;
   final VoidCallback onConfirm;
-
-  /// ✅ 선택 불가 유저 목록
   final List<String> disabledUids;
 
   const SelectFriendDialog({
@@ -21,65 +20,106 @@ class SelectFriendDialog extends StatelessWidget {
     required this.toggleFriend,
     required this.confirmText,
     required this.onConfirm,
-    this.disabledUids = const [], // 기본값은 없음
+    this.disabledUids = const [],
   });
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Dialog(
+      backgroundColor: const Color(0xff1a1a1a),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Colors.white12, width: 0.5),
+      ),
       child: Container(
-        height: 500,
-        width: 400,
+        height: MediaQuery.of(context).size.height * 0.7,
+        width: MediaQuery.of(context).size.width * 0.85,
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              '내 친구 목록에서 추가하기',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Align(
+              alignment: Alignment.topRight,
+              child: GestureDetector(
+                onTap: () {
+                  Get.back();
+                },
+                child: const Icon(Icons.close, color: Colors.white),
+              ),
             ),
-            const SizedBox(height: 12),
-            const Text('선택된 친구들'),
+            const SizedBox(height: 8),
+
+            Text(
+              '내 친구 목록에서 추가하기',
+              style: textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            Text(
+              '선택된 친구들',
+              style: textTheme.bodySmall?.copyWith(color: Colors.grey[500]),
+            ),
             const SizedBox(height: 8),
             Obx(() {
               return Container(
                 height: 80,
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                 decoration: BoxDecoration(
-                  color: Colors.lime.shade100,
+                  color: Colors.grey[900],
                   borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.white12, width: 0.5),
                 ),
                 child:
                     selectedFriends.isEmpty
-                        ? const Center(child: Text('아직 선택된 친구 없음'))
-                        : ListView(
+                        ? Center(
+                          child: Text(
+                            '아직 선택된 친구 없음',
+                            style: textTheme.bodySmall?.copyWith(
+                              color: Colors.white54,
+                            ),
+                          ),
+                        )
+                        : ListView.builder(
                           scrollDirection: Axis.horizontal,
-                          children:
-                              selectedFriends.map((f) {
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  margin: const EdgeInsets.only(right: 8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.lime.shade400,
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Text(f.userModel.name),
-                                );
-                              }).toList(),
+                          itemCount: selectedFriends.length,
+                          itemBuilder: (context, index) {
+                            final friend = selectedFriends[index];
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4.0,
+                              ),
+                              child: UserSquareCard(
+                                user: friend.userModel,
+                                size: 60,
+                                onTap: () {
+                                  toggleFriend(friend);
+                                },
+                              ),
+                            );
+                          },
                         ),
               );
             }),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
+
             Expanded(
               child: Obx(() {
                 final selectedUids =
                     selectedFriends.map((f) => f.userModel.uid).toSet();
 
-                return ListView.builder(
+                return ListView.separated(
                   itemCount: friendList.length,
+                  separatorBuilder:
+                      (context, index) => const Divider(
+                        color: Colors.white12,
+                        thickness: 0.2,
+                        indent: 16,
+                        endIndent: 16,
+                      ),
                   itemBuilder: (context, index) {
                     final friend = friendList[index];
                     final isSelected = selectedUids.contains(
@@ -90,29 +130,64 @@ class SelectFriendDialog extends StatelessWidget {
                     );
 
                     return ListTile(
-                      title: Text(friend.userModel.name),
-                      subtitle: Text(friend.userModel.uniqueId),
+                      leading: CircleAvatar(
+                        radius: 20,
+                        backgroundImage:
+                            friend.userModel.photoUrl.isNotEmpty
+                                ? NetworkImage(friend.userModel.photoUrl)
+                                : const AssetImage(
+                                      'assets/imgs/default_profile.png',
+                                    )
+                                    as ImageProvider,
+                        backgroundColor: Colors.grey[700],
+                      ),
+                      title: Text(
+                        friend.userModel.name,
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: isDisabled ? Colors.grey[600] : Colors.white,
+                        ),
+                      ),
+                      subtitle: Text(
+                        '@${friend.userModel.uniqueId}',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: isDisabled ? Colors.grey[700] : Colors.grey,
+                        ),
+                      ),
                       trailing: Icon(
                         isDisabled
                             ? Icons.check_circle_outline
-                            : (isSelected ? Icons.check : Icons.add),
+                            : (isSelected
+                                ? Icons.check_circle
+                                : Icons.add_circle_outline),
                         color:
                             isDisabled
                                 ? Colors.grey
-                                : (isSelected ? Colors.green : null),
+                                : (isSelected
+                                    ? Colors.greenAccent
+                                    : Colors.blueAccent),
+                        size: 24,
                       ),
                       onTap: isDisabled ? null : () => toggleFriend(friend),
+                      selected: isSelected,
+                      selectedTileColor: Colors.white.withOpacity(0.05),
                     );
                   },
                 );
               }),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
+
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: onConfirm,
-                child: Text(confirmText),
+                style: Theme.of(context).elevatedButtonTheme.style,
+                child: Text(
+                  confirmText,
+                  style: textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
           ],
