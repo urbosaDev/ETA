@@ -102,7 +102,6 @@ class MyApp extends StatelessWidget {
         navigationRailTheme: NavigationRailThemeData(
           backgroundColor: const Color(0xff1a1a1a),
           selectedIconTheme: const IconThemeData(color: Colors.white),
-
           unselectedIconTheme: const IconThemeData(color: Colors.white54),
           selectedLabelTextStyle: const TextStyle(color: Colors.white),
           unselectedLabelTextStyle: const TextStyle(color: Colors.white54),
@@ -114,7 +113,7 @@ class MyApp extends StatelessWidget {
         textTheme: const TextTheme(
           titleLarge: TextStyle(
             fontFamily: 'NotoSansKR',
-            fontSize: 24.0, // 충분히 큰 크기
+            fontSize: 17.0, // 충분히 큰 크기
             fontWeight: FontWeight.w700, // Bold (NotoSansKR-Bold.ttf)
             color: Colors.white, // 기본 색상
           ),
@@ -148,6 +147,28 @@ class MyApp extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Color(0xFFA8216B), width: 2),
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            textStyle: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+
+            // 버튼 배경색
+            backgroundColor: Colors.pinkAccent,
+
+            foregroundColor: Colors.white,
+            // 버튼 패딩
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            // 버튼 모양 (둥근 모서리)
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20), // 8픽셀 둥근 모서리
+            ),
+            // 그림자 색상
+            shadowColor: Colors.black.withOpacity(0.5),
+            // 그림자 높이
+            elevation: 5,
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),

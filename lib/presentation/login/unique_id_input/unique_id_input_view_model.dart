@@ -15,11 +15,6 @@ class UniqueIdInputViewModel extends GetxController {
     required UserRepository userRepository,
   }) : _authRepository = authRepository,
        _userRepository = userRepository;
-  @override
-  void onInit() {
-    // TODO: implement onInit
-    super.onInit();
-  }
 
   final name = ''.obs;
   final selectedName = ''.obs;

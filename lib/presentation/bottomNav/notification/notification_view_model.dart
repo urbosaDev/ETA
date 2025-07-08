@@ -8,13 +8,13 @@ import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 
-class ProfileViewModel extends GetxController {
+class NotificationViewModel extends GetxController {
   final AuthRepository _authRepository;
   final UserRepository _userRepository;
 
   final GroupRepository _groupRepository;
 
-  ProfileViewModel({
+  NotificationViewModel({
     required AuthRepository authRepository,
     required UserRepository userRepository,
 
@@ -130,6 +130,23 @@ class ProfileViewModel extends GetxController {
       unreadMessages.clear(); // RxList 초기화
     } catch (e) {
       // errorMessage.value = '메시지 삭제 실패: $e';
+    }
+  }
+
+  String formatNotificationTime(DateTime time) {
+    final now = DateTime.now();
+    final difference = now.difference(time);
+
+    if (difference.inMinutes < 1) {
+      return '방금 전';
+    } else if (difference.inHours < 1) {
+      return '${difference.inMinutes}분 전';
+    } else if (difference.inDays < 1) {
+      return '${difference.inHours}시간 전';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays}일 전';
+    } else {
+      return '${time.year}년 ${time.month}월 ${time.day}일';
     }
   }
 }

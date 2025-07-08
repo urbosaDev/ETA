@@ -12,7 +12,7 @@ import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/%08
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/bottom_nav_view_model.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/profile/profile_view_model.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/notification/notification_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/setting/setting_view_model.dart';
 
 class BottomNavBinding extends Bindings {
@@ -50,7 +50,7 @@ class BottomNavBinding extends Bindings {
     Get.put(AddFriendViewModel(userRepository: Get.find<UserRepository>()));
 
     Get.put(
-      ProfileViewModel(
+      NotificationViewModel(
         userRepository: Get.find<UserRepository>(),
         authRepository: Get.find<AuthRepository>(),
         groupRepository: Get.find<GroupRepository>(),

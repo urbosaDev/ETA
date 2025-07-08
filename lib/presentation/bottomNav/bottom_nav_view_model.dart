@@ -29,6 +29,6 @@ class BottomNavViewModel extends GetxController {
   }
 
   void requestGoToHome() {
-    changeIndex(0); // 홈 탭으로 전환
+    changeIndex(0);
   }
 }
