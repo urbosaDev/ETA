@@ -8,30 +8,32 @@ class PromiseLogTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: Column(
         children: [
           Center(
             child: Text(
               DateFormat('yyyy.MM.dd HH:mm').format(promise.time),
-              style: const TextStyle(color: Colors.grey, fontSize: 13),
+              style: textTheme.bodySmall?.copyWith(color: Colors.grey[500]),
             ),
           ),
-          const SizedBox(height: 12),
-
+          const SizedBox(height: 8),
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
             width: double.infinity,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              color: const Color(0xff1a1a1a),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white12, width: 0.5),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
+                  color: Colors.black.withOpacity(0.2),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -40,19 +42,19 @@ class PromiseLogTile extends StatelessWidget {
               children: [
                 Text(
                   promise.name,
-                  style: const TextStyle(
-                    fontSize: 18,
+                  style: textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 Text(
                   promise.location.placeName,
-                  style: const TextStyle(fontSize: 14),
+                  style: textTheme.bodySmall?.copyWith(color: Colors.white70),
                 ),
                 Text(
                   promise.location.address,
-                  style: const TextStyle(fontSize: 13, color: Colors.grey),
+                  style: textTheme.bodySmall?.copyWith(color: Colors.grey[500]),
                 ),
               ],
             ),

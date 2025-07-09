@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise_log/component/promise_log_tile.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise_log/promise_log_view_model.dart';
+import 'package:what_is_your_eta/presentation/core/loading/common_loading_lottie.dart';
 
 class PromiseLogView extends GetView<PromiseLogViewModel> {
   const PromiseLogView({super.key});
@@ -14,7 +15,7 @@ class PromiseLogView extends GetView<PromiseLogViewModel> {
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CommonLoadingLottie());
           }
 
           if (controller.endPromises.isEmpty) {

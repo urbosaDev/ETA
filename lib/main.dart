@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,7 @@ void _setupApnsTokenDebug() async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Background Handler 등록
@@ -155,19 +156,18 @@ class MyApp extends StatelessWidget {
               context,
             ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
 
-            // 버튼 배경색
             backgroundColor: Colors.pinkAccent,
 
             foregroundColor: Colors.white,
-            // 버튼 패딩
+
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            // 버튼 모양 (둥근 모서리)
+
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20), // 8픽셀 둥근 모서리
+              borderRadius: BorderRadius.circular(20),
             ),
-            // 그림자 색상
+
             shadowColor: Colors.black.withOpacity(0.5),
-            // 그림자 높이
+
             elevation: 5,
           ),
         ),

@@ -8,8 +8,9 @@ import 'package:what_is_your_eta/data/model/user_model.dart';
 class MessageBubble extends StatelessWidget {
   final MessageModel msg;
   final bool isMe;
-  final UserModel? sender; // nullable로 변경
+  final UserModel? sender;
   final VoidCallback onUserTap;
+
   const MessageBubble({
     super.key,
     required this.msg,
@@ -20,50 +21,52 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     switch (msg.type) {
       case MessageType.text:
-        return _buildTextBubble();
+        return _buildTextBubble(context, textTheme);
       case MessageType.system:
-        return _buildSystemBubble(); // sender 없어도 됨
+        return _buildSystemBubble(textTheme);
       case MessageType.location:
-        return _buildLocationBubble();
+        return _buildLocationBubble(context, textTheme);
     }
   }
 
-  Widget _buildTextBubble() {
-    if (sender == null) return const SizedBox();
+  Widget _buildTextBubble(BuildContext context, TextTheme textTheme) {
+    if (sender == null && !isMe) return const SizedBox();
 
     final bubbleColor =
         isMe
-            ? const Color(0xFF333333).withOpacity(0.95) // 내가 보낸 메시지 (더 진하게)
-            : const Color(0xFF222222).withOpacity(0.75);
+            ? Theme.of(context).elevatedButtonTheme.style?.backgroundColor
+                    ?.resolve({})
+                    ?.withOpacity(0.9) ??
+                Colors.pinkAccent.withOpacity(0.9)
+            : const Color(0xFF222222).withOpacity(0.9);
 
     final textColor = Colors.white;
 
-    final screenWidth =
-        MediaQueryData.fromView(WidgetsBinding.instance.window).size.width;
-    final maxWidth = screenWidth * 0.7;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final maxWidth = screenWidth * 0.75;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment:
             isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
-          /// ❌ isMe일 때는 프로필, 닉네임 없이 말풍선만
           if (!isMe) ...[
             GestureDetector(
               onTap: onUserTap,
               child: CircleAvatar(
-                radius: 16,
+                radius: 12,
                 backgroundImage: NetworkImage(sender!.photoUrl),
+                backgroundColor: Colors.grey[700],
               ),
             ),
             const SizedBox(width: 8),
           ],
-
-          /// 채팅 내용 (isMe에 따라 이름/프로필 포함 여부 달라짐)
           Flexible(
             child: Column(
               crossAxisAlignment:
@@ -74,15 +77,14 @@ class MessageBubble extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 2),
                     child: Text(
                       sender!.name,
-                      style: const TextStyle(
-                        fontSize: 13,
+                      style: textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Colors.white70,
                       ),
                     ),
                   ),
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(10),
                   constraints: BoxConstraints(maxWidth: maxWidth),
                   decoration: BoxDecoration(
                     color: bubbleColor,
@@ -90,8 +92,7 @@ class MessageBubble extends StatelessWidget {
                   ),
                   child: Text(
                     msg.text,
-                    style: TextStyle(
-                      fontSize: 14,
+                    style: textTheme.bodySmall?.copyWith(
                       color: textColor,
                       height: 1.4,
                     ),
@@ -105,16 +106,15 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
-  Widget _buildSystemBubble() {
+  Widget _buildSystemBubble(TextTheme textTheme) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: Center(
         child: Text(
           msg.text,
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: textTheme.bodySmall?.copyWith(
             color: Colors.grey,
-            fontSize: 12,
             fontStyle: FontStyle.italic,
           ),
         ),
@@ -122,93 +122,114 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
-  Widget _buildLocationBubble() {
+  Widget _buildLocationBubble(BuildContext context, TextTheme textTheme) {
     if (sender == null) return const SizedBox();
 
     final locationMsg = msg as LocationMessageModel;
-    final maxWidth =
-        MediaQueryData.fromView(WidgetsBinding.instance.window).size.width *
-        0.8;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final maxWidth = screenWidth * 0.75;
 
     return Align(
-      alignment: Alignment.center,
-      child: Column(
-        children: [
-          Text(
-            '${sender!.name}님이 현재 위치를 공유하셨습니다.',
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.white70,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Container(
-            constraints: BoxConstraints(maxWidth: maxWidth),
-            margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white30),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-
-              children: [
-                const SizedBox(height: 4),
-                Text(
-                  '주소: ${locationMsg.location.address}',
-                  style: const TextStyle(fontSize: 13, color: Colors.white70),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  locationMsg.text,
-                  style: const TextStyle(fontSize: 13, color: Colors.white70),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '시간: ${_formatDateTime(locationMsg.sentAt)}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontStyle: FontStyle.italic,
-                    color: Colors.white60,
+      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        child: Column(
+          crossAxisAlignment:
+              isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
+            if (!isMe)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: Text(
+                  sender!.name,
+                  style: textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white70,
                   ),
                 ),
-                const SizedBox(height: 8),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: SizedBox(
-                    height: 150,
-                    child: NaverMap(
-                      options: NaverMapViewOptions(
-                        initialCameraPosition: NCameraPosition(
-                          target: NLatLng(
-                            locationMsg.location.latitude,
-                            locationMsg.location.longitude,
-                          ),
-                          zoom: 16,
-                        ),
-                        indoorEnable: false,
-                        locationButtonEnable: false,
-                        scaleBarEnable: false,
-                      ),
-                      onMapReady: (controller) async {
-                        final marker = NMarker(
-                          id:
-                              'location_marker_${DateTime.now().millisecondsSinceEpoch}',
-                          position: NLatLng(
-                            locationMsg.location.latitude,
-                            locationMsg.location.longitude,
-                          ),
-                        );
-                        controller.addOverlay(marker);
-                      },
+              ),
+            Container(
+              constraints: BoxConstraints(maxWidth: maxWidth),
+              margin: const EdgeInsets.only(top: 4),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color:
+                    isMe
+                        ? Theme.of(context)
+                                .elevatedButtonTheme
+                                .style
+                                ?.backgroundColor
+                                ?.resolve({})
+                                ?.withOpacity(0.9) ??
+                            Colors.pinkAccent.withOpacity(0.9)
+                        : const Color(0xFF222222).withOpacity(0.9),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${sender!.name}님이 현재 위치를 공유하셨습니다.',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: Colors.white70,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    '주소: ${locationMsg.location.address}',
+                    style: textTheme.bodySmall?.copyWith(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    locationMsg.text,
+                    style: textTheme.bodySmall?.copyWith(color: Colors.white),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '시간: ${_formatDateTime(locationMsg.sentAt)}',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: Colors.grey[500],
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: SizedBox(
+                      height: 120,
+                      child: NaverMap(
+                        options: NaverMapViewOptions(
+                          initialCameraPosition: NCameraPosition(
+                            target: NLatLng(
+                              locationMsg.location.latitude,
+                              locationMsg.location.longitude,
+                            ),
+                            zoom: 16,
+                          ),
+                          indoorEnable: false,
+                          locationButtonEnable: false,
+                          scaleBarEnable: false,
+                        ),
+                        onMapReady: (controller) {
+                          final marker = NMarker(
+                            id:
+                                'location_marker_${DateTime.now().millisecondsSinceEpoch}',
+                            position: NLatLng(
+                              locationMsg.location.latitude,
+                              locationMsg.location.longitude,
+                            ),
+                          );
+                          controller.addOverlay(marker);
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -18,6 +18,8 @@ import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise_lo
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise_log/promise_log_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view_model.dart';
+import 'package:what_is_your_eta/presentation/core/loading/common_loading_lottie.dart';
+import 'package:what_is_your_eta/presentation/core/widget/%08user_card.dart';
 import 'package:what_is_your_eta/presentation/core/widget/select_friend_dialog.dart';
 import 'package:what_is_your_eta/presentation/user_profile/user_profile_view.dart';
 import 'package:what_is_your_eta/presentation/user_profile/user_profile_view_model.dart';
@@ -29,27 +31,143 @@ class GroupView extends GetView<GroupViewModel> {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<GroupViewModel>(tag: groupTag);
+    final textTheme = Theme.of(context).textTheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return SafeArea(
       child: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CommonLoadingLottie()); // 로딩 인디케이터 통일
         }
 
         final data = controller.groupModel.value;
         if (data == null) {
-          return const Center(child: Text('그룹 정보를 불러올 수 없습니다.'));
+          return Center(
+            child: Text('그룹 정보를 불러올 수 없습니다.', style: textTheme.bodyMedium),
+          ); // 폰트 스타일 적용
         }
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return Padding(
+          padding: const EdgeInsets.all(16.0), // 전체 패딩
+          child: SingleChildScrollView(
+            // 스크롤 가능하게
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                // 그룹 정보 헤더 (그룹 이름, 그룹장, 더보기 버튼)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center, // 상단 정렬
                   children: [
-                    Text(data.title, style: const TextStyle(fontSize: 20)),
+                    Expanded(
+                      child: Text(
+                        data.title,
+                        style: textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    PopupMenuButton<String>(
+                      onSelected: (value) {
+                        if (value == 'delete') {
+                          controller.deleteGroup();
+                        } else if (value == 'leave') {
+                          controller.leaveGroup();
+                        }
+                      },
+                      itemBuilder:
+                          (context) => [
+                            if (controller.isMyGroup) ...[
+                              PopupMenuItem(
+                                value: 'delete',
+                                child: Text(
+                                  '그룹 삭제',
+                                  style: textTheme.bodyMedium,
+                                ), // 폰트 스타일
+                              ),
+                            ] else ...[
+                              PopupMenuItem(
+                                value: 'leave',
+                                child: Text(
+                                  '그룹 나가기',
+                                  style: textTheme.bodyMedium,
+                                ), // 폰트 스타일
+                              ),
+                            ],
+                          ],
+                      icon: const Icon(
+                        Icons.more_vert,
+                        color: Colors.white70,
+                      ), // 아이콘 색상
+                      color: const Color(0xff1a1a1a), // 팝업 메뉴 배경색
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Align(
+                  alignment: Alignment.center,
+                  child: GestureDetector(
+                    onTap: () {
+                      Get.dialog(
+                        SelectFriendDialog(
+                          friendList: controller.validFriends.obs,
+                          selectedFriends: controller.selectedFriends,
+                          toggleFriend: controller.toggleFriend,
+                          disabledUids:
+                              controller.memberList
+                                  .map((u) => u.userModel.uid)
+                                  .toList(),
+                          confirmText: '초대하기',
+                          onConfirm: () {
+                            controller.invite();
+                            Get.back();
+                          },
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Color(0xff1a1a1a),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.person_add,
+                            color: Color(0xffa8216b),
+                            size: 18,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            "친구 초대하기",
+                            style: textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xffa8216b),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const Divider(color: Colors.white12, thickness: 0.2), // 구분선
+                const SizedBox(height: 16),
+
+                Row(
+                  children: [
+                    Text(
+                      '구성원',
+                      style: textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Spacer(),
                     Obx(() {
                       final leader = controller.leaderModel.value;
                       final isUnknown = leader?.uniqueId == 'unknown';
@@ -61,204 +179,230 @@ class GroupView extends GetView<GroupViewModel> {
                               leaderUid: controller.currentUser!,
                             );
                           },
-
-                          child: const Text('👑 내가 할래요'),
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero, // 패딩 제거
+                            alignment: Alignment.centerLeft, // 왼쪽 정렬
+                            tapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap, // 터치 영역 최소화
+                          ),
+                          child: Text(
+                            '👑 내가 할래요',
+                            style: textTheme.bodySmall?.copyWith(
+                              color: Colors.blueAccent,
+                            ),
+                          ), // 폰트 스타일
                         );
                       }
 
-                      return Text('그룹장 : ${leader?.name ?? '정보 없음'}');
+                      return Text(
+                        '그룹장: ${leader?.name ?? '정보 없음'}',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: Colors.amber,
+                        ),
+                      ); // 그룹장 이름 스타일
                     }),
                   ],
                 ),
-                Align(
-                  alignment: Alignment.centerRight,
-
-                  child: PopupMenuButton<String>(
-                    onSelected: (value) {
-                      if (value == 'delete') {
-                        controller.deleteGroup();
-                      } else if (value == 'leave') {
-                        controller.leaveGroup();
-                      }
-                    },
-                    itemBuilder:
-                        (context) => [
-                          if (controller.isMyGroup) ...[
-                            const PopupMenuItem(
-                              value: 'delete',
-                              child: Text('그룹 삭제'),
-                            ),
-                          ] else ...[
-                            const PopupMenuItem(
-                              value: 'leave',
-                              child: Text('그룹 나가기'),
-                            ),
-                          ],
-                        ],
-                    icon: const Icon(Icons.more_vert),
+                const SizedBox(height: 8),
+                Container(
+                  height: screenWidth * 0.25, // 화면 너비에 비례하는 높이
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xff1a1a1a),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white12, width: 0.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        spreadRadius: 1,
+                        blurRadius: 3,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
+                  child: groupMemberList(
+                    context,
+                    controller,
+                    textTheme,
+                    screenWidth,
+                  ), // context, textTheme, screenWidth 전달
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            GestureDetector(
-              onTap: () {
-                Get.dialog(
-                  SelectFriendDialog(
-                    friendList: controller.validFriends.obs,
-                    selectedFriends: controller.selectedFriends,
-                    toggleFriend: controller.toggleFriend,
-                    disabledUids:
-                        controller.memberList
-                            .map((u) => u.userModel.uid)
-                            .toList(),
-                    confirmText: '초대하기',
-                    onConfirm: () {
-                      controller.invite();
-                      Get.back();
-                    },
-                  ),
-                );
-              },
-              child: const Text('친구 초대하기'),
-            ),
-            const SizedBox(height: 8),
-            const Text('구성원'),
-            Container(
-              height: 100,
-              color: Colors.indigo,
-              child: groupMemberList(controller),
-            ),
+                const SizedBox(height: 24),
 
-            const SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                Get.to(
-                  () => LoungeInGroupView(),
-                  arguments: controller.group.id,
-                  binding: BindingsBuilder(() {
-                    Get.put(
-                      LoungeInGroupViewModel(
-                        authRepository: Get.find<AuthRepository>(),
-                        userRepository: Get.find<UserRepository>(),
-                        groupRepository: Get.find<GroupRepository>(),
-                        groupId: controller.group.id,
-                      ),
+                GestureDetector(
+                  onTap: () {
+                    Get.to(
+                      () => LoungeInGroupView(),
+                      arguments: controller.group.id,
+                      binding: BindingsBuilder(() {
+                        Get.put(
+                          LoungeInGroupViewModel(
+                            authRepository: Get.find<AuthRepository>(),
+                            userRepository: Get.find<UserRepository>(),
+                            groupRepository: Get.find<GroupRepository>(),
+                            groupId: controller.group.id,
+                          ),
+                        );
+                      }),
                     );
-                  }),
-                );
-              },
-              child: Container(
-                height: 50,
-                color: Colors.amber,
-                child: Center(child: const Text('속닥속닥 라운지')),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-            const Text('현재 진행중인 약속'),
-            const SizedBox(height: 12),
-
-            Obx(() {
-              final promise = controller.currentPromise.value;
-
-              if (promise != null) {
-                return GestureDetector(
-                  onTap:
-                      controller.isParticipating.value
-                          ? () {
-                            // 정상 참여중이면 이동
-                            Get.to(
-                              () => PromiseView(),
-                              binding: BindingsBuilder(() {
-                                Get.put(
-                                  PromiseViewModel(promiseId: promise.id),
-                                );
-                              }),
-                            );
-                          }
-                          : null, // 참여중이 아니면 onTap 없음
+                  },
                   child: Container(
-                    margin: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 16,
-                    ),
-                    padding: const EdgeInsets.all(16),
+                    height: 40, // 높이 조정
+                    width: double.infinity,
                     decoration: BoxDecoration(
-                      color:
-                          controller.isParticipating.value
-                              ? Colors.white
-                              : Colors.grey.shade300,
+                      color: const Color(0xff1a1a1a),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color:
-                            controller.isParticipating.value
-                                ? Colors.blue
-                                : Colors.grey,
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            promise.name,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color:
-                                  controller.isParticipating.value
-                                      ? Colors.black
-                                      : Colors.grey.shade600,
-                            ),
-                          ),
+                      border: Border.all(color: Color(0xffa8216b), width: 0.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          spreadRadius: 1,
+                          blurRadius: 3,
+                          offset: const Offset(0, 2),
                         ),
-                        if (!controller.isParticipating.value)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.red.shade100,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text(
-                              '미참여',
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
                       ],
                     ),
+                    child: Center(
+                      child: Text(
+                        '그룹 채팅 채널',
+                        style: textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ), // 폰트 스타일
+                    ),
                   ),
-                );
-              } else {
-                return const Text('약속이 없습니다.');
-              }
-            }),
+                ),
+                const SizedBox(height: 24),
 
-            Row(
-              children: [
-                // 왼쪽: 약속 추가하러 가기
-                Flexible(
-                  flex: 1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(bottom: 8.0),
-                        child: Text(
-                          '약속 추가하러 가기',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                // 현재 진행중인 약속 섹션
+                Text(
+                  '현재 진행중인 약속',
+                  style: textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Obx(() {
+                  final promise = controller.currentPromise.value;
+
+                  if (promise != null) {
+                    return GestureDetector(
+                      onTap:
+                          controller.isParticipating.value
+                              ? () {
+                                Get.to(
+                                  () => PromiseView(),
+                                  binding: BindingsBuilder(() {
+                                    Get.put(
+                                      PromiseViewModel(promiseId: promise.id),
+                                    );
+                                  }),
+                                );
+                              }
+                              : null,
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color:
+                              controller.isParticipating.value
+                                  ? const Color(0xff1a1a1a) // 참여 중일 때 배경
+                                  : Colors.grey[900], // 미참여일 때 더 어두운 배경
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color:
+                                controller.isParticipating.value
+                                    ? Colors.blueAccent.withOpacity(
+                                      0.5,
+                                    ) // 참여 중일 때 테두리
+                                    : Colors.grey[700]!, // 미참여일 때 테두리
+                            width: 1,
                           ),
+                          boxShadow: [
+                            // 그림자
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          // 약속 이름, 시간, 장소 등을 표시할 수 있는 Column
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    promise.name, // 약속 이름
+                                    style: textTheme.bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color:
+                                          controller.isParticipating.value
+                                              ? Colors.white
+                                              : Colors.grey[500],
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (!controller.isParticipating.value)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      '미참여',
+                                      style: textTheme.bodySmall?.copyWith(
+                                        color: Colors.redAccent,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            // 약속 시간 표시 (promise.time을 적절히 포맷)
+                            Text(
+                              '시간: ${promise.time.year}년 ${promise.time.month}월 ${promise.time.day}일 ${promise.time.hour}시 ${promise.time.minute}분',
+                              style: textTheme.bodySmall?.copyWith(
+                                color: Colors.grey[500],
+                              ),
+                            ),
+                            // 약속 장소 표시 (promise.location.placeName)
+                            Text(
+                              '장소: ${promise.location.placeName}',
+                              style: textTheme.bodySmall?.copyWith(
+                                color: Colors.grey[500],
+                              ),
+                            ),
+                            // 기타 약속 정보 추가 가능
+                          ],
                         ),
                       ),
-                      GestureDetector(
+                    );
+                  } else {
+                    return Text(
+                      '약속이 없습니다.',
+                      style: textTheme.bodySmall?.copyWith(color: Colors.grey),
+                    );
+                  }
+                }),
+                const SizedBox(height: 24),
+
+                // 약속 추가/로그보기 버튼 Row
+                Row(
+                  children: [
+                    // 약속 추가하러 가기
+                    Expanded(
+                      child: GestureDetector(
                         onTap:
                             controller.isPromiseExisted.value
                                 ? null
@@ -284,18 +428,32 @@ class GroupView extends GetView<GroupViewModel> {
                                 },
                         child: Container(
                           padding: const EdgeInsets.all(16),
-                          height: 150,
+                          height: 120, // 높이 고정
                           decoration: BoxDecoration(
                             color:
                                 controller.isPromiseExisted.value
-                                    ? Colors.grey.shade300
-                                    : Colors.blue,
+                                    ? Colors.grey[900] // 비활성화 색상
+                                    : Theme.of(context)
+                                            .elevatedButtonTheme
+                                            .style
+                                            ?.backgroundColor
+                                            ?.resolve({})
+                                            ?.withOpacity(0.9) ??
+                                        Colors.pinkAccent.withOpacity(0.9),
                             borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color:
+                                  controller.isPromiseExisted.value
+                                      ? Colors
+                                          .white12 // 비활성화 테두리
+                                      : Colors.white24, // 활성화 테두리
+                              width: 0.5,
+                            ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black26,
+                                color: Colors.black.withOpacity(0.2),
                                 blurRadius: 4,
-                                offset: Offset(0, 2),
+                                offset: const Offset(0, 2),
                               ),
                             ],
                           ),
@@ -303,13 +461,12 @@ class GroupView extends GetView<GroupViewModel> {
                             child: Text(
                               controller.isPromiseExisted.value
                                   ? '현재 진행중인 약속을 마감해야\n새로운 약속을 추가할 수 있어요'
-                                  : '약속을 추가하러 가기',
-                              style: TextStyle(
+                                  : '약속 추가하러 가기',
+                              style: textTheme.bodySmall?.copyWith(
                                 color:
                                     controller.isPromiseExisted.value
-                                        ? Colors.grey.shade700
+                                        ? Colors.grey[600]
                                         : Colors.white,
-                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
                               textAlign: TextAlign.center,
@@ -317,28 +474,11 @@ class GroupView extends GetView<GroupViewModel> {
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-
-                // 오른쪽: 예전 약속들이 궁금하다면
-                Flexible(
-                  flex: 1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(bottom: 8.0),
-                        child: Text(
-                          '약속 log보기',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
+                    ),
+                    const SizedBox(width: 16), // 버튼 사이 간격
+                    // 약속 log보기
+                    Expanded(
+                      child: GestureDetector(
                         onTap: () {
                           Get.to(
                             () => const PromiseLogView(),
@@ -356,24 +496,24 @@ class GroupView extends GetView<GroupViewModel> {
                         },
                         child: Container(
                           padding: const EdgeInsets.all(16),
-                          height: 150,
+                          height: 120,
                           decoration: BoxDecoration(
-                            color: Colors.green.shade400,
+                            color: const Color(0xff1a1a1a),
                             borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.green, width: 0.5),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black26,
+                                color: Colors.black.withOpacity(0.2),
                                 blurRadius: 4,
-                                offset: Offset(0, 2),
+                                offset: const Offset(0, 2),
                               ),
                             ],
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Text(
                               '지난 약속 목록 보기',
-                              style: TextStyle(
+                              style: textTheme.bodySmall?.copyWith(
                                 color: Colors.white,
-                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
                               textAlign: TextAlign.center,
@@ -381,122 +521,186 @@ class GroupView extends GetView<GroupViewModel> {
                           ),
                         ),
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24), // 버튼 섹션 하단 간격
+                // 약속 마감하기 버튼
+                SizedBox(
+                  // 버튼 중앙 정렬
+                  width: double.infinity, // 너비 최대로
+                  child: ElevatedButton(
+                    onPressed:
+                        controller.isMyGroup &&
+                                controller.currentPromise.value != null
+                            ? () {
+                              Get.dialog(
+                                _buildEndPromiseDialog(
+                                  context, // context 전달
+                                  onConfirm: () {
+                                    controller.endPromise();
+                                    Get.back();
+                                  },
+                                ),
+                              );
+                            }
+                            : null,
+                    style: Theme.of(
+                      context,
+                    ).elevatedButtonTheme.style?.copyWith(
+                      backgroundColor:
+                          MaterialStateProperty.resolveWith<Color?>((
+                            Set<MaterialState> states,
+                          ) {
+                            if (states.contains(MaterialState.disabled)) {
+                              return Colors.grey[800]?.withOpacity(0.4);
+                            }
+                            // 그룹장이고 약속이 있을 때만 활성화 (레드 계열로 강조)
+                            return Colors.redAccent;
+                          }),
+                    ),
+                    child: Text(
+                      '현재 약속 마감하기',
+                      style: textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
-              ],
-            ),
-            Column(
-              children: [
-                ElevatedButton(
-                  onPressed:
-                      controller.isMyGroup &&
-                              controller.currentPromise.value != null
-                          ? () {
-                            Get.dialog(
-                              _buildEndPromiseDialog(
-                                onConfirm: () {
-                                  controller.endPromise();
-                                  Get.back(); // 다이얼로그 닫기
-                                },
-                              ),
-                            );
-                          }
-                          : null, // 그룹장이 아니면 버튼 비활성화
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        controller.isMyGroup
-                            ? Colors.blue
-                            : Colors.grey.shade400,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('현재 약속 마감하기'),
+                const SizedBox(height: 8), // 버튼 아래 간격
+                Text(
+                  '약속 마감은 그룹장만 진행할 수 있어요.',
+                  style: textTheme.bodySmall?.copyWith(color: Colors.grey[500]),
+                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 4),
-                const Text('약속 마감은 그룹장만 진행할 수 있어요.'),
+                const SizedBox(height: 16), // 가장 하단 여백
               ],
             ),
-          ],
+          ),
         );
       }),
     );
   }
 
-  Widget _buildEndPromiseDialog({required VoidCallback onConfirm}) {
+  // groupMemberList 함수도 GroupView 내부에 정의하고 매개변수 추가
+  Widget groupMemberList(
+    BuildContext context,
+    GroupViewModel controller,
+    TextTheme textTheme,
+    double screenWidth,
+  ) {
+    return Obx(() {
+      final members = controller.memberList;
+      if (members.isEmpty) {
+        return Center(
+          child: Text(
+            '구성원이 없습니다.',
+            style: textTheme.bodySmall?.copyWith(color: Colors.white70),
+          ),
+        );
+      }
+
+      final currentUid = controller.currentUser;
+
+      return SingleChildScrollView(
+        // 가로 스크롤 가능하게
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 8.0,
+        ), // 패딩 조정
+        child: Row(
+          children:
+              members.map((member) {
+                final isSelf = member.userModel.uid == currentUid;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 12), // 카드 간 간격
+                  child: GestureDetector(
+                    onTap: () {
+                      Get.to(
+                        () => const UserProfileView(),
+                        fullscreenDialog: true,
+                        transition: Transition.downToUp,
+                        binding: BindingsBuilder(() {
+                          Get.put(
+                            UserProfileViewModel(
+                              userRepository: Get.find<UserRepository>(),
+                              authRepository: Get.find<AuthRepository>(),
+                              chatRepository: Get.find<ChatRepository>(),
+                              targetUserUid: member.userModel.uid,
+                            ),
+                          );
+                        }),
+                      );
+                    },
+                    child: Opacity(
+                      opacity: isSelf ? 0.6 : 1.0, // 본인은 반투명하게 (좀 더 명확하게)
+                      child: UserSquareCard(
+                        // UserSquareCard 재활용
+                        user: member.userModel,
+                        size: screenWidth * 0.16, // 화면 너비에 비례하는 크기
+                        borderColor:
+                            controller.leaderModel.value?.uid ==
+                                    member.userModel.uid
+                                ? Colors.amber
+                                : Colors.transparent, // 그룹장 표시 (예시)
+                        borderWidth:
+                            controller.leaderModel.value?.uid ==
+                                    member.userModel.uid
+                                ? 2.0
+                                : 0.0,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+        ),
+      );
+    });
+  }
+
+  // _buildEndPromiseDialog 함수도 context, textTheme 전달받도록 변경
+  Widget _buildEndPromiseDialog(
+    BuildContext context, {
+    required VoidCallback onConfirm,
+  }) {
+    final textTheme = Theme.of(context).textTheme;
     return AlertDialog(
-      title: const Text('약속 마감'),
-      content: const Text(
+      title: Text(
+        '약속 마감',
+        style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+      ),
+      content: Text(
         '현재 진행중인 약속을 마감하시겠어요? \n 진행되지 않은 약속은 삭제됩니다. \n진행된 약속은 기록으로 볼 수 있어요',
+        style: textTheme.bodySmall,
       ),
       actions: [
         TextButton(
           onPressed: () {
-            Get.back(); // 아니오: 그냥 닫기
+            Get.back();
           },
-          child: const Text('아니오'),
+          child: Text(
+            '아니오',
+            style: textTheme.bodyMedium?.copyWith(color: Colors.white70),
+          ),
         ),
-        ElevatedButton(onPressed: onConfirm, child: const Text('네')),
+        ElevatedButton(
+          onPressed: onConfirm,
+          style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
+            backgroundColor: MaterialStateProperty.all(
+              Colors.redAccent,
+            ), // 강조 색상
+          ),
+          child: Text(
+            '네',
+            style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+        ),
       ],
+      backgroundColor: const Color(0xff1a1a1a), // 배경색 통일
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ), // 둥근 모서리
     );
   }
-}
-
-Widget groupMemberList(GroupViewModel controller) {
-  return Obx(() {
-    final members = controller.memberList;
-    if (members.isEmpty) {
-      return const Text('구성원이 없습니다.');
-    }
-
-    final currentUid = controller.currentUser;
-
-    return SizedBox(
-      height: 80,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: members.length,
-        itemBuilder: (context, index) {
-          final user = members[index];
-          final isSelf = user.userModel.uid == currentUid;
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: GestureDetector(
-              onTap: () {
-                Get.to(
-                  () => const UserProfileView(),
-                  fullscreenDialog: true,
-                  transition: Transition.downToUp,
-                  binding: BindingsBuilder(() {
-                    Get.put(
-                      UserProfileViewModel(
-                        userRepository: Get.find<UserRepository>(),
-                        authRepository: Get.find<AuthRepository>(),
-                        chatRepository: Get.find<ChatRepository>(),
-                        targetUserUid: user.userModel.uid,
-                      ),
-                    );
-                  }),
-                );
-              },
-              child: Opacity(
-                opacity: isSelf ? 0.4 : 1.0, // 본인은 반투명하게
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      backgroundImage: NetworkImage(user.userModel.photoUrl),
-                    ),
-                    Text(
-                      user.userModel.name,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  });
 }

@@ -6,6 +6,8 @@ class UserSquareCard extends StatelessWidget {
   final double size;
   final double borderRadius;
   final VoidCallback? onTap;
+  final Color? borderColor;
+  final double borderWidth;
 
   const UserSquareCard({
     super.key,
@@ -13,6 +15,8 @@ class UserSquareCard extends StatelessWidget {
     this.size = 70.0,
     this.borderRadius = 8.0,
     this.onTap,
+    this.borderColor = Colors.transparent, // 기본값 투명
+    this.borderWidth = 0.0, // 기본값 0
   });
 
   @override
@@ -27,7 +31,10 @@ class UserSquareCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.grey[800],
           borderRadius: BorderRadius.circular(borderRadius),
-          border: Border.all(color: Colors.white12, width: 0.5),
+          border: Border.all(
+            color: borderColor!,
+            width: borderWidth,
+          ), // 동적으로 설정된 테두리 사용
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
@@ -50,7 +57,6 @@ class UserSquareCard extends StatelessWidget {
               backgroundColor: Colors.grey[700],
             ),
             SizedBox(height: size * 0.05),
-
             Text(
               user.name,
               textAlign: TextAlign.center,

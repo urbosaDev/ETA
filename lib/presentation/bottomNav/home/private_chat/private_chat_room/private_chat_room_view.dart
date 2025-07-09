@@ -6,6 +6,7 @@ import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view_model.dart';
+import 'package:what_is_your_eta/presentation/core/loading/common_loading_lottie.dart';
 import 'package:what_is_your_eta/presentation/core/widget/chat/chat_input_box.dart';
 import 'package:what_is_your_eta/presentation/core/widget/chat/chat_message_bubble.dart';
 
@@ -35,6 +36,8 @@ class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (controller.shouldScrollToBottom.value &&
           scrollController.hasClients) {
@@ -46,26 +49,39 @@ class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
         controller.shouldScrollToBottom.value = false;
       }
     });
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        titleSpacing: 0,
         title: Obx(() {
           final friend = controller.friendModel.value;
-          if (friend == null) return const Text('로딩 중...');
+          if (friend == null) {
+            return Text('로딩 중...', style: textTheme.bodyMedium);
+          }
 
           return Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () {
                   Get.offAllNamed('/main');
                 },
               ),
               const SizedBox(width: 8),
-              CircleAvatar(backgroundImage: NetworkImage(friend.photoUrl)),
+              CircleAvatar(
+                radius: 16,
+                backgroundImage: NetworkImage(friend.photoUrl),
+                backgroundColor: Colors.grey[700],
+              ),
               const SizedBox(width: 8),
-              Text(friend.name),
+              Text(
+                friend.name,
+                style: textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           );
         }),
@@ -79,7 +95,7 @@ class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
                 final msgs = controller.messages;
                 final friend = controller.friendModel.value;
                 if (friend == null) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CommonLoadingLottie());
                 }
 
                 final userMap = {
@@ -143,7 +159,13 @@ class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
                                   vertical: 12,
                                 ),
                                 child: Center(
-                                  child: CircularProgressIndicator(),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      textTheme.bodyMedium?.color ??
+                                          Colors.white,
+                                    ),
+                                  ),
                                 ),
                               ),
                             )

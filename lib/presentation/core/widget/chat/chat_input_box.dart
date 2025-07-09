@@ -13,31 +13,28 @@ class ChatInputBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF111111), // 디코 배경색
+      color: const Color(0xFF111111),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 구분선
-          Container(height: 1, color: Color(0xFFA8216B).withOpacity(0.5)),
+          Container(height: 1, color: const Color(0xFFA8216B).withOpacity(0.5)),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
               child: Row(
                 children: [
-                  // 텍스트 입력창
                   Expanded(
                     child: TextField(
+                      keyboardAppearance: Brightness.dark,
                       controller: controller,
-                      style: const TextStyle(
-                        color: Colors.white, // 입력 텍스트 색
-                      ),
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: '메세지를 입력하세요',
                         hintStyle: TextStyle(
-                          color: Color(
-                            0xFFA8216B,
-                          ).withOpacity(0.5), // placeholder 색상
+                          color: const Color(0xFFA8216B).withOpacity(0.5),
+                          fontSize: 12,
                         ),
+
                         filled: true,
                         fillColor: const Color(0xFF222222),
                         contentPadding: const EdgeInsets.symmetric(
@@ -45,23 +42,38 @@ class ChatInputBox extends StatelessWidget {
                           vertical: 12,
                         ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.circular(25.0),
+                          borderSide: BorderSide(
+                            color: Color(0xFFA8216B),
+                            width: 0.5,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                          borderSide: BorderSide(
+                            color: Color(0xFFA8216B),
+                            width: 1,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                          borderSide: BorderSide(
+                            color: Color(0xFFA8216B),
+                            width: 1,
+                          ),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.send),
+                          color: const Color(0xFFA8216B).withOpacity(0.5),
+                          onPressed: () {
+                            final msg = controller.text.trim();
+                            if (msg.isNotEmpty) {
+                              onSend(msg);
+                            }
+                          },
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  // 전송 버튼
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    color: const Color(0xFFA8216B).withOpacity(0.5), // 버튼 색상
-                    onPressed: () {
-                      final msg = controller.text.trim();
-                      if (msg.isNotEmpty) {
-                        onSend(msg);
-                      }
-                    },
                   ),
                 ],
               ),
