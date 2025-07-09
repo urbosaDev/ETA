@@ -295,12 +295,15 @@ class GroupViewModel extends GetxController {
         }
         await _groupRepository.deleteGroup(group.id);
       }
+      isDeleteAndLeaveGroup.value = true;
     } catch (e) {
       // 에러 핸들링
     } finally {
       isLoading.value = false;
     }
   }
+
+  final RxBool isDeleteAndLeaveGroup = false.obs;
 
   Future<void> deleteGroup() async {
     if (!isMyGroup) return;
@@ -326,7 +329,7 @@ class GroupViewModel extends GetxController {
 
       // 3. 그룹 삭제
       await _groupRepository.deleteGroup(group.id);
-
+      isDeleteAndLeaveGroup.value = true;
       // 성공 메시지 등 추가 가능
     } finally {
       isLoading.value = false;

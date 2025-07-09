@@ -37,14 +37,19 @@ class GroupView extends GetView<GroupViewModel> {
     return SafeArea(
       child: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CommonLoadingLottie()); // 로딩 인디케이터 통일
+          return const Center(child: CommonLoadingLottie());
         }
 
         final data = controller.groupModel.value;
         if (data == null) {
           return Center(
             child: Text('그룹 정보를 불러올 수 없습니다.', style: textTheme.bodyMedium),
-          ); // 폰트 스타일 적용
+          );
+        }
+        if (controller.isDeleteAndLeaveGroup.value) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Get.offAllNamed('/main');
+          });
         }
 
         return Padding(
@@ -225,7 +230,7 @@ class GroupView extends GetView<GroupViewModel> {
                     controller,
                     textTheme,
                     screenWidth,
-                  ), // context, textTheme, screenWidth 전달
+                  ),
                 ),
                 const SizedBox(height: 24),
 
@@ -582,7 +587,6 @@ class GroupView extends GetView<GroupViewModel> {
     );
   }
 
-  // groupMemberList 함수도 GroupView 내부에 정의하고 매개변수 추가
   Widget groupMemberList(
     BuildContext context,
     GroupViewModel controller,
@@ -603,47 +607,48 @@ class GroupView extends GetView<GroupViewModel> {
       final currentUid = controller.currentUser;
 
       return SingleChildScrollView(
-        // 가로 스크롤 가능하게
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16.0,
-          vertical: 8.0,
-        ), // 패딩 조정
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: Row(
           children:
               members.map((member) {
                 final isSelf = member.userModel.uid == currentUid;
                 return Padding(
-                  padding: const EdgeInsets.only(right: 12), // 카드 간 간격
+                  padding: const EdgeInsets.only(right: 12),
                   child: GestureDetector(
-                    onTap: () {
-                      Get.to(
-                        () => const UserProfileView(),
-                        fullscreenDialog: true,
-                        transition: Transition.downToUp,
-                        binding: BindingsBuilder(() {
-                          Get.put(
-                            UserProfileViewModel(
-                              userRepository: Get.find<UserRepository>(),
-                              authRepository: Get.find<AuthRepository>(),
-                              chatRepository: Get.find<ChatRepository>(),
-                              targetUserUid: member.userModel.uid,
-                            ),
-                          );
-                        }),
-                      );
-                    },
+                    onTap:
+                        isSelf
+                            ? null
+                            : () {
+                              Get.to(
+                                () => const UserProfileView(),
+                                fullscreenDialog: true,
+                                transition: Transition.downToUp,
+                                binding: BindingsBuilder(() {
+                                  Get.put(
+                                    UserProfileViewModel(
+                                      userRepository:
+                                          Get.find<UserRepository>(),
+                                      authRepository:
+                                          Get.find<AuthRepository>(),
+                                      chatRepository:
+                                          Get.find<ChatRepository>(),
+                                      targetUserUid: member.userModel.uid,
+                                    ),
+                                  );
+                                }),
+                              );
+                            },
                     child: Opacity(
-                      opacity: isSelf ? 0.6 : 1.0, // 본인은 반투명하게 (좀 더 명확하게)
+                      opacity: isSelf ? 0.6 : 1.0,
                       child: UserSquareCard(
-                        // UserSquareCard 재활용
                         user: member.userModel,
-                        size: screenWidth * 0.16, // 화면 너비에 비례하는 크기
+                        size: screenWidth * 0.16,
                         borderColor:
                             controller.leaderModel.value?.uid ==
                                     member.userModel.uid
                                 ? Colors.amber
-                                : Colors.transparent, // 그룹장 표시 (예시)
+                                : Colors.transparent,
                         borderWidth:
                             controller.leaderModel.value?.uid ==
                                     member.userModel.uid

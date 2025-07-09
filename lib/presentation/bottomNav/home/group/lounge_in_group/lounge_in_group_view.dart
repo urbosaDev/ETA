@@ -63,11 +63,13 @@ class LoungeInGroupView extends GetView<LoungeInGroupViewModel> {
         ),
         actions: [
           Obx(() {
+            final textTheme =
+                Theme.of(context).textTheme; // TextTheme 인스턴스 가져오기
             final promiseId = controller.currentPromiseId.value;
             final isEnabled = promiseId != null;
 
             return Padding(
-              padding: const EdgeInsets.only(right: 12.0),
+              padding: const EdgeInsets.only(right: 12.0), // 오른쪽 패딩 유지
               child: TextButton(
                 onPressed:
                     isEnabled
@@ -79,12 +81,8 @@ class LoungeInGroupView extends GetView<LoungeInGroupViewModel> {
                             }),
                           );
                         }
-                        : null, // null이면 비활성화됨
+                        : null,
                 style: TextButton.styleFrom(
-                  backgroundColor:
-                      isEnabled ? Colors.blue : Colors.grey.shade300,
-                  foregroundColor:
-                      isEnabled ? Colors.white : Colors.grey.shade600,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 8,
@@ -93,7 +91,16 @@ class LoungeInGroupView extends GetView<LoungeInGroupViewModel> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: Text(isEnabled ? "약속 보기" : "약속 없음"),
+                child: Text(
+                  isEnabled ? "약속 보기" : "약속 없음",
+                  style: textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color:
+                        isEnabled
+                            ? Color(0xFFA8216B).withOpacity(0.7)
+                            : Colors.grey[600],
+                  ),
+                ),
               ),
             );
           }),

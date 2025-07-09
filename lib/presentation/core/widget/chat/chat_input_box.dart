@@ -28,11 +28,13 @@ class ChatInputBox extends StatelessWidget {
                       keyboardAppearance: Brightness.dark,
                       controller: controller,
                       style: const TextStyle(color: Colors.white),
+
                       decoration: InputDecoration(
-                        hintText: '메세지를 입력하세요',
+                        hintText: '@메세지를 입력하세요',
                         hintStyle: TextStyle(
                           color: const Color(0xFFA8216B).withOpacity(0.5),
-                          fontSize: 12,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w900,
                         ),
 
                         filled: true,
