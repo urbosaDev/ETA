@@ -7,6 +7,10 @@ class CommonTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final void Function(String)? onChanged;
   final int? maxLength;
+  final Widget? suffixIcon;
+  final TextStyle? textStyle;
+  final TextStyle? hintStyle;
+  final void Function(String)? onSubmitted;
 
   const CommonTextField({
     super.key,
@@ -16,6 +20,10 @@ class CommonTextField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.onChanged,
     this.maxLength,
+    this.suffixIcon,
+    this.textStyle,
+    this.hintStyle,
+    this.onSubmitted,
   });
 
   @override
@@ -27,14 +35,15 @@ class CommonTextField extends StatelessWidget {
       keyboardType: keyboardType,
       onChanged: onChanged,
       maxLength: maxLength,
-      style: const TextStyle(color: Colors.white),
+      onSubmitted: onSubmitted,
+      style: textStyle ?? const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(
           vertical: 14,
           horizontal: 20,
         ),
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+        hintStyle: hintStyle ?? TextStyle(color: Colors.white.withOpacity(0.6)),
         filled: true,
         fillColor: Colors.white.withOpacity(0.1),
         enabledBorder: OutlineInputBorder(
@@ -51,6 +60,7 @@ class CommonTextField extends StatelessWidget {
             width: 0.5,
           ),
         ),
+        suffixIcon: suffixIcon,
       ),
     );
   }

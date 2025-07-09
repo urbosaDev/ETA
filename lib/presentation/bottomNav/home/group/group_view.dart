@@ -264,7 +264,7 @@ class GroupView extends GetView<GroupViewModel> {
                                 ? null
                                 : () {
                                   Get.to(
-                                    () => const CreatePromiseView(),
+                                    () => CreatePromiseView(),
                                     binding: BindingsBuilder(() {
                                       Get.put(
                                         CreatePromiseViewModel(

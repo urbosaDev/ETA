@@ -9,6 +9,7 @@ import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/filter_words.dart';
 
 class CreatePromiseViewModel extends GetxController {
   final String groupId;
@@ -35,7 +36,7 @@ class CreatePromiseViewModel extends GetxController {
   final RxBool isLoading = true.obs;
   final RxBool isMemberFetchLoading = false.obs;
   final RxString promiseName = ''.obs;
-
+  final RxBool containsBlockedWordInName = false.obs;
   StreamSubscription<GroupModel>? _groupSub;
   final Rx<DateTime?> promiseTime = Rx<DateTime?>(null);
   final Rx<PromiseLocationModel?> selectedLocation = Rx<PromiseLocationModel?>(
@@ -43,6 +44,13 @@ class CreatePromiseViewModel extends GetxController {
   );
   void setPromiseTime(DateTime time) {
     promiseTime.value = time;
+  }
+
+  void onPromiseNameChanged(String value) {
+    promiseName.value = value.trim();
+    containsBlockedWordInName.value = FilterWords.containsBlockedWord(
+      promiseName.value,
+    );
   }
 
   final RxBool isFormValid = false.obs;
@@ -127,11 +135,19 @@ class CreatePromiseViewModel extends GetxController {
     selectedLocation.value = location;
   }
 
-  Future<bool> createPromise() async {
-    isLoading.value = true;
+  final RxBool isPromiseCreated = false.obs;
+  final RxString systemMessage = ''.obs;
+  final RxBool isCreatingPromise = false.obs;
+  Future<void> createPromise() async {
     try {
-      if (!isFormValid.value) return false;
+      if (!isFormValid.value) {
+        systemMessage.value = '약속 정보를 모두 올바르게 입력해주세요.';
+        isPromiseCreated.value = false;
+        return;
+      }
 
+      isPromiseCreated.value = false;
+      isCreatingPromise.value = true;
       final promise = PromiseModel(
         id: '',
         groupId: groupId,
@@ -152,7 +168,7 @@ class CreatePromiseViewModel extends GetxController {
         groupId: groupId,
         promiseId: createdId,
       );
-      // FCM 발송
+
       try {
         final memberUids = selectedMemberIds.toList();
         final tokenUidPairs = <Map<String, String>>[];
@@ -172,14 +188,14 @@ class CreatePromiseViewModel extends GetxController {
             groupId: groupId,
           );
         }
-      } catch (e) {
-        print('FCM 약속 생성 알림 발송 실패: $e');
-      }
-      return true; // 성공!
-    } catch (e) {
-      return false; // 실패
+      } catch (_) {}
+      systemMessage.value = '약속이 성공적으로 생성되었습니다.';
+      isPromiseCreated.value = true;
+    } catch (_) {
+      systemMessage.value = '약속 생성 중 오류가 발생했습니다';
+      isPromiseCreated.value = false;
     } finally {
-      isLoading.value = false;
+      isCreatingPromise.value = false;
     }
   }
 }
