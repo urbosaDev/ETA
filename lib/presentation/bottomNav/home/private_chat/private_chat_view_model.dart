@@ -92,7 +92,6 @@ class PrivateChatViewModel extends GetxController {
       final opponentUid = uid1 == myUid ? uid2 : uid1;
 
       if (blockedUids.contains(opponentUid)) {
-        // 차단한 유저면 이 방은 스킵
         continue;
       }
 
@@ -103,7 +102,6 @@ class PrivateChatViewModel extends GetxController {
     }
   }
 
-  //상대 uid 추출 함수
   String getOpponentUid(String myUid, List<String> participants) {
     return participants.firstWhere((id) => id != myUid);
   }
@@ -119,7 +117,6 @@ class PrivateChatViewModel extends GetxController {
   Future<void> addFriend(String uniqueId) async {
     final friendUid = await _userRepository.getUidByUniqueId(uniqueId);
     if (friendUid == null) return;
-    // TODO: Implement friend addition logic
   }
 
   String generateChatRoomId(String uid1, String uid2) {

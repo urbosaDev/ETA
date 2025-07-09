@@ -57,7 +57,7 @@ class HomeView extends GetView<HomeViewModel> {
                       destinations: [
                         const NavigationRailDestination(
                           icon: Icon(Icons.chat),
-                          label: Text('채팅'),
+                          label: Text('메시지'),
                         ),
                         NavigationRailDestination(
                           icon: Container(
