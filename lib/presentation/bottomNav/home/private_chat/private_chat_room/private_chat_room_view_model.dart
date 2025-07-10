@@ -17,6 +17,7 @@ class PrivateChatRoomViewModel extends GetxController {
   PrivateChatRoomViewModel({
     required ChatRepository chatRepository,
     required UserRepository userRepository,
+
     required this.chatRoomId,
     required this.myUid,
     required this.friendUid,

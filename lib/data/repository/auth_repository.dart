@@ -5,16 +5,17 @@ import 'package:what_is_your_eta/data/service/auth_service.dart';
 //  UserModel 말고 User 리턴
 abstract class AuthRepository {
   Future<String?> signInWithGoogle();
+  Future<String?> signInWithApple(); // Apple 로그인 메서드 추가
   Future<void> signOut();
-  User? getCurrentUser();
+  User? getCurrentUser(); // User 타입이 Firebase 종속적이긴 하지만, 현재 사용 중이라면 유지
   String? getCurrentUid();
   Future<void> deleteAccount();
   bool isSignedIn();
-  Stream<User?> get userStream;
+  Stream<User?> get userStream; // Firebase User 타입 스트림도 ViewModel에서 직접 사용한다면 유지
 }
 
 class FirebaseAuthRepository implements AuthRepository {
-  final AuthService _authService;
+  final AuthService _authService; // 구체적인 AuthService에 의존
 
   FirebaseAuthRepository(this._authService);
 
@@ -25,16 +26,20 @@ class FirebaseAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<String?> signInWithApple() async {
+    // Apple 로그인 구현
+    final credential = await _authService.signInWithApple();
+    return credential.user?.uid;
+  }
+
+  @override
   Future<void> signOut() async {
     await _authService.signOut();
   }
 
   @override
   User? getCurrentUser() {
-    final user = _authService.getCurrentUser();
-    if (user == null) return null;
-
-    return user;
+    return _authService.getCurrentUser();
   }
 
   @override

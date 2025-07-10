@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
-import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 
@@ -156,7 +156,22 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                 }
               }),
             ),
-
+            Row(
+              children: [
+                Text(
+                  '채팅방 목록',
+                  style: textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '스와이프 해서 나가기',
+                  style: textTheme.bodySmall?.copyWith(color: Colors.white70),
+                ),
+              ],
+            ),
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -174,16 +189,8 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                   ],
                 ),
                 child: Obx(() {
-                  if (controller.chatRoomList.isEmpty) {
-                    return Center(
-                      child: Text(
-                        '아직 채팅방이 없습니다.',
-                        style: textTheme.bodySmall?.copyWith(
-                          color: Colors.white70,
-                        ),
-                      ),
-                    );
-                  } else {
+                  final chatRoomList = controller.chatRoomList;
+                  if (chatRoomList.isNotEmpty) {
                     return ListView.separated(
                       padding: EdgeInsets.zero,
                       itemCount: controller.chatRoomList.length,
@@ -195,52 +202,71 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                             endIndent: 16,
                           ),
                       itemBuilder: (context, index) {
-                        final chatRoom = controller.chatRoomList[index];
-
-                        return FutureBuilder<UserModel?>(
-                          future: controller.getOpponentInfo(chatRoom),
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return const SizedBox(
-                                height: 60,
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
+                        final displayModel = controller.chatRoomList[index];
+                        // displayModel.chatRoom
+                        final chatRoom = displayModel.chatRoom;
+                        final opponent = displayModel.opponentUser;
+                        final my = controller.userModel.value!;
+                        return Slidable(
+                          key: ValueKey(chatRoom.id),
+                          endActionPane: ActionPane(
+                            motion: const ScrollMotion(),
+                            extentRatio: 0.25,
+                            children: [
+                              SlidableAction(
+                                onPressed: (context) {
+                                  Get.defaultDialog(
+                                    backgroundColor: Color(0xff1a1a1a),
+                                    title: '채팅방 나가기',
+                                    middleText:
+                                        '정말로 이 채팅방을 나가시겠습니까? \n대화 기록은 삭제됩니다.',
+                                    textConfirm: '나가기',
+                                    textCancel: '취소',
+                                    confirmTextColor: Colors.white,
+                                    cancelTextColor: Colors.white,
+                                    buttonColor: Colors.redAccent,
+                                    radius: 8.0,
+                                    onConfirm: () async {
+                                      Get.back();
+                                      await controller.leaveChatRoom(
+                                        chatRoom.id,
+                                      );
+                                    },
+                                  );
+                                },
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                icon: Icons.exit_to_app,
+                                label: '나가기',
+                              ),
+                            ],
+                          ),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              radius: 15,
+                              backgroundImage: NetworkImage(opponent.photoUrl),
+                              backgroundColor: Colors.grey[700],
+                            ),
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '@${opponent.uniqueId}',
+                                  style: textTheme.bodySmall?.copyWith(
+                                    color: Colors.white,
                                   ),
                                 ),
-                              );
-                            }
-
-                            final opponent = snapshot.data!;
-                            final my = controller.userModel.value!;
-
-                            return ListTile(
-                              leading: CircleAvatar(
-                                radius: 15,
-                                backgroundImage: NetworkImage(
-                                  opponent.photoUrl,
+                                Text(
+                                  '${opponent.name}님과의 채팅방',
+                                  style: textTheme.bodySmall?.copyWith(
+                                    color: Colors.grey[400],
+                                  ),
                                 ),
-                                backgroundColor: Colors.grey[700],
-                              ),
-                              title: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '@${opponent.uniqueId}',
-                                    style: textTheme.bodySmall?.copyWith(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${opponent.name}님과의 채팅방',
-                                    style: textTheme.bodySmall?.copyWith(
-                                      color: Colors.grey[400],
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              ],
+                            ),
 
-                              onTap: () {
+                            onTap: () {
+                              if (opponent.uniqueId != 'unknown') {
                                 Get.to(
                                   () => PrivateChatRoomView(),
                                   arguments: chatRoom.id,
@@ -258,11 +284,20 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                                     );
                                   }),
                                 );
-                              },
-                            );
-                          },
+                              }
+                            },
+                          ),
                         );
                       },
+                    );
+                  } else {
+                    return Center(
+                      child: Text(
+                        '아직 채팅방이 없습니다.',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: Colors.white70,
+                        ),
+                      ),
                     );
                   }
                 }),

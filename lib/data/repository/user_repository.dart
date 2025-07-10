@@ -10,6 +10,10 @@ abstract class UserRepository {
   Stream<UserModel> streamUser(String uid);
   Future<void> deleteUser(String uid); // 회원탈퇴
   Future<void> addPrivateChatId(String uid, String chatRoomId);
+  Future<void> removePrivateChatId({
+    required String uid,
+    required String chatRoomId,
+  });
   Future<bool> userExists(String uid); // 해당 UID 존재 여부, 회원가입시
   Future<String?> getUidByUniqueId(String uniqueId);
   Future<bool> isUniqueIdAvailable(String uniqueId);
@@ -68,6 +72,14 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<void> addPrivateChatId(String uid, String chatRoomId) {
     return _userService.addPrivateChatId(uid, chatRoomId);
+  }
+
+  @override
+  Future<void> removePrivateChatId({
+    required String uid,
+    required String chatRoomId,
+  }) {
+    return _userService.removePrivateChatId(uid: uid, chatRoomId: chatRoomId);
   }
 
   // 친구추가 로직

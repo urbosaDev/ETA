@@ -1,4 +1,5 @@
 import 'package:what_is_your_eta/data/model/message_model.dart';
+import 'package:what_is_your_eta/data/model/private_chat_model.dart';
 import 'package:what_is_your_eta/data/service/chat_service.dart';
 
 // 의존성 주입시 어떤 Chat을 사용할지에 따라 ChatService가 다르게 주입
@@ -8,7 +9,8 @@ abstract class ChatRepository {
     required String chatId,
     required Map<String, dynamic> data,
   });
-  Future<Map<String, dynamic>?> getChatRoom(String roomId);
+  Future<PrivateChatModel?> getChatRoom(String roomId);
+  Future<List<PrivateChatModel>?> getChatRoomIds(List<String> roomIds);
 
   Future<void> updateChatRoom(String roomId, Map<String, dynamic> data);
   Future<void> deleteChatRoom(String roomId);
@@ -23,6 +25,14 @@ abstract class ChatRepository {
     MessageWithSnapshot lastMessage,
   );
   Stream<List<MessageWithSnapshot>> streamLatestMessages(String roomId);
+  Future<void> markUserAsLeftInChatRoom({
+    required String roomId,
+    required String userId,
+  });
+  Future<void> markUserAsJoinedInChatRoom({
+    required String roomId,
+    required String userId,
+  });
 }
 
 class ChatRepositoryImpl implements ChatRepository {
@@ -40,8 +50,25 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Future<Map<String, dynamic>?> getChatRoom(String roomId) {
-    return _service.get(roomId);
+  Future<PrivateChatModel?> getChatRoom(String roomId) {
+    final room = _service.get(roomId);
+    return room.then((data) {
+      if (data == null) return null;
+      return PrivateChatModel.fromJson(data);
+    });
+  }
+
+  @override
+  Future<List<PrivateChatModel>?> getChatRoomIds(List<String> roomIds) {
+    final futures = roomIds.map((id) => _service.get(id));
+    return Future.wait(futures).then((results) {
+      return results
+          .where((data) => data != null)
+          .map(
+            (data) => PrivateChatModel.fromJson(data as Map<String, dynamic>),
+          )
+          .toList();
+    });
   }
 
   @override
@@ -116,5 +143,25 @@ class ChatRepositoryImpl implements ChatRepository {
                   )
                   .toList(),
         );
+  }
+
+  @override
+  Future<void> markUserAsLeftInChatRoom({
+    required String roomId,
+    required String userId,
+  }) async {
+    final msg = SystemMessageModel(text: '유저가 떠났어요...', sentAt: DateTime.now());
+    await _service.leftInChatRoom(roomId: roomId, userId: userId);
+    await _service.sendMessageJson(roomId, msg.toJson());
+  }
+
+  @override
+  Future<void> markUserAsJoinedInChatRoom({
+    required String roomId,
+    required String userId,
+  }) async {
+    final msg = SystemMessageModel(text: '유저가 입장했어요', sentAt: DateTime.now());
+    await _service.joinedInChatRoom(roomId: roomId, userId: userId);
+    await _service.sendMessageJson(roomId, msg.toJson());
   }
 }

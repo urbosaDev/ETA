@@ -9,7 +9,7 @@ import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
-import 'package:what_is_your_eta/filter_words.dart';
+import 'package:what_is_your_eta/presentation/core/filter_words.dart';
 
 class CreatePromiseViewModel extends GetxController {
   final String groupId;

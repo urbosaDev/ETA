@@ -22,8 +22,6 @@ class UserProfileViewModel extends GetxController {
        _userRepository = userRepository,
        _chatRepository = chatRepository;
 
-  // 내 유저모델을 패치,구독 후 상대를 판별해야함
-  // 데이터를 어떻게 불러올까 ?
   @override
   void onInit() {
     _initialize();
@@ -70,7 +68,7 @@ class UserProfileViewModel extends GetxController {
   void _updateRelationStatus(UserModel? currentUser, UserModel? targetUser) {
     if (targetUser == null || targetUser.uniqueId == 'unknown') {
       relationStatus.value = UserRelationStatus.unknown;
-    } else if (currentUser?.blockedUids.contains(targetUser.uid) == true) {
+    } else if (currentUser?.blockFriendsUids.contains(targetUser.uid) == true) {
       relationStatus.value = UserRelationStatus.blocked;
     } else {
       relationStatus.value = UserRelationStatus.normal;
@@ -135,7 +133,7 @@ class UserProfileViewModel extends GetxController {
         blockFriendUid: targetUserUid,
       );
       currentUserModel.update((user) {
-        user?.blockedUids.add(targetUserUid);
+        user?.blockFriendsUids.add(targetUserUid);
       });
       _updateRelationStatus(currentUserModel.value, targetUserModel.value);
       systemMessage.value = '차단에 성공했어요 🎉';
@@ -157,7 +155,7 @@ class UserProfileViewModel extends GetxController {
         blockFriendUid: targetUserUid,
       );
       currentUserModel.update((user) {
-        user?.blockedUids.remove(targetUserUid);
+        user?.blockFriendsUids.remove(targetUserUid);
       });
       _updateRelationStatus(currentUserModel.value, targetUserModel.value);
       systemMessage.value = '차단 해제에 성공했어요 🎉';
@@ -182,23 +180,31 @@ class UserProfileViewModel extends GetxController {
   Future<String?> createChatRoom() async {
     isChatRoomLoading.value = true;
     try {
-      final currentUser = _authRepository.getCurrentUser()?.uid;
-      if (currentUser == null) {
+      final myUid = _authRepository.getCurrentUser()?.uid;
+      if (myUid == null) {
         isChatRoomLoading.value = false;
         return null;
       }
 
-      final chatRoomId = generateChatRoomId(currentUser, targetUserUid);
+      final chatRoomId = generateChatRoomId(myUid, targetUserUid);
 
       final exists = await _chatRepository.chatRoomExists(chatRoomId);
       if (exists) {
+        final room = await _chatRepository.getChatRoom(chatRoomId);
+        if (room != null && !room.participantIds.contains(myUid)) {
+          await _chatRepository.markUserAsJoinedInChatRoom(
+            roomId: chatRoomId,
+            userId: myUid,
+          );
+          await _userRepository.addPrivateChatId(myUid, chatRoomId);
+        }
         navigateToChatRoomId.value = chatRoomId;
         isChatRoomLoading.value = false;
         return chatRoomId;
       }
 
       final chatRoomData = {
-        'participantIds': [currentUser, targetUserUid],
+        'participantIds': [myUid, targetUserUid],
         'lastMessage': '',
         'lastMessageAt': DateTime.now(),
       };
@@ -207,7 +213,7 @@ class UserProfileViewModel extends GetxController {
         chatId: chatRoomId,
         data: chatRoomData,
       );
-      await _userRepository.addPrivateChatId(currentUser, chatRoomId);
+      await _userRepository.addPrivateChatId(myUid, chatRoomId);
       await _userRepository.addPrivateChatId(targetUserUid, chatRoomId);
       navigateToChatRoomId.value = chatRoomId;
 

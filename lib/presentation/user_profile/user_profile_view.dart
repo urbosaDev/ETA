@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
+import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/report_repository.dart';
+import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view_model.dart';
 import 'package:what_is_your_eta/presentation/report/report_view.dart';
@@ -72,17 +75,18 @@ class UserProfileView extends GetView<UserProfileViewModel> {
                   binding: BindingsBuilder(() {
                     Get.put(
                       PrivateChatRoomViewModel(
-                        chatRepository: Get.find(),
+                        chatRepository: Get.find<ChatRepository>(),
                         chatRoomId: chatId,
                         friendUid: controller.targetUserUid,
                         myUid: controller.currentUserUid,
-                        userRepository: Get.find(),
+                        userRepository: Get.find<UserRepository>(),
                       ),
                     );
                   }),
                 );
               });
             }
+
             return Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: width * 0.08,
@@ -237,6 +241,7 @@ class UserProfileView extends GetView<UserProfileViewModel> {
                 break;
               case 'block':
                 controller.blockUserId();
+
                 break;
               case 'unblock':
                 controller.unblockUserId();

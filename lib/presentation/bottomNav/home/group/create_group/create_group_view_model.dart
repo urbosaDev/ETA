@@ -9,7 +9,7 @@ import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
-import 'package:what_is_your_eta/filter_words.dart';
+import 'package:what_is_your_eta/presentation/core/filter_words.dart';
 import 'package:what_is_your_eta/presentation/models/friend_info_model.dart';
 
 class CreateGroupViewModel extends GetxController {
@@ -99,7 +99,7 @@ class CreateGroupViewModel extends GetxController {
 
   Future<void> getUsersByUids(List<String> uids) async {
     final users = await _userRepository.getUsersByUids(uids);
-    final blockedUids = userModel.value?.blockedUids ?? [];
+    final blockedUids = userModel.value?.blockFriendsUids ?? [];
 
     friendList.value =
         users.map((user) {

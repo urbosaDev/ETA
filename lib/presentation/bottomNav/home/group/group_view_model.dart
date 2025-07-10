@@ -119,7 +119,7 @@ class GroupViewModel extends GetxController {
 
   Future<void> getUsersByUids(UserModel user) async {
     final users = await _userRepository.getUsersByUids(user.friendsUids);
-    final blockedUids = userModel.value?.blockedUids ?? [];
+    final blockedUids = userModel.value?.blockFriendsUids ?? [];
 
     friendList.value =
         users.map((user) {
@@ -142,7 +142,7 @@ class GroupViewModel extends GetxController {
 
   Future<void> _fetchMember(GroupModel group) async {
     final users = await _userRepository.getUsersByUids(group.memberIds);
-    final blockedUids = userModel.value?.blockedUids ?? [];
+    final blockedUids = userModel.value?.blockFriendsUids ?? [];
 
     memberList.value =
         users.map((user) {

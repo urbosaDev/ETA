@@ -41,4 +41,32 @@ class LoginViewModel extends GetxController {
       isLoading.value = false;
     }
   }
+
+  Future<void> signInWithApple() async {
+    isLoading.value = true;
+    try {
+      final uid = await _authRepository.signInWithApple();
+      if (uid == null) {
+        systemMessage.value = '로그인 실패: 인증에 실패했습니다.\n 다시 시도해주세요.';
+        isLoading.value = false;
+        return;
+      }
+
+      final user = _authRepository.getCurrentUser();
+      if (user == null) {
+        systemMessage.value = '로그인 실패: 사용자 정보가 없습니다.\n 다시 시도해주세요.';
+        isLoading.value = false;
+        return;
+      }
+      final exist = await _userRepository.userExists(uid);
+      idExist.value = exist;
+    } catch (e) {
+      systemMessage.value = '로그인 실패: 알 수 없는 오류가 발생했습니다.\n 다시 시도해주세요.';
+      print('Error during Apple sign-in: $e');
+      isLoading.value = false;
+      return;
+    } finally {
+      isLoading.value = false;
+    }
+  }
 }

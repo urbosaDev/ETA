@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
-import 'package:what_is_your_eta/filter_words.dart';
+import 'package:what_is_your_eta/presentation/core/filter_words.dart';
 
 enum UniqueIdCheck { none, available, notAvailable, blank }
 

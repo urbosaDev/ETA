@@ -7,7 +7,7 @@ class UserModel {
   final String name;
   final String photoUrl;
   final List<String> friendsUids;
-  final List<String> blockedUids;
+  final List<String> blockFriendsUids;
   final List<String> groupIds;
   final List<String> privateChatIds;
   final UserLocationModel? location;
@@ -18,7 +18,7 @@ class UserModel {
     required this.name,
     required this.photoUrl,
     this.friendsUids = const [],
-    this.blockedUids = const [],
+    this.blockFriendsUids = const [],
     this.groupIds = const [],
     this.privateChatIds = const [],
     this.location,
@@ -31,7 +31,7 @@ class UserModel {
         name: '존재하지 않는 사용자',
         photoUrl: dotenv.env['DEFAULT_IMAGE']!,
         friendsUids: const [],
-        blockedUids: const [],
+        blockFriendsUids: const [],
         groupIds: const [],
         privateChatIds: const [],
         location: null,
@@ -44,7 +44,7 @@ class UserModel {
       name: json['name'],
       photoUrl: json['photoUrl'],
       friendsUids: List<String>.from(json['friendsUids'] ?? []),
-      blockedUids: List<String>.from(json['blockFriendsUids'] ?? []),
+      blockFriendsUids: List<String>.from(json['blockFriendsUids'] ?? []),
       groupIds: List<String>.from(json['groupIds'] ?? []),
       privateChatIds: List<String>.from(json['privateChatIds'] ?? []),
       location:
@@ -61,7 +61,7 @@ class UserModel {
       'name': name,
       'photoUrl': photoUrl,
       'friendsUids': friendsUids,
-      'blockFriendsUids': blockedUids,
+      'blockFriendsUids': blockFriendsUids,
       'groupIds': groupIds,
       'privateChatIds': privateChatIds,
       if (location != null) 'location': location!.toJson(),
@@ -85,7 +85,7 @@ class UserModel {
       name: name ?? this.name,
       photoUrl: photoUrl ?? this.photoUrl,
       friendsUids: friendsUids ?? this.friendsUids,
-      blockedUids: blockFriendsUids ?? blockedUids,
+      blockFriendsUids: blockFriendsUids ?? this.blockFriendsUids,
       groupIds: groupIds ?? this.groupIds,
       privateChatIds: privateChatIds ?? this.privateChatIds,
       location: location ?? this.location,

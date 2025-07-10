@@ -16,6 +16,11 @@ abstract class ChatService {
     DocumentSnapshot lastDoc,
   );
   Stream<List<DocumentSnapshot>> streamLatestMessages(String roomId);
+  Future<void> leftInChatRoom({required String roomId, required String userId});
+  Future<void> joinedInChatRoom({
+    required String roomId,
+    required String userId,
+  });
 }
 
 class PrivateChatService implements ChatService {
@@ -96,5 +101,25 @@ class PrivateChatService implements ChatService {
         .limit(20)
         .snapshots()
         .map((snapshot) => snapshot.docs);
+  }
+
+  @override
+  Future<void> leftInChatRoom({
+    required String roomId,
+    required String userId,
+  }) async {
+    await _ref.doc(roomId).update({
+      'participantIds': FieldValue.arrayRemove([userId]),
+    });
+  }
+
+  @override
+  Future<void> joinedInChatRoom({
+    required String roomId,
+    required String userId,
+  }) async {
+    await _ref.doc(roomId).update({
+      'participantIds': FieldValue.arrayUnion([userId]),
+    });
   }
 }

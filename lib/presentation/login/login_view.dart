@@ -101,6 +101,31 @@ class LoginView extends GetView<LoginViewModel> {
                       ),
                     ),
                   ),
+                  SizedBox(height: height * 0.02),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        controller.signInWithApple();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.pink,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                      ),
+                      child: const Text(
+                        'Apple로 로그인',
+                        style: TextStyle(
+                          fontFamily: 'Inconsolata',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
                   SizedBox(height: height * 0.03),
                   _buildPolicyText(context),
                   SizedBox(height: height * 0.08),
