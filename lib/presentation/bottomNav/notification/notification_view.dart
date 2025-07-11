@@ -67,8 +67,8 @@ class NotificationView extends GetView<NotificationViewModel> {
                     final msg = controller.unreadMessages[index];
 
                     return Dismissible(
-                      key: Key(msg.id), // 유일한 키 필수
-                      direction: DismissDirection.endToStart, // 오른쪽→왼쪽 스와이프
+                      key: Key(msg.id),
+                      direction: DismissDirection.endToStart,
                       background: Container(
                         color: Colors.red,
                         alignment: Alignment.centerRight,
@@ -125,10 +125,9 @@ class NotificationView extends GetView<NotificationViewModel> {
   Widget _buildProfileHeader(BuildContext context, UserModel user) {
     return Row(
       children: [
-        // 원형 프로필 이미지
         CircleAvatar(radius: 22, backgroundImage: NetworkImage(user.photoUrl)),
         const SizedBox(width: 16),
-        // 이름과 아이디
+
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

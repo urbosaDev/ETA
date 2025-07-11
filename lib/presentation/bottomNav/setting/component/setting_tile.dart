@@ -17,13 +17,9 @@ class SettingTile extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return InkWell(
-      // 탭 효과를 위해 InkWell 사용
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
-        ), // 패딩 조정
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

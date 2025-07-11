@@ -43,9 +43,7 @@ class SelectLocationViewModel extends GetxController {
     if (_mapReady) {
       try {
         _mapController.dispose();
-      } catch (e) {
-        print('⚠️ NaverMap dispose 중 오류 무시: $e');
-      }
+      } catch (e) {}
     }
   }
 
@@ -66,7 +64,6 @@ class SelectLocationViewModel extends GetxController {
         _moveCameraTo(location);
       }
     } catch (e) {
-      // print('현재 위치 가져오기 실패: $e');
     } finally {
       isLoading.value = false;
     }

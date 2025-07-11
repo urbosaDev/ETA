@@ -66,7 +66,7 @@ Widget userInfoDialogView({
                 ],
           ),
         ),
-        // 프로필 이미지
+
         CircleAvatar(
           radius: 40,
           backgroundImage:
@@ -76,7 +76,6 @@ Widget userInfoDialogView({
         ),
         const SizedBox(height: 12),
 
-        // 이름 + 유니크 ID
         Text(
           targetUser.name,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -89,7 +88,6 @@ Widget userInfoDialogView({
 
         const SizedBox(height: 24),
 
-        // 1:1 채팅 버튼 (unknown은 비활성화)
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(

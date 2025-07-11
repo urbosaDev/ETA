@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:get/get.dart';
-import 'package:what_is_your_eta/data/model/private_chat_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
@@ -14,7 +13,6 @@ class PrivateChatViewModel extends GetxController {
   final UserRepository _userRepository;
   final AuthRepository _authRepository;
   final ChatRepository _chatRepository;
-  // final LeaveDeleteChatUsecase _leaveDeleteChatUsecase;
 
   PrivateChatViewModel({
     required AuthRepository authRepository,
@@ -26,7 +24,6 @@ class PrivateChatViewModel extends GetxController {
 
   final Rx<UserModel?> userModel = Rx<UserModel?>(null);
   final RxList<FriendInfoModel> friendList = <FriendInfoModel>[].obs;
-  final RxList<String> defaultFriendList = <String>[].obs;
   final RxList<String> blockedUidsList = <String>[].obs;
   final RxList<ChatRoomDisplayModel> chatRoomList =
       <ChatRoomDisplayModel>[].obs;
@@ -34,6 +31,7 @@ class PrivateChatViewModel extends GetxController {
 
   StreamSubscription<UserModel>? _userSub;
   final RxBool navigateToChat = false.obs;
+
   @override
   void onInit() {
     _initialize();
@@ -49,7 +47,6 @@ class PrivateChatViewModel extends GetxController {
   Future<void> _initialize() async {
     isLoading.value = true;
     final currentUser = _authRepository.getCurrentUser();
-
     if (currentUser == null) {
       isLoading.value = false;
       return;
@@ -58,36 +55,28 @@ class PrivateChatViewModel extends GetxController {
     isLoading.value = false;
   }
 
-  // 필요한 데이터 ,
-  // 차단 정보, 내가가진 채팅방 정보, 친구정보
-  // 우선 차단된 유저를 관리
   void _startUserStream(String uid) {
     _userSub = _userRepository.streamUser(uid).listen((user) async {
       userModel.value = user;
-
-      blockedUidsList.value = user.blockFriendsUids;
-      defaultFriendList.value = user.friendsUids;
+      blockedUidsList.value = List<String>.from(user.blockFriendsUids ?? []);
       await getUsersByUids(user);
       await getChatRoomIds(user);
     });
   }
 
-  Future<void> getUsersByUids(user) async {
+  Future<void> getUsersByUids(UserModel user) async {
     final currentUserData = user;
     if (currentUserData == null) return;
-    final uids = currentUserData.friendsUids;
-    final blockedUids = blockedUidsList;
+    final uids = List<String>.from(currentUserData.friendsUids ?? []);
     final users = await _userRepository.getUsersByUids(uids);
-
     friendList.value =
-        users.map((user) {
-          final isBlocked = blockedUids.contains(user.uid);
-          return FriendInfoModel(userModel: user, isBlocked: isBlocked);
+        users.map((friend) {
+          final isBlocked = blockedUidsList.contains(friend.uid);
+          return FriendInfoModel(userModel: friend, isBlocked: isBlocked);
         }).toList();
   }
 
-  Future<void> getChatRoomIds(user) async {
-    chatRoomList.clear();
+  Future<void> getChatRoomIds(UserModel user) async {
     final currentUserData = user;
     if (currentUserData == null) {
       chatRoomList.assignAll([]);
@@ -95,54 +84,50 @@ class PrivateChatViewModel extends GetxController {
     }
 
     final myUid = currentUserData.uid;
-    final blockedUids = currentUserData.blockFriendsUids;
-    final userChatRoomIds = currentUserData.privateChatIds;
+    final blockedUids = List<String>.from(
+      currentUserData.blockFriendsUids ?? [],
+    );
+    final userChatRoomIds = List<String>.from(
+      currentUserData.privateChatIds ?? [],
+    );
 
-    final List<String> chatRoomIdsToFetch = [];
-    final Map<String, String> chatRoomIdToOpponentUidMap = {};
-
-    for (final id in userChatRoomIds) {
-      final parts = id.split('_');
-      if (parts.length != 2) {
-        continue;
-      }
-      final uid1 = parts[0];
-      final uid2 = parts[1];
-      final opponentUid = (uid1 == myUid) ? uid2 : uid1;
-
-      if (!blockedUids.contains(opponentUid)) {
-        chatRoomIdsToFetch.add(id);
-        chatRoomIdToOpponentUidMap[id] = opponentUid;
-      } else {}
+    if (userChatRoomIds.isEmpty) {
+      chatRoomList.assignAll([]);
+      return;
     }
 
-    final List<PrivateChatModel>? fetchedChatRooms = await _chatRepository
-        .getChatRoomIds(chatRoomIdsToFetch);
-
-    final List<String> opponentUidsToFetch =
-        chatRoomIdToOpponentUidMap.values.whereType<String>().toSet().toList();
+    final opponentUids =
+        userChatRoomIds
+            .map((id) {
+              final parts = id.split('_');
+              if (parts.length != 2) return null;
+              return (parts[0] == myUid) ? parts[1] : parts[0];
+            })
+            .whereType<String>()
+            .toSet()
+            .toList();
 
     final List<UserModel> fetchedOpponentUsers = await _userRepository
-        .getUsersByUids(opponentUidsToFetch);
-    final Map<String, UserModel> opponentUserMap = {
-      for (var user in fetchedOpponentUsers) user.uid: user,
-    };
+        .getUsersByUids(opponentUids);
 
     final List<ChatRoomDisplayModel> finalChatRoomDisplayList = [];
-    if (fetchedChatRooms != null) {
-      for (final chatRoom in fetchedChatRooms) {
-        final opponentUid = chatRoomIdToOpponentUidMap[chatRoom.id];
-        final UserModel? opponent =
-            opponentUid != null ? opponentUserMap[opponentUid] : null;
 
-        if (opponent != null) {
-          finalChatRoomDisplayList.add(
-            ChatRoomDisplayModel(chatRoom: chatRoom, opponentUser: opponent),
-          );
-        } else {}
+    for (final opponentUser in fetchedOpponentUsers) {
+      if (blockedUids.contains(opponentUser.uid)) {
+        continue;
       }
+
+      final chatRoomId = generateChatRoomId(myUid, opponentUser.uid);
+
+      finalChatRoomDisplayList.add(
+        ChatRoomDisplayModel(
+          chatRoomId: chatRoomId,
+          opponentUser: opponentUser,
+        ),
+      );
     }
-    chatRoomList.value = finalChatRoomDisplayList;
+
+    chatRoomList.assignAll(finalChatRoomDisplayList);
   }
 
   String generateChatRoomId(String uid1, String uid2) {
@@ -158,20 +143,15 @@ class PrivateChatViewModel extends GetxController {
     try {
       final myUid = userModel.value!.uid;
       final chatRoomId = generateChatRoomId(myUid, friendUid);
-
       final exists = await _chatRepository.chatRoomExists(chatRoomId);
       if (exists) {
-        await _chatRepository.getChatRoom(chatRoomId);
-        navigateToChat.value = true;
         return chatRoomId;
       }
-
       final chatRoomData = {
         'participantIds': [myUid, friendUid],
         'lastMessage': '',
         'lastMessageAt': DateTime.now(),
       };
-
       await _chatRepository.createChatRoom(
         chatId: chatRoomId,
         data: chatRoomData,
@@ -186,36 +166,37 @@ class PrivateChatViewModel extends GetxController {
     }
   }
 
-  // Future<void> leaveChatRoom(String chatRoomId) async {
-  //   isLoading.value = true;
-  //   try {
-  //     await _leaveDeleteChatUsecase.leaveAndDelete(chatRoomId);
-  //     // userModel.update((user) {
-  //     //   user?.privateChatIds.remove(chatRoomId);
-  //     // });
-  //     await getChatRoomIds(userModel.value);
-  //   } catch (_) {
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-  // }
-
   Future<void> deleteChatRoom(String chatRoomId, String opponentUid) async {
     isLoading.value = true;
     await _userRepository.removePrivateChatId(
       uid: userModel.value!.uid,
       chatRoomId: chatRoomId,
     );
-    await _chatRepository.deleteChatRoom(chatRoomId);
-    userModel.update((user) {
-      user?.privateChatIds.remove(chatRoomId);
-    });
-
     await _userRepository.removePrivateChatId(
       uid: opponentUid,
       chatRoomId: chatRoomId,
     );
 
+    await _chatRepository.deleteChatRoom(chatRoomId);
     isLoading.value = false;
+  }
+
+  Future<void> forceRefreshChatRooms() async {
+    isLoading.value = true;
+    try {
+      final latestUser = await _userRepository.getUser(
+        _authRepository.getCurrentUser()!.uid,
+      );
+
+      if (latestUser != null) {
+        userModel.value = latestUser;
+        await getUsersByUids(latestUser);
+        await getChatRoomIds(latestUser);
+      }
+    } catch (e) {
+    } finally {
+      // 4. 성공하든 실패하든 로딩 상태를 해제합니다.
+      isLoading.value = false;
+    }
   }
 }

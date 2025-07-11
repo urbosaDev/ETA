@@ -14,13 +14,6 @@ abstract class LocalMapApiService {
     required String longitude,
     required String latitude,
   });
-  // Future<Map<String, dynamic>> categoryToPlace({
-  //   required String categoryGroupCode,
-  //   required String x,
-  //   required String y,
-  //   int radius,
-  //   int page,
-  // });
 }
 
 class KakaoMapLocalApiService implements LocalMapApiService {
@@ -106,34 +99,4 @@ class KakaoMapLocalApiService implements LocalMapApiService {
       throw Exception('좌표 → 주소 변환 실패: ${response.statusCode}');
     }
   }
-  // @override
-  // Future<Map<String, dynamic>> categoryToPlace({
-  //   required String categoryGroupCode,
-  //   required String x,
-  //   required String y,
-  //   int radius = 10000,
-  //   int page = 1,
-  // }) async {
-  //   final uri = Uri.parse('$_baseUrl/v2/local/search/category.json').replace(
-  //     queryParameters: {
-  //       'category_group_code': categoryGroupCode,
-  //       'x': x,
-  //       'y': y,
-  //       'radius': radius.toString(),
-  //       'page': page.toString(),
-  //       'size': _fixedSize.toString(),
-  //     },
-  //   );
-
-  //   final response = await _client.get(
-  //     uri,
-  //     headers: {'Authorization': 'KakaoAK $_apiKey'},
-  //   );
-
-  //   if (response.statusCode == 200) {
-  //     return jsonDecode(response.body) as Map<String, dynamic>;
-  //   } else {
-  //     throw Exception('카테고리 장소 검색 실패: ${response.statusCode}');
-  //   }
-  // }
 }

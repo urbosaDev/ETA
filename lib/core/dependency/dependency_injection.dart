@@ -93,13 +93,5 @@ class DependencyInjection {
       CalculateDistanceUseCase(),
       permanent: true,
     );
-    // Get.put<LeaveDeleteChatUsecase>(
-    //   LeaveDeleteChatUsecase(
-    //     chatRepository: Get.find<ChatRepository>(),
-    //     authRepository: Get.find<AuthRepository>(),
-    //     userRepository: Get.find<UserRepository>(),
-    //   ),
-    //   permanent: true,
-    // );
   }
 }

@@ -17,8 +17,6 @@ import 'package:what_is_your_eta/presentation/bottomNav/setting/setting_view_mod
 class BottomNavBinding extends Bindings {
   @override
   void dependencies() {
-    // ViewModels
-
     Get.put(
       BottomNavViewModel(fcmTokenRepository: Get.find<FcmTokenRepository>()),
     );
@@ -39,7 +37,6 @@ class BottomNavBinding extends Bindings {
 
     Get.put(
       PrivateChatViewModel(
-        // leaveDeleteChatUsecase: Get.find<LeaveDeleteChatUsecase>(),
         userRepository: Get.find<UserRepository>(),
         authRepository: Get.find<AuthRepository>(),
         chatRepository: Get.find<ChatRepository>(),

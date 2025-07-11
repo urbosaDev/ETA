@@ -14,7 +14,7 @@ class CreateGroupView extends GetView<CreateGroupViewModel> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    // final height = MediaQuery.of(context).size.height;
+
     if (titleController.text != controller.groupTitle.value) {
       titleController.text = controller.groupTitle.value;
     }

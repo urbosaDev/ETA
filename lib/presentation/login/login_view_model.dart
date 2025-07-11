@@ -62,7 +62,7 @@ class LoginViewModel extends GetxController {
       idExist.value = exist;
     } catch (e) {
       systemMessage.value = '로그인 실패: 알 수 없는 오류가 발생했습니다.\n 다시 시도해주세요.';
-      print('Error during Apple sign-in: $e');
+
       isLoading.value = false;
       return;
     } finally {

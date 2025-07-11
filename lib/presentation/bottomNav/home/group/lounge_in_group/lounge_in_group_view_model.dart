@@ -28,6 +28,7 @@ class LoungeInGroupViewModel extends GetxController {
   RxMap<String, UserModel> memberMap = <String, UserModel>{}.obs;
   final RxBool isLoading = true.obs;
   final Rx<UserModel?> userModel = Rx<UserModel?>(null);
+  final RxList<String> blockedUidsList = <String>[].obs;
   final Rx<GroupModel?> groupModel = Rx<GroupModel?>(null);
   StreamSubscription<UserModel>? _userSub;
   StreamSubscription<GroupModel>? _groupSub;
@@ -73,17 +74,17 @@ class LoungeInGroupViewModel extends GetxController {
     }
     groupModel.value = fetchedGroup;
     currentPromiseId.value = fetchedGroup.currentPromiseId;
-    await _fetchMember(fetchedGroup.memberIds); // 먼저 memberMap 초기화
+    await _fetchMember(fetchedGroup.memberIds);
 
     _startGroupStream();
 
     isLoading.value = false;
   }
 
-  // 본인 Stream 통해 유저 정보 업데이트
   void _startUserStream(String uid) {
     _userSub = _userRepository.streamUser(uid).listen((user) async {
       userModel.value = user;
+      blockedUidsList.value = user.blockFriendsUids;
     });
   }
 
@@ -101,8 +102,6 @@ class LoungeInGroupViewModel extends GetxController {
 
     memberMap.value = {for (var u in users) u.uid: u};
   }
-  // groupId 로 그룹모델을 불러오고 ,그룹모델 stream,
-  //
 
   Future<void> sendMessage(String content) async {
     final msg = TextMessageModel(

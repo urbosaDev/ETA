@@ -54,7 +54,6 @@ class LocationShareViewModel extends GetxController {
     try {
       isLoading.value = true;
 
-      // UseCase 사용
       final pLoc = await _locationShareUseCase.getPromiseLocation(promiseId);
       final uLoc = await _locationShareUseCase.getCurrentUserLocation();
 
@@ -103,7 +102,6 @@ class LocationShareViewModel extends GetxController {
       final uLoc = await _locationShareUseCase.getCurrentUserLocation();
       currentLocation.value = uLoc;
 
-      // distance 재계산
       final pLoc = promiseLocation.value;
       if (uLoc != null && pLoc != null) {
         final distance = _locationShareUseCase.calculateDistance(

@@ -1,8 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:what_is_your_eta/data/service/auth_service.dart';
 
-// FireAuth 관련된 것만 담당 , getCurrentUser는 FireAuth내의 정보만 다루기에
-//  UserModel 말고 User 리턴
 abstract class AuthRepository {
   Future<String?> signInWithGoogle();
   Future<String?> signInWithApple(); // Apple 로그인 메서드 추가

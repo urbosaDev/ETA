@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sign_in_button/sign_in_button.dart';
 
 import 'package:what_is_your_eta/presentation/core/loading/common_loading_lottie.dart';
 import 'package:what_is_your_eta/presentation/login/login_view_model.dart';
@@ -77,55 +78,23 @@ class LoginView extends GetView<LoginViewModel> {
                     ),
                   ),
                   SizedBox(height: height * 0.04),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        controller.signInWithGoogle();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.pinkAccent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                      ),
-                      child: const Text(
-                        'Google로 로그인',
-                        style: TextStyle(
-                          fontFamily: 'Inconsolata',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+
+                  SignInButton(
+                    Buttons.google,
+                    text: "Google 계정으로 로그인",
+                    onPressed: () {
+                      controller.signInWithGoogle();
+                    },
                   ),
-                  SizedBox(height: height * 0.02),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        controller.signInWithApple();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.pink,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                      ),
-                      child: const Text(
-                        'Apple로 로그인',
-                        style: TextStyle(
-                          fontFamily: 'Inconsolata',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+                  const SizedBox(height: 8),
+                  SignInButton(
+                    Buttons.apple,
+                    text: "Apple로 로그인",
+                    onPressed: () {
+                      controller.signInWithApple();
+                    },
                   ),
+
                   SizedBox(height: height * 0.03),
                   _buildPolicyText(context),
                   SizedBox(height: height * 0.08),

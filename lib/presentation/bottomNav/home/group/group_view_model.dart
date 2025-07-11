@@ -52,10 +52,7 @@ class GroupViewModel extends GetxController {
   final RxBool isPromiseExisted = false.obs;
   List<FriendInfoModel> get validFriends =>
       friendList
-          .where(
-            (f) =>
-                f.userModel.uniqueId != 'unknown' && !f.isBlocked, // 차단한 유저는 제외
-          )
+          .where((f) => f.userModel.uniqueId != 'unknown' && !f.isBlocked)
           .toList();
   @override
   void onInit() {
@@ -96,7 +93,6 @@ class GroupViewModel extends GetxController {
       }
     }
 
-    // 본인 정보 스트림 시작
     _userSub = _userRepository.streamUser(currentUser?.uid ?? '').listen((
       user,
     ) {
@@ -188,10 +184,9 @@ class GroupViewModel extends GetxController {
 
     selectedFriends.clear();
 
-    // 메시지 넣기 + 타이머로 자동 초기화
     snackbarMessage.value = '친구를 그룹에 초대했습니다.';
     Future.delayed(Duration(milliseconds: 70), () {
-      snackbarMessage.value = null; // ❗ ViewModel 내부에서 직접 초기화
+      snackbarMessage.value = null;
     });
   }
 
@@ -268,7 +263,6 @@ class GroupViewModel extends GetxController {
       final group = groupModel.value;
       if (group == null) return;
 
-      // 1. 탈퇴 처리 (그룹에서 나 제거)
       await _groupRepository.removeUserFromGroup(
         groupId: group.id,
         userId: uid,
@@ -276,7 +270,6 @@ class GroupViewModel extends GetxController {
 
       await _userRepository.removeGroupId(userId: uid, groupId: group.id);
 
-      // 2. 약속에서 나 제거
       final currentId = group.currentPromiseId;
       if (currentId != null) {
         await _promiseRepository.removeUserFromPromise(
@@ -297,7 +290,6 @@ class GroupViewModel extends GetxController {
       }
       isDeleteAndLeaveGroup.value = true;
     } catch (e) {
-      // 에러 핸들링
     } finally {
       isLoading.value = false;
     }
@@ -313,13 +305,11 @@ class GroupViewModel extends GetxController {
     try {
       isLoading.value = true;
 
-      // 1. 연결된 약속 삭제
       final currentId = group.currentPromiseId;
       if (currentId != null) {
         await _promiseRepository.deletePromise(currentId);
       }
 
-      // 2. 유저 문서에서 그룹 ID 제거
       for (final memberId in group.memberIds) {
         await _userRepository.removeGroupId(
           userId: memberId,
@@ -327,10 +317,8 @@ class GroupViewModel extends GetxController {
         );
       }
 
-      // 3. 그룹 삭제
       await _groupRepository.deleteGroup(group.id);
       isDeleteAndLeaveGroup.value = true;
-      // 성공 메시지 등 추가 가능
     } finally {
       isLoading.value = false;
     }
@@ -347,20 +335,16 @@ class GroupViewModel extends GetxController {
     if (promise == null) return;
 
     if (promise.notifyStartScheduled == false) {
-      // 1. 약속 시작되지 않음 → 삭제만
       await _promiseRepository.deletePromise(promiseId);
 
-      // currentPromiseId만 제거
       await _groupRepository.clearCurrentPromiseId(group.id);
     } else {
-      // 2. 시작된 약속 → 마감 처리
       await _groupRepository.endCurrentPromise(
         groupId: group.id,
         promiseId: promiseId,
       );
     }
 
-    // 상태 정리
     currentPromise.value = null;
     isPromiseExisted.value = false;
     successEndPromise.value = true;
@@ -378,7 +362,6 @@ class GroupViewModel extends GetxController {
         uid: leaderUid,
       );
     } catch (e) {
-      // 로그 등 처리
     } finally {
       isLoading.value = false;
     }

@@ -18,8 +18,6 @@ abstract class Routes {
   static const main = '/main';
   static const privacyPolicy = '/privacy-policy';
   static const termsOfService = '/terms-of-service';
-  // // in private chat
-  // static const addFriend = '/addFriend';
 }
 
 final getPages = [

@@ -35,7 +35,6 @@ class ReportViewModel extends GetxController {
   Future<void> submitReport() async {
     final reporter = _authRepository.getCurrentUser();
     if (reporter == null) {
-      // 로그인 안 되어 있음. 에러 처리
       throw Exception('로그인한 사용자만 신고할 수 있습니다.');
     }
 

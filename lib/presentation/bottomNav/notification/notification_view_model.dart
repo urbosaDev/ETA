@@ -36,12 +36,10 @@ class NotificationViewModel extends GetxController {
   void onInit() {
     super.onInit();
     _initialize();
-    // Initialize any necessary data or state here
   }
 
   @override
   void onClose() {
-    // Clean up resources or subscriptions if needed
     _userSub?.cancel();
     _messageSub?.cancel();
     super.onClose();
@@ -67,7 +65,7 @@ class NotificationViewModel extends GetxController {
     _messageSub = _userRepository.streamNotificationMessages(uid).listen((
       messages,
     ) {
-      unreadMessages.assignAll(messages); // RxList 업데이트
+      unreadMessages.assignAll(messages);
     });
   }
 
@@ -88,8 +86,8 @@ class NotificationViewModel extends GetxController {
     }
   }
 
-  final RxnString errorMessage = RxnString(null); // 메시지용
-  final RxBool canEnterGroup = false.obs; // 이동 가능 여부
+  final RxnString errorMessage = RxnString(null);
+  final RxBool canEnterGroup = false.obs;
   final RxBool isNavigating = false.obs;
   Future<void> checkGroupNavigation(String groupId) async {
     isNavigating.value = true;
@@ -127,10 +125,8 @@ class NotificationViewModel extends GetxController {
 
     try {
       await _userRepository.deleteAllMessagesFromUser(uid);
-      unreadMessages.clear(); // RxList 초기화
-    } catch (e) {
-      // errorMessage.value = '메시지 삭제 실패: $e';
-    }
+      unreadMessages.clear();
+    } catch (e) {}
   }
 
   String formatNotificationTime(DateTime time) {
@@ -150,5 +146,3 @@ class NotificationViewModel extends GetxController {
     }
   }
 }
-// userModel fetch, stream 
-// 친구들도 fetch 

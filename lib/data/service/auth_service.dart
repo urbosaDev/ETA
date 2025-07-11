@@ -23,7 +23,6 @@ class AuthService {
   }
 
   Future<UserCredential> signInWithApple() async {
-    // 1. Apple 로그인 credential 받기
     final appleCredential = await SignInWithApple.getAppleIDCredential(
       scopes: [
         AppleIDAuthorizationScopes.email,
@@ -31,13 +30,11 @@ class AuthService {
       ],
     );
 
-    // 2. Firebase Auth용 OAuth credential 생성
     final oauthCredential = OAuthProvider("apple.com").credential(
       idToken: appleCredential.identityToken,
       accessToken: appleCredential.authorizationCode,
     );
 
-    // 3. Firebase 로그인 처리
     return await _auth.signInWithCredential(oauthCredential);
   }
 
@@ -54,7 +51,6 @@ class AuthService {
     await _auth.signOut();
   }
 
-  /// 현재 유저 가져오기
   User? getCurrentUser() {
     return _auth.currentUser;
   }

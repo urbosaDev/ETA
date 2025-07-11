@@ -53,15 +53,13 @@ class GroupView extends GetView<GroupViewModel> {
         }
 
         return Padding(
-          padding: const EdgeInsets.all(16.0), // 전체 패딩
+          padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
-            // 스크롤 가능하게
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 그룹 정보 헤더 (그룹 이름, 그룹장, 더보기 버튼)
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.center, // 상단 정렬
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
                       child: Text(
@@ -88,7 +86,7 @@ class GroupView extends GetView<GroupViewModel> {
                                 child: Text(
                                   '그룹 삭제',
                                   style: textTheme.bodyMedium,
-                                ), // 폰트 스타일
+                                ),
                               ),
                             ] else ...[
                               PopupMenuItem(
@@ -96,15 +94,12 @@ class GroupView extends GetView<GroupViewModel> {
                                 child: Text(
                                   '그룹 나가기',
                                   style: textTheme.bodyMedium,
-                                ), // 폰트 스타일
+                                ),
                               ),
                             ],
                           ],
-                      icon: const Icon(
-                        Icons.more_vert,
-                        color: Colors.white70,
-                      ), // 아이콘 색상
-                      color: const Color(0xff1a1a1a), // 팝업 메뉴 배경색
+                      icon: const Icon(Icons.more_vert, color: Colors.white70),
+                      color: const Color(0xff1a1a1a),
                     ),
                   ],
                 ),
@@ -161,7 +156,7 @@ class GroupView extends GetView<GroupViewModel> {
                     ),
                   ),
                 ),
-                const Divider(color: Colors.white12, thickness: 0.2), // 구분선
+                const Divider(color: Colors.white12, thickness: 0.2),
                 const SizedBox(height: 16),
 
                 Row(
@@ -185,17 +180,16 @@ class GroupView extends GetView<GroupViewModel> {
                             );
                           },
                           style: TextButton.styleFrom(
-                            padding: EdgeInsets.zero, // 패딩 제거
-                            alignment: Alignment.centerLeft, // 왼쪽 정렬
-                            tapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap, // 터치 영역 최소화
+                            padding: EdgeInsets.zero,
+                            alignment: Alignment.centerLeft,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                           child: Text(
                             '👑 내가 할래요',
                             style: textTheme.bodySmall?.copyWith(
                               color: Colors.blueAccent,
                             ),
-                          ), // 폰트 스타일
+                          ),
                         );
                       }
 
@@ -204,13 +198,13 @@ class GroupView extends GetView<GroupViewModel> {
                         style: textTheme.bodySmall?.copyWith(
                           color: Colors.amber,
                         ),
-                      ); // 그룹장 이름 스타일
+                      );
                     }),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Container(
-                  height: screenWidth * 0.25, // 화면 너비에 비례하는 높이
+                  height: screenWidth * 0.25,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: const Color(0xff1a1a1a),
@@ -252,7 +246,7 @@ class GroupView extends GetView<GroupViewModel> {
                     );
                   },
                   child: Container(
-                    height: 40, // 높이 조정
+                    height: 40,
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: const Color(0xff1a1a1a),
@@ -273,13 +267,12 @@ class GroupView extends GetView<GroupViewModel> {
                         style: textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
-                      ), // 폰트 스타일
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
 
-                // 현재 진행중인 약속 섹션
                 Text(
                   '현재 진행중인 약속',
                   style: textTheme.bodyMedium?.copyWith(
@@ -311,20 +304,17 @@ class GroupView extends GetView<GroupViewModel> {
                         decoration: BoxDecoration(
                           color:
                               controller.isParticipating.value
-                                  ? const Color(0xff1a1a1a) // 참여 중일 때 배경
-                                  : Colors.grey[900], // 미참여일 때 더 어두운 배경
+                                  ? const Color(0xff1a1a1a)
+                                  : Colors.grey[900],
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color:
                                 controller.isParticipating.value
-                                    ? Colors.blueAccent.withOpacity(
-                                      0.5,
-                                    ) // 참여 중일 때 테두리
-                                    : Colors.grey[700]!, // 미참여일 때 테두리
+                                    ? Colors.blueAccent.withOpacity(0.5)
+                                    : Colors.grey[700]!,
                             width: 1,
                           ),
                           boxShadow: [
-                            // 그림자
                             BoxShadow(
                               color: Colors.black.withOpacity(0.2),
                               blurRadius: 4,
@@ -333,7 +323,6 @@ class GroupView extends GetView<GroupViewModel> {
                           ],
                         ),
                         child: Column(
-                          // 약속 이름, 시간, 장소 등을 표시할 수 있는 Column
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
@@ -341,7 +330,7 @@ class GroupView extends GetView<GroupViewModel> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    promise.name, // 약속 이름
+                                    promise.name,
                                     style: textTheme.bodyMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color:
@@ -374,21 +363,20 @@ class GroupView extends GetView<GroupViewModel> {
                               ],
                             ),
                             const SizedBox(height: 8),
-                            // 약속 시간 표시 (promise.time을 적절히 포맷)
+
                             Text(
                               '시간: ${promise.time.year}년 ${promise.time.month}월 ${promise.time.day}일 ${promise.time.hour}시 ${promise.time.minute}분',
                               style: textTheme.bodySmall?.copyWith(
                                 color: Colors.grey[500],
                               ),
                             ),
-                            // 약속 장소 표시 (promise.location.placeName)
+
                             Text(
                               '장소: ${promise.location.placeName}',
                               style: textTheme.bodySmall?.copyWith(
                                 color: Colors.grey[500],
                               ),
                             ),
-                            // 기타 약속 정보 추가 가능
                           ],
                         ),
                       ),
@@ -402,10 +390,8 @@ class GroupView extends GetView<GroupViewModel> {
                 }),
                 const SizedBox(height: 24),
 
-                // 약속 추가/로그보기 버튼 Row
                 Row(
                   children: [
-                    // 약속 추가하러 가기
                     Expanded(
                       child: GestureDetector(
                         onTap:
@@ -433,11 +419,11 @@ class GroupView extends GetView<GroupViewModel> {
                                 },
                         child: Container(
                           padding: const EdgeInsets.all(16),
-                          height: 120, // 높이 고정
+                          height: 120,
                           decoration: BoxDecoration(
                             color:
                                 controller.isPromiseExisted.value
-                                    ? Colors.grey[900] // 비활성화 색상
+                                    ? Colors.grey[900]
                                     : Theme.of(context)
                                             .elevatedButtonTheme
                                             .style
@@ -449,9 +435,8 @@ class GroupView extends GetView<GroupViewModel> {
                             border: Border.all(
                               color:
                                   controller.isPromiseExisted.value
-                                      ? Colors
-                                          .white12 // 비활성화 테두리
-                                      : Colors.white24, // 활성화 테두리
+                                      ? Colors.white12
+                                      : Colors.white24,
                               width: 0.5,
                             ),
                             boxShadow: [
@@ -480,8 +465,8 @@ class GroupView extends GetView<GroupViewModel> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16), // 버튼 사이 간격
-                    // 약속 log보기
+                    const SizedBox(width: 16),
+
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
@@ -529,11 +514,10 @@ class GroupView extends GetView<GroupViewModel> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24), // 버튼 섹션 하단 간격
-                // 약속 마감하기 버튼
+                const SizedBox(height: 24),
+
                 SizedBox(
-                  // 버튼 중앙 정렬
-                  width: double.infinity, // 너비 최대로
+                  width: double.infinity,
                   child: ElevatedButton(
                     onPressed:
                         controller.isMyGroup &&
@@ -541,7 +525,7 @@ class GroupView extends GetView<GroupViewModel> {
                             ? () {
                               Get.dialog(
                                 _buildEndPromiseDialog(
-                                  context, // context 전달
+                                  context,
                                   onConfirm: () {
                                     controller.endPromise();
                                     Get.back();
@@ -560,7 +544,7 @@ class GroupView extends GetView<GroupViewModel> {
                             if (states.contains(MaterialState.disabled)) {
                               return Colors.grey[800]?.withOpacity(0.4);
                             }
-                            // 그룹장이고 약속이 있을 때만 활성화 (레드 계열로 강조)
+
                             return Colors.redAccent;
                           }),
                     ),
@@ -572,13 +556,13 @@ class GroupView extends GetView<GroupViewModel> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 8), // 버튼 아래 간격
+                const SizedBox(height: 8),
                 Text(
                   '약속 마감은 그룹장만 진행할 수 있어요.',
                   style: textTheme.bodySmall?.copyWith(color: Colors.grey[500]),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 16), // 가장 하단 여백
+                const SizedBox(height: 16),
               ],
             ),
           ),
@@ -664,7 +648,6 @@ class GroupView extends GetView<GroupViewModel> {
     });
   }
 
-  // _buildEndPromiseDialog 함수도 context, textTheme 전달받도록 변경
   Widget _buildEndPromiseDialog(
     BuildContext context, {
     required VoidCallback onConfirm,
@@ -692,9 +675,7 @@ class GroupView extends GetView<GroupViewModel> {
         ElevatedButton(
           onPressed: onConfirm,
           style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
-            backgroundColor: MaterialStateProperty.all(
-              Colors.redAccent,
-            ), // 강조 색상
+            backgroundColor: MaterialStateProperty.all(Colors.redAccent),
           ),
           child: Text(
             '네',
@@ -702,10 +683,8 @@ class GroupView extends GetView<GroupViewModel> {
           ),
         ),
       ],
-      backgroundColor: const Color(0xff1a1a1a), // 배경색 통일
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ), // 둥근 모서리
+      backgroundColor: const Color(0xff1a1a1a),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     );
   }
 }

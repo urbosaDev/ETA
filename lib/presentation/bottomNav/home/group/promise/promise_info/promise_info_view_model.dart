@@ -38,13 +38,12 @@ class PromiseInfoViewModel extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Initialize any necessary data or streams here
+
     _initialize();
   }
 
   @override
   void onClose() {
-    // Clean up any resources or streams if necessary
     super.onClose();
     _promiseSub?.cancel();
     mapController.value?.dispose();
@@ -76,7 +75,6 @@ class PromiseInfoViewModel extends GetxController {
     }
 
     _promiseSub = _promiseRepository.streamPromise(promiseId).listen((p) async {
-      // 추후 memberIds 변경 감지 로직 추가 가능
       promise.value = p;
       location.value = p.location;
       userLocations.value = p.userLocations ?? {};

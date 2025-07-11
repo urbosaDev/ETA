@@ -34,14 +34,12 @@ class LateViewModel extends GetxController {
   final RxBool isLoading = true.obs;
   @override
   void onInit() {
-    // TODO: implement onInit
     _initialize();
     super.onInit();
   }
 
   @override
   void onClose() {
-    // TODO: implement onClose
     _promiseSub?.cancel();
     super.onClose();
   }
@@ -100,5 +98,3 @@ class LateViewModel extends GetxController {
     memberList.value = users;
   }
 }
-
-// 순서대로

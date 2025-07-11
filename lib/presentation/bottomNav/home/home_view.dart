@@ -25,7 +25,6 @@ class HomeView extends GetView<HomeViewModel> {
     return SafeArea(
       child: Row(
         children: [
-          // 사이드바
           SizedBox(
             width: leftTabWidth,
             child: Obx(() {
@@ -62,16 +61,14 @@ class HomeView extends GetView<HomeViewModel> {
                         NavigationRailDestination(
                           icon: Container(
                             decoration: BoxDecoration(
-                              color: Colors.pinkAccent.withOpacity(
-                                0.15,
-                              ), // 커스텀 배경
+                              color: Colors.pinkAccent.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             padding: const EdgeInsets.all(6),
                             child: const Icon(
                               Icons.add,
                               color: Colors.pinkAccent,
-                            ), // 커스텀 색상
+                            ),
                           ),
                           label: Text(
                             '그룹생성',
@@ -102,7 +99,6 @@ class HomeView extends GetView<HomeViewModel> {
             }),
           ),
 
-          // 본문
           Expanded(
             child: Obx(() {
               final index = controller.selectedIndex.value;

@@ -192,7 +192,7 @@ class PromiseInfoView extends GetView<PromiseInfoViewModel> {
                 ),
               ],
             ),
-            // 3. 참여자 목록 섹션
+
             Text(
               '참여자 (${controller.promiseMemberStatusList.length}명)',
               style: textTheme.bodyMedium?.copyWith(
@@ -270,13 +270,13 @@ class PromiseInfoView extends GetView<PromiseInfoViewModel> {
   ) {
     return UserTile(
       user: memberStatus.user,
-      textTheme: textTheme, // ✨ textTheme 전달
-      isSelected: false, // PromiseInfoView에서는 isSelected를 사용하지 않음
+      textTheme: textTheme,
+      isSelected: false,
       onTap:
           memberStatus.updateStatus == MemberUpdateStatus.updated &&
                   memberStatus.location != null
               ? () {
-                controller.selectUser(memberStatus); // ViewModel의 selectUser 호출
+                controller.selectUser(memberStatus);
               }
               : null,
       trailing: switch (memberStatus.updateStatus) {

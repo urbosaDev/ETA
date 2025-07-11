@@ -38,7 +38,21 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
             const Divider(color: Colors.white12, thickness: 0.2),
 
             _buildFriendList(textTheme, screenWidth),
-            const SizedBox(height: 12),
+            Row(
+              children: [
+                Text(
+                  '채팅방 목록',
+                  style: textTheme.titleSmall?.copyWith(color: Colors.white),
+                ),
+                Spacer(),
+                IconButton(
+                  icon: Icon(Icons.refresh, color: Colors.white),
+                  onPressed: () {
+                    controller.forceRefreshChatRooms();
+                  },
+                ),
+              ],
+            ),
             _buildChatList(textTheme),
           ],
         ),
@@ -197,11 +211,11 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                   ),
               itemBuilder: (context, index) {
                 final displayModel = controller.chatRoomList[index];
-                final chatRoom = displayModel.chatRoom;
+                final chatRoomId = displayModel.chatRoomId;
                 final opponent = displayModel.opponentUser;
                 final my = controller.userModel.value!;
                 return Slidable(
-                  key: ValueKey(chatRoom.id),
+                  key: ValueKey(chatRoomId),
                   endActionPane: ActionPane(
                     motion: const ScrollMotion(),
                     extentRatio: 0.25,
@@ -221,7 +235,7 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                             onConfirm: () async {
                               Get.back();
                               await controller.deleteChatRoom(
-                                chatRoom.id,
+                                chatRoomId,
                                 opponent.uid,
                               );
                               Get.offAllNamed('/main');
@@ -263,13 +277,13 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                       if (opponent.uniqueId != 'unknown') {
                         Get.off(
                           () => PrivateChatRoomView(),
-                          arguments: chatRoom.id,
+                          arguments: chatRoomId,
                           binding: BindingsBuilder(() {
                             Get.put(
                               PrivateChatRoomViewModel(
                                 chatRepository: Get.find<ChatRepository>(),
                                 userRepository: Get.find<UserRepository>(),
-                                chatRoomId: chatRoom.id,
+                                chatRoomId: chatRoomId,
                                 myUid: my.uid,
                                 friendUid: opponent.uid,
                               ),

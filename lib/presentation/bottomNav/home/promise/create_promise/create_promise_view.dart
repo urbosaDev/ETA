@@ -87,7 +87,6 @@ class CreatePromiseView extends GetView<CreatePromiseViewModel> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 1. 약속 이름 설정 섹션
                     Text(
                       '약속 이름을 정해요',
                       style: textTheme.bodyMedium?.copyWith(
@@ -95,13 +94,9 @@ class CreatePromiseView extends GetView<CreatePromiseViewModel> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    _buildPromiseNameInput(
-                      context,
-                      textTheme,
-                    ), // 약속 이름 입력 필드와 필터링 메시지
+                    _buildPromiseNameInput(context, textTheme),
                     const SizedBox(height: 24),
 
-                    // 2. 구성원 모집 섹션
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -121,10 +116,9 @@ class CreatePromiseView extends GetView<CreatePromiseViewModel> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    _buildAddMemberField(context, textTheme), // 구성원 추가 필드
+                    _buildAddMemberField(context, textTheme),
                     const SizedBox(height: 24),
 
-                    // 3. 약속 위치 설정 섹션
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

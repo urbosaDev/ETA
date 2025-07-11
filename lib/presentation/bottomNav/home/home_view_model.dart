@@ -25,7 +25,7 @@ class HomeViewModel extends GetxController {
   final RxList<GroupModel> _groupList = <GroupModel>[].obs;
   List<GroupModel> get groupList => _groupList;
 
-  final selectedIndex = 0.obs; // 0: Chat, 1: Create
+  final selectedIndex = 0.obs;
 
   StreamSubscription<UserModel>? _userSub;
   final RxnString groupIdToOpen = RxnString();
@@ -42,7 +42,6 @@ class HomeViewModel extends GetxController {
         selectedIndex.value = index + 2;
       }
 
-      // groupIdToOpen도 초기화 (한 번만 이동하게)
       bottomNavController.pendingGroupId.value = null;
     });
   }
