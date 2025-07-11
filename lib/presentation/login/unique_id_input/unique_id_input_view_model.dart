@@ -1,3 +1,4 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
@@ -162,7 +163,7 @@ class UniqueIdInputViewModel extends GetxController {
       uid: user.uid,
       uniqueId: id,
       name: nameValue,
-      photoUrl: user.photoURL ?? '',
+      photoUrl: user.photoURL ?? dotenv.env['DEFAULT_IMAGE']!,
     );
 
     try {

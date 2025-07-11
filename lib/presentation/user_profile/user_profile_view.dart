@@ -25,7 +25,9 @@ class UserProfileView extends GetView<UserProfileViewModel> {
         actions: [_buildPopupMenu()],
         leading: IconButton(
           icon: const Icon(Icons.close),
-          onPressed: () => Get.back(),
+          onPressed: () {
+            Get.offAllNamed('/main');
+          },
         ),
       ),
       body: LayoutBuilder(
@@ -58,10 +60,20 @@ class UserProfileView extends GetView<UserProfileViewModel> {
 
             if (controller.targetUserModel.value == null ||
                 controller.relationStatus.value == UserRelationStatus.unknown) {
-              return const Center(
-                child: Text(
-                  '유저 정보를 불러올 수 없습니다.',
-                  style: TextStyle(color: Colors.white),
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('탈퇴한 유저 입니다.', style: TextStyle(color: Colors.white)),
+                    const SizedBox(height: 40),
+                    ElevatedButton(
+                      onPressed: () {
+                        controller.deleteFriend();
+                        Get.back();
+                      },
+                      child: Text('친구 삭제'),
+                    ),
+                  ],
                 ),
               );
             }

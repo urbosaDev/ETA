@@ -190,14 +190,7 @@ class UserProfileViewModel extends GetxController {
 
       final exists = await _chatRepository.chatRoomExists(chatRoomId);
       if (exists) {
-        final room = await _chatRepository.getChatRoom(chatRoomId);
-        if (room != null && !room.participantIds.contains(myUid)) {
-          await _chatRepository.markUserAsJoinedInChatRoom(
-            roomId: chatRoomId,
-            userId: myUid,
-          );
-          await _userRepository.addPrivateChatId(myUid, chatRoomId);
-        }
+        await _chatRepository.getChatRoom(chatRoomId);
         navigateToChatRoomId.value = chatRoomId;
         isChatRoomLoading.value = false;
         return chatRoomId;

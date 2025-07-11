@@ -23,7 +23,6 @@ import 'package:what_is_your_eta/data/service/promise_service.dart';
 import 'package:what_is_your_eta/data/service/report_service.dart';
 import 'package:what_is_your_eta/data/service/user_service.dart';
 import 'package:what_is_your_eta/domain/usecase/calculate_distance_usecase.dart';
-import 'package:what_is_your_eta/domain/usecase/leave_delete_chat_usecase.dart';
 
 class DependencyInjection {
   static Future<void> init() async {
@@ -94,13 +93,13 @@ class DependencyInjection {
       CalculateDistanceUseCase(),
       permanent: true,
     );
-    Get.put<LeaveDeleteChatUsecase>(
-      LeaveDeleteChatUsecase(
-        chatRepository: Get.find<ChatRepository>(),
-        authRepository: Get.find<AuthRepository>(),
-        userRepository: Get.find<UserRepository>(),
-      ),
-      permanent: true,
-    );
+    // Get.put<LeaveDeleteChatUsecase>(
+    //   LeaveDeleteChatUsecase(
+    //     chatRepository: Get.find<ChatRepository>(),
+    //     authRepository: Get.find<AuthRepository>(),
+    //     userRepository: Get.find<UserRepository>(),
+    //   ),
+    //   permanent: true,
+    // );
   }
 }

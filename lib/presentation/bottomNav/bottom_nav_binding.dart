@@ -3,10 +3,8 @@ import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/fcm_token_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
-import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
-import 'package:what_is_your_eta/domain/usecase/leave_delete_chat_usecase.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/home_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/%08add_friend/add_friend_view_model.dart';
@@ -36,14 +34,12 @@ class BottomNavBinding extends Bindings {
         authRepository: Get.find<AuthRepository>(),
         fcmTokenRepository: Get.find<FcmTokenRepository>(),
         userRepository: Get.find<UserRepository>(),
-        groupRepository: Get.find<GroupRepository>(),
-        promiseRepository: Get.find<PromiseRepository>(),
       ),
     );
 
     Get.put(
       PrivateChatViewModel(
-        leaveDeleteChatUsecase: Get.find<LeaveDeleteChatUsecase>(),
+        // leaveDeleteChatUsecase: Get.find<LeaveDeleteChatUsecase>(),
         userRepository: Get.find<UserRepository>(),
         authRepository: Get.find<AuthRepository>(),
         chatRepository: Get.find<ChatRepository>(),

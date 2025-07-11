@@ -34,7 +34,6 @@ class PromiseInfoView extends GetView<PromiseInfoViewModel> {
         );
       }
 
-      // SingleChildScrollView를 제거하여 페이지 자체는 스크롤 불가능하도록 합니다.
       return Padding(
         padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
         child: Column(
@@ -177,14 +176,13 @@ class PromiseInfoView extends GetView<PromiseInfoViewModel> {
                     style: Theme.of(
                       context,
                     ).elevatedButtonTheme.style?.copyWith(
-                      // 패딩을 줄여 버튼 크기를 작게 만듭니다.
                       padding: MaterialStateProperty.all(
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                       ),
                     ),
                     child: Text(
                       '내 위치 공유하기',
-                      // 텍스트 크기도 bodySmall로 줄여 더 작은 버튼에 맞춥니다.
+
                       style: textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -240,7 +238,6 @@ class PromiseInfoView extends GetView<PromiseInfoViewModel> {
     });
   }
 
-  // 재사용 가능한 정보 카드 위젯
   Widget _buildInfoCard(
     BuildContext context,
     TextTheme textTheme, {
@@ -271,10 +268,8 @@ class PromiseInfoView extends GetView<PromiseInfoViewModel> {
     TextTheme textTheme,
     PromiseMemberStatus memberStatus,
   ) {
-    // PromiseMemberStatus 모델에 `location` 필드가 존재함을 가정합니다.
     return UserTile(
-      // ✨ UserTile 위젯 사용
-      user: memberStatus.user, // UserModel 전달
+      user: memberStatus.user,
       textTheme: textTheme, // ✨ textTheme 전달
       isSelected: false, // PromiseInfoView에서는 isSelected를 사용하지 않음
       onTap:
@@ -283,9 +278,8 @@ class PromiseInfoView extends GetView<PromiseInfoViewModel> {
               ? () {
                 controller.selectUser(memberStatus); // ViewModel의 selectUser 호출
               }
-              : null, // 미공유 또는 위치 정보 없으면 탭 비활성화
+              : null,
       trailing: switch (memberStatus.updateStatus) {
-        // ✨ trailing 위젯을 UserTile에 전달
         MemberUpdateStatus.notUpdated => Text(
           '미 공유',
           style: textTheme.bodySmall?.copyWith(
@@ -315,9 +309,6 @@ class PromiseInfoView extends GetView<PromiseInfoViewModel> {
           ],
         ),
       },
-      // UserTile 내부에서 contentPadding과 tileColor가 이미 처리됩니다.
-      // contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      // tileColor: Colors.transparent,
     );
   }
 }

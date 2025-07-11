@@ -46,6 +46,7 @@ class LocationShareViewModel extends GetxController {
   @override
   void onClose() {
     _promiseSub?.cancel();
+
     super.onClose();
   }
 

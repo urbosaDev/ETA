@@ -42,7 +42,7 @@ class UserModel {
       uid: json['uid'],
       uniqueId: json['uniqueId'],
       name: json['name'],
-      photoUrl: json['photoUrl'],
+      photoUrl: json['photoUrl'] ?? dotenv.env['DEFAULT_IMAGE']!,
       friendsUids: List<String>.from(json['friendsUids'] ?? []),
       blockFriendsUids: List<String>.from(json['blockFriendsUids'] ?? []),
       groupIds: List<String>.from(json['groupIds'] ?? []),

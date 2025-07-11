@@ -178,7 +178,11 @@ class CreateGroupViewModel extends GetxController {
 
       await _groupRepository.sendGroupMessage(
         groupId,
-        SystemMessageModel(text: '채팅방이 생성되었습니다', sentAt: DateTime.now()),
+        SystemMessageModel(
+          text:
+              '그룹에 오신 것을 환영합니다! 🎉\n이 그룹에서 발생하는 모든 부적절한 언행(욕설, 비방, 음란물, 개인정보 요구 등)은 서비스 이용 제한의 대상이 될 수 있습니다. 서로 존중하는 대화를 부탁드립니다.😊',
+          sentAt: DateTime.now(),
+        ),
       );
 
       final otherUids = finalSelectedUid.where((uid) => uid != currentUser);

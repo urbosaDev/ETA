@@ -25,14 +25,14 @@ abstract class ChatRepository {
     MessageWithSnapshot lastMessage,
   );
   Stream<List<MessageWithSnapshot>> streamLatestMessages(String roomId);
-  Future<void> markUserAsLeftInChatRoom({
-    required String roomId,
-    required String userId,
-  });
-  Future<void> markUserAsJoinedInChatRoom({
-    required String roomId,
-    required String userId,
-  });
+  // Future<void> markUserAsLeftInChatRoom({
+  //   required String roomId,
+  //   required String userId,
+  // });
+  // Future<void> markUserAsJoinedInChatRoom({
+  //   required String roomId,
+  //   required String userId,
+  // });
 }
 
 class ChatRepositoryImpl implements ChatRepository {
@@ -145,23 +145,26 @@ class ChatRepositoryImpl implements ChatRepository {
         );
   }
 
-  @override
-  Future<void> markUserAsLeftInChatRoom({
-    required String roomId,
-    required String userId,
-  }) async {
-    final msg = SystemMessageModel(text: '유저가 떠났어요...', sentAt: DateTime.now());
-    await _service.leftInChatRoom(roomId: roomId, userId: userId);
-    await _service.sendMessageJson(roomId, msg.toJson());
-  }
+  // @override
+  // Future<void> markUserAsLeftInChatRoom({
+  //   required String roomId,
+  //   required String userId,
+  // }) async {
+  //   final msg = SystemMessageModel(
+  //     text: '유저가 떠났어요...\n 채팅방을 삭제 후 다시 생성해주세요.',
+  //     sentAt: DateTime.now(),
+  //   );
+  //   await _service.leftInChatRoom(roomId: roomId, userId: userId);
+  //   await _service.sendMessageJson(roomId, msg.toJson());
+  // }
 
-  @override
-  Future<void> markUserAsJoinedInChatRoom({
-    required String roomId,
-    required String userId,
-  }) async {
-    final msg = SystemMessageModel(text: '유저가 입장했어요', sentAt: DateTime.now());
-    await _service.joinedInChatRoom(roomId: roomId, userId: userId);
-    await _service.sendMessageJson(roomId, msg.toJson());
-  }
+  // @override
+  // Future<void> markUserAsJoinedInChatRoom({
+  //   required String roomId,
+  //   required String userId,
+  // }) async {
+  //   final msg = SystemMessageModel(text: '유저가 입장했어요', sentAt: DateTime.now());
+  //   await _service.joinedInChatRoom(roomId: roomId, userId: userId);
+  //   await _service.sendMessageJson(roomId, msg.toJson());
+  // }
 }

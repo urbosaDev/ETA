@@ -29,7 +29,10 @@ class ReportView extends GetView<ReportViewModel> {
                   children:
                       controller.reportReasonLabels.entries.map((entry) {
                         return CheckboxListTile(
-                          title: Text(entry.value),
+                          title: Text(
+                            entry.value,
+                            style: TextStyle(color: Colors.white),
+                          ),
                           value: controller.isSelected(entry.key),
                           onChanged: (_) => controller.toggleReason(entry.key),
                         );

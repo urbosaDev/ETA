@@ -11,4 +11,11 @@ class PromiseViewModel extends GetxController {
       currentPage.value = page;
     }
   }
+
+  @override
+  void onClose() {
+    // TODO: implement onClose
+
+    super.onClose();
+  }
 }
