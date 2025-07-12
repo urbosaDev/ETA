@@ -105,7 +105,6 @@ class UserService {
     return query.docs.isEmpty;
   }
 
-  /// 여러 명의 유저 불러오기 (예: 친구 목록)
   Future<List<Map<String, dynamic>>> getUsersByUids(List<String> uids) async {
     if (uids.isEmpty) return [];
 

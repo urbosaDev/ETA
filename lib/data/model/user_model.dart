@@ -24,18 +24,33 @@ class UserModel {
     this.location,
   });
 
-  UserModel.unknownWithUid(String uid)
-    : this(
-        uid: uid,
-        uniqueId: 'unknown',
-        name: '존재하지 않는 사용자',
-        photoUrl: dotenv.env['DEFAULT_IMAGE']!,
-        friendsUids: const [],
-        blockFriendsUids: const [],
-        groupIds: const [],
-        privateChatIds: const [],
-        location: null,
-      );
+  factory UserModel.unknownWithUid(String uid) {
+    return UserModel(
+      uid: uid,
+      uniqueId: 'unknown',
+      name: '존재하지 않는 사용자',
+      photoUrl: dotenv.env['DEFAULT_IMAGE']!,
+      friendsUids: const [],
+      blockFriendsUids: const [],
+      groupIds: const [],
+      privateChatIds: const [],
+      location: null,
+    );
+  }
+
+  factory UserModel.blocked(String uid) {
+    return UserModel(
+      uid: uid,
+      uniqueId: 'blocked_user',
+      name: '차단된 사용자',
+      photoUrl: dotenv.env['DEFAULT_IMAGE']!,
+      friendsUids: const [],
+      blockFriendsUids: const [],
+      groupIds: const [],
+      privateChatIds: const [],
+      location: null,
+    );
+  }
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(

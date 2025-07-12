@@ -5,7 +5,7 @@ import 'package:what_is_your_eta/data/model/group_model.dart';
 import 'package:what_is_your_eta/data/model/location_model/promise_location_model.dart';
 import 'package:what_is_your_eta/data/model/promise_model.dart';
 import 'package:what_is_your_eta/data/model/user_model.dart';
-import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
+import 'package:what_is_your_eta/data/repository/notification_api_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
@@ -16,13 +16,13 @@ class CreatePromiseViewModel extends GetxController {
   final GroupRepository _groupRepository;
   final UserRepository _userRepository;
   final PromiseRepository _promiseRepository;
-  final FcmRepository _fcmRepository;
+  final NotificationApiRepository _fcmRepository;
   CreatePromiseViewModel({
     required this.groupId,
     required GroupRepository groupRepository,
     required UserRepository userRepository,
     required PromiseRepository promiseRepository,
-    required FcmRepository fcmRepository,
+    required NotificationApiRepository fcmRepository,
   }) : _groupRepository = groupRepository,
        _userRepository = userRepository,
        _promiseRepository = promiseRepository,
@@ -171,18 +171,10 @@ class CreatePromiseViewModel extends GetxController {
 
       try {
         final memberUids = selectedMemberIds.toList();
-        final tokenUidPairs = <Map<String, String>>[];
 
-        for (final uid in memberUids) {
-          final tokens = await _userRepository.getFcmTokens(uid);
-          for (final token in tokens) {
-            tokenUidPairs.add({'token': token, 'uid': uid});
-          }
-        }
-
-        if (tokenUidPairs.isNotEmpty) {
+        if (memberUids.isNotEmpty) {
           await _fcmRepository.sendPromiseNotification(
-            targetTokens: tokenUidPairs,
+            targetUserIds: memberUids,
             title: '${groupModel.value?.title ?? '그룹'} 약속 생성',
             body: '${promiseName.value} 약속이 생성되었습니다!',
             groupId: groupId,

@@ -4,6 +4,7 @@ import 'package:what_is_your_eta/data/model/message_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/domain/usecase/get_single_with_status_usecase.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/loading/common_loading_lottie.dart';
@@ -152,6 +153,10 @@ class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
                                       chatRepository:
                                           Get.find<ChatRepository>(),
                                       targetUserUid: sender!.uid,
+                                      getSingleUserWithStatusUsecase:
+                                          Get.find<
+                                            GetSingleUserWithStatusUsecase
+                                          >(),
                                     ),
                                   );
                                 }),

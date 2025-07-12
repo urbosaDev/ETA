@@ -68,7 +68,6 @@ class UserRepositoryImpl implements UserRepository {
     await _userService.updateUserData(user.uid, user.toJson());
   }
 
-  // 채팅방 생길때 유저정보 업데이트
   @override
   Future<void> addPrivateChatId(String uid, String chatRoomId) {
     return _userService.addPrivateChatId(uid, chatRoomId);
@@ -89,11 +88,9 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<UserModel> getUser(String uid) async {
+  Future<UserModel?> getUser(String uid) async {
     final json = await _userService.getUserData(uid);
-    return json == null
-        ? UserModel.unknownWithUid(uid)
-        : UserModel.fromJson(json);
+    return json == null ? null : UserModel.fromJson(json);
   }
   // @override
   // Future<UserModel?> getUserByUniqueId(String uniqueId) async {
@@ -130,26 +127,27 @@ class UserRepositoryImpl implements UserRepository {
     return _userService.isUniqueIdAvailable(uniqueId);
   }
 
-  // @override
-  // Future<List<UserModel>> getUsersByUids(List<String> uids) async {
-  //   final jsonList = await _userService.getUsersByUids(uids);
-  //   return jsonList.map((json) {
-  //     if (json == null) return UserModel.unknown;
-  //     return UserModel.fromJson(json);
-  //   }).toList();
-  // }
   @override
   Future<List<UserModel>> getUsersByUids(List<String> uids) async {
-    final results = <UserModel>[];
-    for (final uid in uids) {
-      final json = await _userService.getUserData(uid);
-      if (json == null) {
-        results.add(UserModel.unknownWithUid(uid));
-      } else {
-        results.add(UserModel.fromJson(json));
-      }
+    if (uids.isEmpty) {
+      return [];
     }
-    return results;
+
+    final List<UserModel> userList = [];
+
+    for (int i = 0; i < uids.length; i += 10) {
+      final sublist = uids.sublist(
+        i,
+        i + 10 > uids.length ? uids.length : i + 10,
+      );
+
+      final List<Map<String, dynamic>> userJsons = await _userService
+          .getUsersByUids(sublist);
+
+      userList.addAll(userJsons.map((json) => UserModel.fromJson(json)));
+    }
+
+    return userList;
   }
 
   @override

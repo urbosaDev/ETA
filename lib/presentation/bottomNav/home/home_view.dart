@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
-import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
+import 'package:what_is_your_eta/data/repository/notification_api_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/create_group/create_group_view.dart';
@@ -201,7 +201,8 @@ class HomeView extends GetView<HomeViewModel> {
                           userRepository: Get.find<UserRepository>(),
                           authRepository: Get.find<AuthRepository>(),
                           groupRepository: Get.find<GroupRepository>(),
-                          fcmRepository: Get.find<FcmRepository>(),
+                          notificationApiRepository:
+                              Get.find<NotificationApiRepository>(),
                         ),
                       );
                     }),

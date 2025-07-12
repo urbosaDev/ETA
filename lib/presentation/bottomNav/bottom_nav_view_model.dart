@@ -1,10 +1,10 @@
 import 'package:get/state_manager.dart';
-import 'package:what_is_your_eta/data/repository/fcm_token_repository.dart';
+import 'package:what_is_your_eta/data/repository/notification_client_repository.dart';
 
 class BottomNavViewModel extends GetxController {
   final currentIndex = 0.obs;
-  final FcmTokenRepository _fcmTokenRepository;
-  BottomNavViewModel({required FcmTokenRepository fcmTokenRepository})
+  final NotificationClientRepository _fcmTokenRepository;
+  BottomNavViewModel({required NotificationClientRepository fcmTokenRepository})
     : _fcmTokenRepository = fcmTokenRepository;
   void changeIndex(int index) {
     currentIndex.value = index;

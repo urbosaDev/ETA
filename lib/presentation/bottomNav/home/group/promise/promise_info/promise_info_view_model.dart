@@ -9,7 +9,7 @@ import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/domain/usecase/calculate_distance_usecase.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/model/promise_member_status.dart';
+import 'package:what_is_your_eta/presentation/models/promise_member_status.dart';
 
 class PromiseInfoViewModel extends GetxController {
   final String promiseId;

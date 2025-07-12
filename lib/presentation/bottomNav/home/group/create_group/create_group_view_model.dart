@@ -5,7 +5,7 @@ import 'package:what_is_your_eta/data/model/group_model.dart';
 
 import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
-import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
+import 'package:what_is_your_eta/data/repository/notification_api_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
@@ -16,16 +16,16 @@ class CreateGroupViewModel extends GetxController {
   final GroupRepository _groupRepository;
   final UserRepository _userRepository;
   final AuthRepository _authRepository;
-  final FcmRepository _fcmRepository;
+  final NotificationApiRepository _notificationApiRepository;
   CreateGroupViewModel({
     required GroupRepository groupRepository,
     required AuthRepository authRepository,
     required UserRepository userRepository,
-    required FcmRepository fcmRepository,
+    required NotificationApiRepository notificationApiRepository,
   }) : _groupRepository = groupRepository,
        _authRepository = authRepository,
        _userRepository = userRepository,
-       _fcmRepository = fcmRepository;
+       _notificationApiRepository = notificationApiRepository;
 
   final Rx<UserModel?> userModel = Rx<UserModel?>(null);
 
@@ -176,32 +176,24 @@ class CreateGroupViewModel extends GetxController {
         await _userRepository.addGroupId(uid, groupId);
       }
 
-      final otherUids = finalSelectedUid.where((uid) => uid != currentUser);
-      final tokenUidPairs = <Map<String, String>>[];
-      for (final uid in otherUids) {
-        final tokens = await _userRepository.getFcmTokens(uid);
-        for (final token in tokens) {
-          tokenUidPairs.add({'token': token, 'uid': uid});
-        }
-      }
+      final targetUserIds =
+          finalSelectedUid.where((uid) => uid != currentUser).toList();
 
-      if (tokenUidPairs.isNotEmpty) {
-        await _fcmRepository.sendGroupNotification(
-          targetTokens: tokenUidPairs,
-          groupName: groupTitle.value,
-          message: '그룹이 생성되었습니다',
+      if (targetUserIds.isNotEmpty) {
+        await _notificationApiRepository.sendGroupNotification(
+          targetUserIds: targetUserIds,
+          groupName: "'${groupTitle.value}' 그룹에 초대되셨습니다! 💌",
+          message: '${userModel.value?.name ?? '새 친구'}님이 당신을 그룹에 초대했습니다.',
           groupId: groupId,
         );
       }
-
-      isGroupCreated.value = true; // 성공 시 상태 업데이트
-      systemMessage.value = '그룹이 성공적으로 생성되었습니다.'; // 성공 메시지 설정
+      isGroupCreated.value = true;
+      systemMessage.value = '그룹이 성공적으로 생성되었습니다.';
     } catch (e) {
-      systemMessage.value =
-          '그룹 생성 중 알 수 없는 오류가 발생했습니다: ${e.toString()}'; // 실패 시 메시지 설정
-      isGroupCreated.value = false; // 실패 시 상태 설정
+      systemMessage.value = '그룹 생성 중 알 수 없는 오류가 발생했습니다: ${e.toString()}';
+      isGroupCreated.value = false;
     } finally {
-      isLoading.value = false; // 로딩 최종 해제
+      isLoading.value = false;
       isCreating.value = false; // 중복 호출 플래그 해제
     }
   }

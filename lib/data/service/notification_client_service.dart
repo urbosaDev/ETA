@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-class FcmTokenService {
+class NotificationClientService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
@@ -39,7 +39,6 @@ class FcmTokenService {
     print('FCM Token 삭제됨 (Array): $token');
   }
 
-  // FCM Token refresh 대응 → app 실행 시 listen 등록
   void listenTokenRefresh() {
     _messaging.onTokenRefresh.listen((newToken) async {
       final user = _auth.currentUser;
@@ -53,5 +52,17 @@ class FcmTokenService {
 
       print('FCM Token 갱신됨 (Array): $newToken');
     });
+  }
+
+  Future<void> subscribeToUserTopic(String userId) async {
+    final topic = 'user_$userId';
+    await _messaging.subscribeToTopic(topic);
+    print('🔔 알림 구독 완료: $topic');
+  }
+
+  Future<void> unsubscribeFromUserTopic(String userId) async {
+    final topic = 'user_$userId';
+    await _messaging.unsubscribeFromTopic(topic);
+    print('🔕 알림 구독 취소: $topic');
   }
 }

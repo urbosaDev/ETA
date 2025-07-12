@@ -8,7 +8,7 @@ import 'package:what_is_your_eta/domain/usecase/location_share_usecase.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/location_share/location_share_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/location_share/location_share_view_model.dart';
 
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/model/promise_member_status.dart';
+import 'package:what_is_your_eta/presentation/models/promise_member_status.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_info/promise_info_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/loading/common_loading_lottie.dart';
 import 'package:what_is_your_eta/presentation/core/widget/user_tile.dart';

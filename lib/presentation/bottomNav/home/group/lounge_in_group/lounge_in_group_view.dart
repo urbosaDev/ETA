@@ -65,12 +65,12 @@ class LoungeInGroupView extends GetView<LoungeInGroupViewModel> {
         actions: [
           Obx(() {
             final textTheme =
-                Theme.of(context).textTheme; // TextTheme 인스턴스 가져오기
+                Theme.of(context).textTheme; 
             final promiseId = controller.currentPromiseId.value;
             final isEnabled = promiseId != null;
 
             return Padding(
-              padding: const EdgeInsets.only(right: 12.0), // 오른쪽 패딩 유지
+              padding: const EdgeInsets.only(right: 12.0), 
               child: TextButton(
                 onPressed:
                     isEnabled

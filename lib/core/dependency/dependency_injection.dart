@@ -3,8 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
-import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
-import 'package:what_is_your_eta/data/repository/fcm_token_repository.dart';
+import 'package:what_is_your_eta/data/repository/notification_api_repository.dart';
+import 'package:what_is_your_eta/data/repository/notification_client_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/location_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
@@ -13,8 +13,8 @@ import 'package:what_is_your_eta/data/repository/report_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/data/service/auth_service.dart';
 import 'package:what_is_your_eta/data/service/chat_service.dart';
-import 'package:what_is_your_eta/data/service/fcm_service.dart';
-import 'package:what_is_your_eta/data/service/fcm_token_service.dart';
+import 'package:what_is_your_eta/data/service/notification_api_service.dart';
+import 'package:what_is_your_eta/data/service/notification_client_service.dart';
 
 import 'package:what_is_your_eta/data/service/group_service.dart';
 import 'package:what_is_your_eta/data/service/local_map_api_service.dart';
@@ -23,15 +23,16 @@ import 'package:what_is_your_eta/data/service/promise_service.dart';
 import 'package:what_is_your_eta/data/service/report_service.dart';
 import 'package:what_is_your_eta/data/service/user_service.dart';
 import 'package:what_is_your_eta/domain/usecase/calculate_distance_usecase.dart';
+import 'package:what_is_your_eta/domain/usecase/get_friends_with_status_usecase.dart';
 
 class DependencyInjection {
   static Future<void> init() async {
     final kakaoApiKey = dotenv.env['KAKAO_REST_API_KEY']!;
     final kakaoBaseUrl = dotenv.env['KAKAO_BASE_URL']!;
     final fcmFunctionUrl = dotenv.env['FIREBASE_FCM_FUNCTION_URL']!;
-    final fcmService = FcmService(functionUrl: fcmFunctionUrl);
+    final fcmService = NotificationApiService(functionUrl: fcmFunctionUrl);
 
-    Get.put<FcmService>(fcmService, permanent: true);
+    Get.put<NotificationApiService>(fcmService, permanent: true);
     Get.put<AuthService>(AuthService(), permanent: true);
     Get.put<UserService>(UserService(), permanent: true);
     Get.put<GroupService>(GroupService(), permanent: true);
@@ -39,14 +40,21 @@ class DependencyInjection {
     Get.put<PrivateChatService>(PrivateChatService(), permanent: true);
 
     Get.put<ReportService>(ReportService(), permanent: true);
-    Get.put<FcmRepository>(
-      FcmRepositoryImpl(fcmService: Get.find<FcmService>()),
+    Get.put<NotificationApiRepository>(
+      NotificationApiRepositoryImpl(
+        fcmService: Get.find<NotificationApiService>(),
+      ),
       permanent: true,
     );
 
-    Get.put<FcmTokenService>(FcmTokenService(), permanent: true);
-    Get.put<FcmTokenRepository>(
-      FcmTokenRepository(service: Get.find<FcmTokenService>()),
+    Get.put<NotificationClientService>(
+      NotificationClientService(),
+      permanent: true,
+    );
+    Get.put<NotificationClientRepository>(
+      NotificationClientRepository(
+        service: Get.find<NotificationClientService>(),
+      ),
       permanent: true,
     );
 
@@ -91,6 +99,13 @@ class DependencyInjection {
     );
     Get.put<CalculateDistanceUseCase>(
       CalculateDistanceUseCase(),
+      permanent: true,
+    );
+    Get.put<GetFriendsWithStatusUsecase>(
+      GetFriendsWithStatusUsecase(
+        authRepository: Get.find<AuthRepository>(),
+        userRepository: Get.find<UserRepository>(),
+      ),
       permanent: true,
     );
   }

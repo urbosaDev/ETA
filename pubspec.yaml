@@ -53,6 +53,7 @@ dependencies:
   flutter_slidable: ^4.0.0
   equatable: ^2.0.7
   sign_in_button: ^4.0.1
+  shared_preferences: ^2.5.3
 
   
   
@@ -87,12 +88,10 @@ flutter:
     - assets/lottie/
 
   fonts:
-    - family: Inconsolata
+    - family: DungGeun
       fonts:
-        - asset: assets/font/Inconsolata-Bold.ttf
-          weight: 700
-        - asset: assets/font/Inconsolata-ExtraBold.ttf
-          weight: 800
+        - asset: assets/font/DungGeunMo.ttf
+          
 
     - family: NotoSansKR
       fonts:

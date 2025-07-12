@@ -3,11 +3,12 @@ import 'package:get/get.dart';
 
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
-import 'package:what_is_your_eta/data/repository/fcm_repository.dart';
+import 'package:what_is_your_eta/data/repository/notification_api_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/domain/usecase/get_single_with_status_usecase.dart';
 
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/group_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/lounge_in_group/lounge_in_group_view.dart';
@@ -411,7 +412,9 @@ class GroupView extends GetView<GroupViewModel> {
                                           promiseRepository:
                                               Get.find<PromiseRepository>(),
                                           fcmRepository:
-                                              Get.find<FcmRepository>(),
+                                              Get.find<
+                                                NotificationApiRepository
+                                              >(),
                                         ),
                                       );
                                     }),
@@ -618,6 +621,10 @@ class GroupView extends GetView<GroupViewModel> {
                                       chatRepository:
                                           Get.find<ChatRepository>(),
                                       targetUserUid: member.userModel.uid,
+                                      getSingleUserWithStatusUsecase:
+                                          Get.find<
+                                            GetSingleUserWithStatusUsecase
+                                          >(),
                                     ),
                                   );
                                 }),

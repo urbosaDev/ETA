@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class FcmService {
+class NotificationApiService {
   final String functionUrl;
 
-  FcmService({required this.functionUrl});
+  NotificationApiService({required this.functionUrl});
 
   Future<void> sendFcmMessages({
-    required List<Map<String, String>> targetTokens,
+    required List<String> targetUserIds,
     required String title,
     required String body,
     Map<String, String>? data,
@@ -16,7 +16,7 @@ class FcmService {
       Uri.parse(functionUrl),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'tokens': targetTokens,
+        'targetUserIds': targetUserIds,
         'title': title,
         'body': body,
         'data': data,

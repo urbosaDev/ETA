@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
-import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
+
 import 'package:what_is_your_eta/presentation/core/loading/common_loading_lottie.dart';
 
 import 'package:what_is_your_eta/presentation/splash/splash_view_model.dart';
@@ -51,12 +51,12 @@ class SplashView extends GetView<SplashViewModel> {
                         fit: BoxFit.contain,
                       ),
                     ),
-                    SizedBox(height: height * 0.12),
+                    SizedBox(height: height * 0.09),
 
                     const Text(
-                      'E.T.A',
+                      '어딧삼',
                       style: TextStyle(
-                        fontFamily: 'Inconsolata',
+                        fontFamily: 'DungGeun',
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 4,

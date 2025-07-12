@@ -5,6 +5,7 @@ import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/domain/usecase/get_single_with_status_usecase.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/%08add_friend/add_friend_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view_model.dart';
@@ -158,6 +159,10 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                                   userRepository: Get.find<UserRepository>(),
                                   authRepository: Get.find<AuthRepository>(),
                                   chatRepository: Get.find<ChatRepository>(),
+                                  getSingleUserWithStatusUsecase:
+                                      Get.find<
+                                        GetSingleUserWithStatusUsecase
+                                      >(),
                                   targetUserUid: friendInfo.userModel.uid,
                                 ),
                               );
