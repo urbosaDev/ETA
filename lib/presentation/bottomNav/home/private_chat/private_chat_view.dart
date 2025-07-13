@@ -3,13 +3,11 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
-
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/domain/usecase/get_single_with_status_usecase.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/%08add_friend/add_friend_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_room/private_chat_room_view_model.dart';
-
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/private_chat/private_chat_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/loading/common_loading_lottie.dart';
 import 'package:what_is_your_eta/presentation/core/widget/%08user_card.dart';
@@ -37,7 +35,29 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
             _buildPrivateHeader(textTheme),
 
             const Divider(color: Colors.white12, thickness: 0.2),
-
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  '친구 목록',
+                  style: textTheme.titleSmall?.copyWith(
+                    color: Colors.white,
+                    fontSize: 12,
+                  ),
+                ),
+                Spacer(),
+                Obx(() {
+                  return Text(
+                    '${controller.friendList.length}/30',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: Colors.grey,
+                      fontSize: 10,
+                    ),
+                  );
+                }),
+              ],
+            ),
+            const SizedBox(height: 8),
             _buildFriendList(textTheme, screenWidth),
             Row(
               children: [
@@ -77,6 +97,17 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
           alignment: Alignment.center,
           child: GestureDetector(
             onTap: () {
+              const int maxFriends = 30;
+              if (controller.friendList.length >= maxFriends) {
+                Get.snackbar(
+                  '알림',
+                  '친구는 최대 $maxFriends명까지만 추가할 수 있습니다.',
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+                return;
+              }
               if (controller.userModel.value != null) {
                 Get.to(() => AddFriendView(user: controller.userModel.value!));
               }

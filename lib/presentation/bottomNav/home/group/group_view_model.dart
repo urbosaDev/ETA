@@ -124,7 +124,7 @@ class GroupViewModel extends GetxController {
       friendList.clear();
       return;
     }
-    // UseCase를 사용하여 상태가 반영된 친구 목록을 가져옴
+
     friendList.value = await _getFriendsWithStatusUsecase.getFriendWithStatus(
       uids: myFriendsUids,
     );

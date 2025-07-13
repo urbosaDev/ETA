@@ -29,73 +29,102 @@ class HomeView extends GetView<HomeViewModel> {
           SizedBox(
             width: leftTabWidth,
             child: Obx(() {
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height,
-                  ),
-                  child: IntrinsicHeight(
-                    child: NavigationRail(
-                      backgroundColor: Color(0xff111111),
-                      selectedIndex: controller.selectedIndex.value,
-                      selectedLabelTextStyle: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(color: Colors.white),
-                      unselectedLabelTextStyle: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(color: Colors.white54),
-                      onDestinationSelected: (index) {
-                        if (index == 1) {
-                          showCreateGroupDialog(context);
-                          return;
-                        }
-
-                        controller.selectedIndex.value = index;
-                      },
-
-                      labelType: NavigationRailLabelType.all,
-                      destinations: [
-                        const NavigationRailDestination(
-                          icon: Icon(Icons.chat),
-                          label: Text('메시지'),
+              return Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: MediaQuery.of(context).size.height,
                         ),
-                        NavigationRailDestination(
-                          icon: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.pinkAccent.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.all(6),
-                            child: const Icon(
-                              Icons.add,
-                              color: Colors.pinkAccent,
-                            ),
-                          ),
-                          label: Text(
-                            '그룹생성',
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: Colors.pinkAccent),
+                        child: IntrinsicHeight(
+                          child: NavigationRail(
+                            backgroundColor: Color(0xff111111),
+                            selectedIndex: controller.selectedIndex.value,
+                            selectedLabelTextStyle: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(color: Colors.white),
+                            unselectedLabelTextStyle: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(color: Colors.white54),
+                            onDestinationSelected: (index) {
+                              if (index == 1) {
+                                showCreateGroupDialog(context);
+                                return;
+                              }
+
+                              controller.selectedIndex.value = index;
+                            },
+
+                            labelType: NavigationRailLabelType.all,
+                            destinations: [
+                              const NavigationRailDestination(
+                                icon: Icon(Icons.chat),
+                                label: Text('메시지'),
+                              ),
+                              NavigationRailDestination(
+                                icon: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.pinkAccent.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  padding: const EdgeInsets.all(6),
+                                  child: const Icon(
+                                    Icons.add,
+                                    color: Colors.pinkAccent,
+                                  ),
+                                ),
+                                label: Text(
+                                  '그룹생성',
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(color: Colors.pinkAccent),
+                                ),
+                              ),
+                              ...controller.groupList.map((group) {
+                                String displayText = group.title;
+                                if (displayText.length > 3) {
+                                  displayText =
+                                      '${displayText.substring(0, 3)}..';
+                                }
+
+                                return NavigationRailDestination(
+                                  icon: const Icon(Icons.groups),
+                                  label: Text(
+                                    displayText,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                );
+                              }).toList(),
+                            ],
                           ),
                         ),
-                        ...controller.groupList.map((group) {
-                          String displayText = group.title;
-                          if (displayText.length > 3) {
-                            displayText = '${displayText.substring(0, 3)}..';
-                          }
-
-                          return NavigationRailDestination(
-                            icon: const Icon(Icons.groups),
-                            label: Text(
-                              displayText,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                          );
-                        }).toList(),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+
+                  Obx(() {
+                    final totalGroups = controller.groupList.length;
+
+                    return Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8.0,
+                          horizontal: 4.0,
+                        ),
+                        child: Text(
+                          '$totalGroups/6\n최대6개',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: Colors.white54, fontSize: 12),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }),
+                ],
               );
             }),
           ),
@@ -125,16 +154,14 @@ class HomeView extends GetView<HomeViewModel> {
                           Get.find<NotificationApiRepository>(),
                     ),
                     tag: tag,
-                    permanent: true,
                   );
                 }
-
                 innerView = GetBuilder<GroupViewModel>(
                   tag: tag,
                   builder: (_) => GroupView(groupTag: tag),
                 );
               } else {
-                innerView = const Center(child: Text('그룹은 별도 화면에서 열립니다.'));
+                innerView = const PrivateChatView();
               }
 
               return Container(
@@ -189,40 +216,59 @@ class HomeView extends GetView<HomeViewModel> {
                   color: Colors.white,
                 ),
               ),
+
               const SizedBox(height: 8),
-              Text(
-                '그룹 채널 내에서 친구들과 함께 약속을\n만들어볼까요 🌸',
-                style: textTheme.bodySmall?.copyWith(color: Colors.pinkAccent),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  Get.to(
-                    () => CreateGroupView(),
-                    binding: BindingsBuilder(() {
-                      Get.put(
-                        CreateGroupViewModel(
-                          userRepository: Get.find<UserRepository>(),
-                          authRepository: Get.find<AuthRepository>(),
-                          groupRepository: Get.find<GroupRepository>(),
-                          notificationApiRepository:
-                              Get.find<NotificationApiRepository>(),
-                          getFriendsWithStatusUsecase:
-                              Get.find<GetFriendsWithStatusUsecase>(),
-                        ),
-                      );
-                    }),
+              Obx(() {
+                final groupCount = controller.groupList.length;
+                final maxGroups = 6;
+                if (groupCount >= maxGroups) {
+                  return Text(
+                    '그룹은 최대 $maxGroups개까지 만들 수 있어요.',
+                    style: textTheme.bodySmall?.copyWith(color: Colors.red),
                   );
-                },
-                child: Text(
-                  '⭐채널 생성하기',
-                  style: textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+                } else {
+                  return Column(
+                    children: [
+                      Text(
+                        '그룹 채널 내에서 친구들과 함께 약속을\n만들어볼까요 🌸',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: Colors.pinkAccent,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+
+                      ElevatedButton(
+                        onPressed: () {
+                          Get.to(
+                            () => CreateGroupView(),
+                            binding: BindingsBuilder(() {
+                              Get.put(
+                                CreateGroupViewModel(
+                                  userRepository: Get.find<UserRepository>(),
+                                  authRepository: Get.find<AuthRepository>(),
+                                  groupRepository: Get.find<GroupRepository>(),
+                                  notificationApiRepository:
+                                      Get.find<NotificationApiRepository>(),
+                                  getFriendsWithStatusUsecase:
+                                      Get.find<GetFriendsWithStatusUsecase>(),
+                                ),
+                              );
+                            }),
+                          );
+                        },
+                        child: Text(
+                          '⭐채널 생성하기',
+                          style: textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+              }),
             ],
           ),
         ),

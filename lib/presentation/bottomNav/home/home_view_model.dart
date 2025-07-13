@@ -41,7 +41,6 @@ class HomeViewModel extends GetxController {
       if (index != -1) {
         selectedIndex.value = index + 2;
       }
-
       bottomNavController.pendingGroupId.value = null;
     });
   }
@@ -77,12 +76,11 @@ class HomeViewModel extends GetxController {
           selectedIndex.value = 0;
         }
       }
-
-      if (newGroupIds.isNotEmpty) {
-        await _fetchGroups(newGroupIds);
-      } else {
-        _groupList.clear();
-      }
+      await _fetchGroups(newGroupIds);
+      // if (newGroupIds.isNotEmpty) {
+      // } else {
+      //   _groupList.clear();
+      // }
     });
   }
 

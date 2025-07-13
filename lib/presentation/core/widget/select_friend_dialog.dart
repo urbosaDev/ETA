@@ -12,7 +12,7 @@ class SelectFriendDialog extends StatelessWidget {
   final String confirmText;
   final VoidCallback onConfirm;
   final List<String> disabledUids;
-
+  final int maxGroupsPerUser;
   const SelectFriendDialog({
     super.key,
     required this.friendList,
@@ -21,6 +21,7 @@ class SelectFriendDialog extends StatelessWidget {
     required this.confirmText,
     required this.onConfirm,
     this.disabledUids = const [],
+    this.maxGroupsPerUser = 6,
   });
 
   @override
@@ -128,6 +129,23 @@ class SelectFriendDialog extends StatelessWidget {
                     final isDisabled = disabledUids.contains(
                       friend.userModel.uid,
                     );
+                    final bool isGroupLimitReached =
+                        friend.userModel.groupIds.length >= maxGroupsPerUser;
+
+                    final bool finalIsDisabled =
+                        isDisabled ||
+                        isGroupLimitReached ||
+                        friend.status == UserStatus.deleted ||
+                        friend.status == UserStatus.blocked;
+
+                    String subtitleText = '@${friend.userModel.uniqueId}';
+                    if (friend.status == UserStatus.deleted) {
+                      subtitleText = '탈퇴한 유저입니다.';
+                    } else if (friend.status == UserStatus.blocked) {
+                      subtitleText = '차단된 유저입니다.';
+                    } else if (isGroupLimitReached) {
+                      subtitleText = '그룹 최대($maxGroupsPerUser개)에 도달했어요.';
+                    }
 
                     return ListTile(
                       leading: CircleAvatar(
@@ -148,7 +166,7 @@ class SelectFriendDialog extends StatelessWidget {
                         ),
                       ),
                       subtitle: Text(
-                        '@${friend.userModel.uniqueId}',
+                        '$subtitleText',
                         style: textTheme.bodySmall?.copyWith(
                           color: isDisabled ? Colors.grey[700] : Colors.grey,
                         ),
@@ -167,7 +185,8 @@ class SelectFriendDialog extends StatelessWidget {
                                     : Colors.blueAccent),
                         size: 24,
                       ),
-                      onTap: isDisabled ? null : () => toggleFriend(friend),
+                      onTap:
+                          finalIsDisabled ? null : () => toggleFriend(friend),
                       selected: isSelected,
                       selectedTileColor: Colors.white.withOpacity(0.05),
                     );
