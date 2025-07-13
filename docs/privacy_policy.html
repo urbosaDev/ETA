@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>개인정보 처리방침 - ETA (수집 항목 및 목적)</title>
+    <style>
+        body { 
+            font-family: 'Noto Sans KR', sans-serif; /* 한국어 폰트 우선 */
+            line-height: 1.6; 
+            margin: 20px; 
+            color: #333; 
+            background-color: #f9f9f9; /* 밝은 배경색 */
+            padding: 10px;
+        }
+        h1 { 
+            color: #1a1a1a; 
+            font-size: 28px; 
+            margin-bottom: 15px; 
+            border-bottom: 2px solid #eee; 
+            padding-bottom: 10px;
+        }
+        h2 { 
+            color: #333; 
+            font-size: 22px; 
+            margin-top: 30px; 
+            border-bottom: 1px solid #ddd; 
+            padding-bottom: 8px;
+        }
+        p { 
+            font-size: 15px; 
+            margin-bottom: 15px; 
+            color: #555; 
+        }
+        ul { 
+            list-style-type: disc; 
+            margin-left: 20px; 
+            padding-left: 0; 
+            margin-bottom: 15px;
+        }
+        ul ul { 
+            list-style-type: circle; 
+            margin-left: 15px; 
+            font-size: 14px; 
+        }
+        li { 
+            margin-bottom: 8px; 
+            color: #666;
+        }
+        strong { 
+            font-weight: bold; 
+            color: #1a1a1a;
+        }
+        em { 
+            font-style: normal; 
+            color: #888; 
+            font-size: 13px;
+        }
+        
+        /* 모바일 반응형 기본 설정 */
+        @media (max-width: 600px) {
+            body {
+                margin: 10px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            h2 {
+                font-size: 20px;
+            }
+            p, ul, li {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>개인정보 처리방침 (ETA 앱)</h1>
+    <p>본 개인정보 처리방침은 'ETA' 앱 (이하 "저희" 또는 "서비스")이 사용자 여러분의 개인정보를 어떻게 수집, 이용하고 보호하는지를 명확히 설명합니다. 저희는 「개인정보보호법」 등 관련 법규를 준수하며 사용자의 개인정보 보호에 최선을 다하고 있습니다.</p>
+    <p><strong>시행일: 2025년 7월 11일</strong></p>
+
+    <h2>1. 수집하는 개인정보 항목 및 수집 목적</h2>
+    <p>저희 'ETA' 앱은 원활한 서비스 제공 및 사용자 경험 향상을 위해 다음과 같은 최소한의 개인정보를 수집 및 이용합니다.</p>
+    <ul>
+        <li><strong>계정 정보:</strong>
+            <ul>
+                <li><strong>사용자 고유 ID (UID):</strong> Firebase에서 자동으로 생성되는 고유 식별자로, 서비스 회원 가입 및 관리, 개인 식별에 사용됩니다.</li>
+                <li><strong>닉네임 (사용자 이름):</strong> 사용자가 직접 설정하는 정보로, 앱 내에서 다른 사용자와 소통하고 식별하는 데 사용됩니다.</li>
+                <li><strong>프로필 사진:</strong> 사용자가 직접 설정하는 정보로, 앱 내에서 시각적인 식별을 돕습니다.</li>
+                <li><strong>이메일 주소:</strong> Apple 로그인 또는 Google 로그인을 통해 인증 목적으로만 사용되며, 앱 내에서 직접적인 이메일 주소는 수집 및 저장되지 않습니다.</li>
+            </ul>
+        </li>
+        <li><strong>채팅 및 그룹 활동 정보:</strong>
+            <ul>
+                <li><strong>메시지 내용:</strong> 1:1 채팅 및 그룹 채팅 기능을 제공하기 위해 수집되며, 메시지를 주고받는 사용자 간에 공유되고 앱 서버에 저장됩니다.</li>
+                <li><strong>채팅방 ID 및 그룹 ID:</strong> 채팅방 및 그룹의 고유 식별자로, 1:1 채팅방은 참여 사용자 UID의 조합으로 자동 생성되며, 그룹 ID는 그룹 생성 시 자동으로 생성됩니다. 이는 채팅 및 그룹 활동 관리에 사용됩니다.</li>
+                <li><strong>참여자 목록 (채팅방/그룹):</strong> 각 채팅방 및 그룹에 참여하는 사용자들의 고유 ID(UID)만 저장됩니다. 이는 채팅 및 그룹 참여자 관리, 메시지 전달, 친구 관계 및 차단 상태 관리에 사용됩니다.</li>
+            </ul>
+        </li>
+        <li><strong>위치 정보:</strong>
+            <ul>
+                <li><strong>항목:</strong> 사용자의 현재 위치 좌표 (위도, 경도), 해당 좌표의 주소, 위치 정보 업데이트 시각이 수집됩니다.</li>
+                <li><strong>수집 목적:</strong> 그룹 내 약속 장소와의 거리 계산 및 지도 상에 사용자 위치를 공유하는 기능 제공을 위해서만 사용됩니다.</li>
+                <li><strong>수집 시점:</strong> 사용자가 약속 화면 내에서 <strong>'위치 공유' 버튼을 직접 눌렀을 때에만 일회성으로 수집</strong>됩니다. 앱이 백그라운드에 있거나 사용자가 직접 버튼을 누르지 않는 한 위치 정보는 수집되지 않습니다.</li>
+            </ul>
+        </li>
+        <li><strong>기기 정보:</strong>
+            <ul>
+                <li><strong>푸시 알림 (FCM) 토큰:</strong> 사용자에게 알림 메시지(새로운 메시지, 약속 알림 등)를 발송하기 위해 기기의 푸시 알림 토큰을 수집합니다.</li>
+            </ul>
+        </li>
+        <li><strong>신고 관련 정보:</strong>
+            <ul>
+                <li><strong>항목:</strong> 신고 대상 사용자 고유 ID (UID), 신고 유형 (부적절한 프로필, 부적절한 메시지, 부적절한 닉네임 중 선택된 항목), 신고가 접수된 시각이 수집됩니다.</li>
+                <li><strong>수집 목적:</strong> 서비스 환경을 보호하고, 사용자 간의 건전한 소통을 유지하며, 부적절한 사용자 및 콘텐츠에 대한 서비스 관리 및 조치를 위해서만 사용됩니다.</li>
+            </ul>
+        </li>
+        <li><strong>기타 자동 수집 정보:</strong>
+            <ul>
+                <li>서비스 이용 과정에서 기기 정보(OS 버전, 모델명), 앱 사용 기록, 오류 및 충돌 로그 등이 자동 수집될 수 있습니다. 이는 서비스 안정성 확보, 품질 개선, 오류 해결을 위한 목적으로만 사용되며, 특정 개인을 식별할 수 없는 형태로 수집됩니다.</li>
+            </ul>
+        </li>
+    </ul>
+    </body>
+</html>
