@@ -4,6 +4,7 @@ import 'package:what_is_your_eta/data/model/message_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/domain/usecase/get_single_with_status_usecase.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/lounge_in_group/lounge_in_group_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_view_model.dart';
@@ -64,13 +65,12 @@ class LoungeInGroupView extends GetView<LoungeInGroupViewModel> {
         ),
         actions: [
           Obx(() {
-            final textTheme =
-                Theme.of(context).textTheme; 
+            final textTheme = Theme.of(context).textTheme;
             final promiseId = controller.currentPromiseId.value;
             final isEnabled = promiseId != null;
 
             return Padding(
-              padding: const EdgeInsets.only(right: 12.0), 
+              padding: const EdgeInsets.only(right: 12.0),
               child: TextButton(
                 onPressed:
                     isEnabled
@@ -165,26 +165,31 @@ class LoungeInGroupView extends GetView<LoungeInGroupViewModel> {
                             msg: msg,
                             isMe: isMe,
                             sender: sender,
-                            onUserTap: () {
-                              Get.to(
-                                () => const UserProfileView(),
-                                fullscreenDialog: true,
-                                transition: Transition.downToUp,
-                                binding: BindingsBuilder(() {
-                                  Get.put(
-                                    UserProfileViewModel(
-                                      userRepository:
-                                          Get.find<UserRepository>(),
-                                      authRepository:
-                                          Get.find<AuthRepository>(),
-                                      chatRepository:
-                                          Get.find<ChatRepository>(),
-                                      targetUserUid: sender!.uid,
-                                    ),
-                                  );
-                                }),
-                              );
-                            },
+                            onUserTap: null,
+                            // onUserTap: () {
+                            //   Get.to(
+                            //     () => const UserProfileView(),
+                            //     fullscreenDialog: true,
+                            //     transition: Transition.downToUp,
+                            //     binding: BindingsBuilder(() {
+                            //       Get.put(
+                            //         UserProfileViewModel(
+                            //           userRepository:
+                            //               Get.find<UserRepository>(),
+                            //           authRepository:
+                            //               Get.find<AuthRepository>(),
+                            //           chatRepository:
+                            //               Get.find<ChatRepository>(),
+                            //           targetUserUid: sender!.uid,
+                            //           getSingleUserWithStatusUsecase:
+                            //               Get.find<
+                            //                 GetSingleUserWithStatusUsecase
+                            //               >(),
+                            //         ),
+                            //       );
+                            //     }),
+                            //   );
+                            // },
                           );
                         }, childCount: msgs.length),
                       ),

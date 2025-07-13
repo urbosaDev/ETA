@@ -9,14 +9,14 @@ class MessageBubble extends StatelessWidget {
   final MessageModel msg;
   final bool isMe;
   final UserModel? sender;
-  final VoidCallback onUserTap;
+  final VoidCallback? onUserTap;
 
   const MessageBubble({
     super.key,
     required this.msg,
     required this.isMe,
     required this.sender,
-    required this.onUserTap,
+    this.onUserTap,
   });
 
   @override

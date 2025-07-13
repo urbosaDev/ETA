@@ -69,7 +69,7 @@ class SettingView extends GetView<SettingViewModel> {
                   ),
                 ),
                 const Divider(color: Colors.grey, thickness: 0.2),
-                SettingTile(title: "앱 버전", value: "1.0.0", onTap: () {}),
+                SettingTile(title: "앱 버전", value: "1.0.0", onTap: null),
                 const Divider(color: Colors.grey, thickness: 0.2),
                 SettingTile(title: "로그아웃", onTap: controller.signOut),
                 SettingTile(

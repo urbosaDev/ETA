@@ -62,14 +62,16 @@ class PrivateChatViewModel extends GetxController {
   void _startUserStream(String uid) {
     _userSub = _userRepository.streamUser(uid).listen((user) async {
       userModel.value = user;
-      await _updateAllLists(user);
+      forceRefreshChatRooms();
+      // await _updateAllLists(user);
     });
   }
 
   Future<void> _updateAllLists(UserModel user) async {
-    print('Updating1');
     userModel.value = user;
+
     final friendUids = user.friendsUids;
+
     final processedFriendList = await _getFriendsWithStatusUsecase
         .getFriendWithStatus(uids: friendUids);
     friendList.value = processedFriendList;
@@ -85,7 +87,7 @@ class PrivateChatViewModel extends GetxController {
       chatRoomList.clear();
       return;
     }
-    print('Updating2');
+
     final opponentUids =
         chatIds
             .map((id) {

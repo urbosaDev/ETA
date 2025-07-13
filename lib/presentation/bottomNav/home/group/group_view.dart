@@ -590,9 +590,7 @@ class GroupView extends GetView<GroupViewModel> {
           ),
         );
       }
-
       final currentUid = controller.currentUser;
-
       return SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),

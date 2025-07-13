@@ -9,6 +9,7 @@ import 'package:what_is_your_eta/data/repository/chat_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/domain/usecase/get_friends_with_status_usecase.dart';
 import 'package:what_is_your_eta/presentation/models/friend_info_model.dart';
 
 class GroupViewModel extends GetxController {
@@ -18,6 +19,7 @@ class GroupViewModel extends GetxController {
   final AuthRepository _authRepository;
   final PromiseRepository _promiseRepository;
   final ChatRepository _chatRepository;
+  final GetFriendsWithStatusUsecase _getFriendsWithStatusUsecase;
 
   GroupViewModel({
     required GroupRepository groupRepository,
@@ -26,11 +28,14 @@ class GroupViewModel extends GetxController {
     required PromiseRepository promiseRepository,
     required ChatRepository chatRepository,
     required this.group,
+    required GetFriendsWithStatusUsecase getFriendsWithStatusUsecase,
+    required notificationApiRepository,
   }) : _groupRepository = groupRepository,
        _userRepository = userRepository,
        _authRepository = authRepository,
        _promiseRepository = promiseRepository,
-       _chatRepository = chatRepository;
+       _chatRepository = chatRepository,
+       _getFriendsWithStatusUsecase = getFriendsWithStatusUsecase;
 
   final Rx<GroupModel?> groupModel = Rx<GroupModel?>(null);
   final RxBool isLoading = true.obs;
@@ -52,7 +57,7 @@ class GroupViewModel extends GetxController {
   final RxBool isPromiseExisted = false.obs;
   List<FriendInfoModel> get validFriends =>
       friendList
-          .where((f) => f.userModel.uniqueId != 'unknown' && !f.isBlocked)
+          .where((friendInfo) => friendInfo.status == UserStatus.active)
           .toList();
   @override
   void onInit() {
@@ -89,7 +94,7 @@ class GroupViewModel extends GetxController {
       if (user != null) {
         userModel.value = user;
         await getUsersByUids(user);
-        await _fetchMember(fetchedGroup);
+        await _fetchMember();
       }
     }
 
@@ -100,7 +105,7 @@ class GroupViewModel extends GetxController {
       getUsersByUids(user);
       final latestGroup = groupModel.value;
       if (latestGroup != null) {
-        _fetchMember(latestGroup);
+        _fetchMember();
       }
     });
 
@@ -114,21 +119,22 @@ class GroupViewModel extends GetxController {
   }
 
   Future<void> getUsersByUids(UserModel user) async {
-    final users = await _userRepository.getUsersByUids(user.friendsUids);
-    final blockedUids = userModel.value?.blockFriendsUids ?? [];
-
-    friendList.value =
-        users.map((user) {
-          final isBlocked = blockedUids.contains(user.uid);
-          return FriendInfoModel(userModel: user, isBlocked: isBlocked);
-        }).toList();
+    final myFriendsUids = userModel.value?.friendsUids;
+    if (myFriendsUids == null || myFriendsUids.isEmpty) {
+      friendList.clear();
+      return;
+    }
+    // UseCase를 사용하여 상태가 반영된 친구 목록을 가져옴
+    friendList.value = await _getFriendsWithStatusUsecase.getFriendWithStatus(
+      uids: myFriendsUids,
+    );
   }
 
   void _startGroupStream() {
     _groupSub = _groupRepository.streamGroup(group.id).listen((group) {
       groupModel.value = group;
       isPromiseExisted.value = group.currentPromiseId != null;
-      _fetchMember(group);
+      _fetchMember();
       _fetchPromise(group);
       if (leaderModel.value?.uid != group.createrId) {
         fetchLeaderInfo(group.createrId);
@@ -136,18 +142,15 @@ class GroupViewModel extends GetxController {
     });
   }
 
-  Future<void> _fetchMember(GroupModel group) async {
-    final users = await _userRepository.getUsersByUids(group.memberIds);
-    final blockedUids = userModel.value?.blockFriendsUids ?? [];
-
-    memberList.value =
-        users.map((user) {
-          final isBlocked = blockedUids.contains(user.uid);
-          return FriendInfoModel(userModel: user, isBlocked: isBlocked);
-        }).toList();
-
-    selectedFriends.removeWhere(
-      (f) => group.memberIds.contains(f.userModel.uid),
+  Future<void> _fetchMember() async {
+    final memberUids = groupModel.value?.memberIds;
+    if (memberUids == null || memberUids.isEmpty) {
+      memberList.clear();
+      return;
+    }
+    // UseCase를 사용하여 상태가 반영된 멤버 목록을 가져옴
+    memberList.value = await _getFriendsWithStatusUsecase.getFriendWithStatus(
+      uids: memberUids,
     );
   }
 

@@ -128,7 +128,8 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
         ],
       ),
       child: Obx(() {
-        if (controller.friendList.isEmpty) {
+        final friendList = controller.friendList;
+        if (friendList.isEmpty) {
           return Center(
             child: Text(
               '아직 친구가 없습니다.',
@@ -144,7 +145,7 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
             ),
             child: Row(
               children:
-                  controller.friendList.map((friendInfo) {
+                  friendList.map((friendInfo) {
                     return Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: GestureDetector(
@@ -183,7 +184,6 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
     );
   }
 
-  //채팅방 목록
   Widget _buildChatList(TextTheme textTheme) {
     return Expanded(
       child: Container(
@@ -215,7 +215,7 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                     endIndent: 16,
                   ),
               itemBuilder: (context, index) {
-                final displayModel = controller.chatRoomList[index];
+                final displayModel = chatRoomList[index];
                 final chatRoomId = displayModel.chatRoomId;
                 final opponent = displayModel.opponentUser;
                 final my = controller.userModel.value!;

@@ -24,6 +24,7 @@ import 'package:what_is_your_eta/data/service/report_service.dart';
 import 'package:what_is_your_eta/data/service/user_service.dart';
 import 'package:what_is_your_eta/domain/usecase/calculate_distance_usecase.dart';
 import 'package:what_is_your_eta/domain/usecase/get_friends_with_status_usecase.dart';
+import 'package:what_is_your_eta/domain/usecase/get_single_with_status_usecase.dart';
 
 class DependencyInjection {
   static Future<void> init() async {
@@ -103,6 +104,13 @@ class DependencyInjection {
     );
     Get.put<GetFriendsWithStatusUsecase>(
       GetFriendsWithStatusUsecase(
+        authRepository: Get.find<AuthRepository>(),
+        userRepository: Get.find<UserRepository>(),
+      ),
+      permanent: true,
+    );
+    Get.put<GetSingleUserWithStatusUsecase>(
+      GetSingleUserWithStatusUsecase(
         authRepository: Get.find<AuthRepository>(),
         userRepository: Get.find<UserRepository>(),
       ),

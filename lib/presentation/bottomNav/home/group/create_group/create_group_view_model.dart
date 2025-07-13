@@ -9,6 +9,7 @@ import 'package:what_is_your_eta/data/repository/notification_api_repository.dar
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/domain/usecase/get_friends_with_status_usecase.dart';
 import 'package:what_is_your_eta/presentation/core/filter_words.dart';
 import 'package:what_is_your_eta/presentation/models/friend_info_model.dart';
 
@@ -17,15 +18,18 @@ class CreateGroupViewModel extends GetxController {
   final UserRepository _userRepository;
   final AuthRepository _authRepository;
   final NotificationApiRepository _notificationApiRepository;
+  final GetFriendsWithStatusUsecase _getFriendsWithStatusUsecase;
   CreateGroupViewModel({
     required GroupRepository groupRepository,
     required AuthRepository authRepository,
     required UserRepository userRepository,
     required NotificationApiRepository notificationApiRepository,
+    required GetFriendsWithStatusUsecase getFriendsWithStatusUsecase,
   }) : _groupRepository = groupRepository,
        _authRepository = authRepository,
        _userRepository = userRepository,
-       _notificationApiRepository = notificationApiRepository;
+       _notificationApiRepository = notificationApiRepository,
+       _getFriendsWithStatusUsecase = getFriendsWithStatusUsecase;
 
   final Rx<UserModel?> userModel = Rx<UserModel?>(null);
 
@@ -50,10 +54,7 @@ class CreateGroupViewModel extends GetxController {
 
   List<FriendInfoModel> get validFriends =>
       friendList
-          .where(
-            (f) =>
-                f.userModel.uniqueId != 'unknown' && !f.isBlocked, // 차단한 유저는 제외
-          )
+          .where((friendInfo) => friendInfo.status == UserStatus.active)
           .toList();
 
   final RxBool containsBlockedWordInTitle = false.obs;
@@ -98,14 +99,12 @@ class CreateGroupViewModel extends GetxController {
   }
 
   Future<void> getUsersByUids(List<String> uids) async {
-    final users = await _userRepository.getUsersByUids(uids);
-    final blockedUids = userModel.value?.blockFriendsUids ?? [];
+    final uids = userModel.value?.friendsUids;
+    if (uids == null) return;
 
-    friendList.value =
-        users.map((user) {
-          final isBlocked = blockedUids.contains(user.uid);
-          return FriendInfoModel(userModel: user, isBlocked: isBlocked);
-        }).toList();
+    final processedList = await _getFriendsWithStatusUsecase
+        .getFriendWithStatus(uids: uids);
+    friendList.value = processedList;
   }
 
   final RxBool isGroupCreated = false.obs;

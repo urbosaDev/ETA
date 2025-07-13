@@ -133,54 +133,37 @@ class UserProfileViewModel extends GetxController {
 
   Future<String?> createChatRoom() async {
     isChatRoomLoading.value = true;
-
     try {
       final myUid = _authRepository.getCurrentUser()?.uid;
-
       if (myUid == null) {
         isChatRoomLoading.value = false;
 
         return null;
       }
-
       final chatRoomId = generateChatRoomId(myUid, targetUserUid);
-
       final exists = await _chatRepository.chatRoomExists(chatRoomId);
 
       if (exists) {
         await _chatRepository.getChatRoom(chatRoomId);
-
         navigateToChatRoomId.value = chatRoomId;
-
         isChatRoomLoading.value = false;
-
         return chatRoomId;
       }
-
       final chatRoomData = {
         'participantIds': [myUid, targetUserUid],
-
         'lastMessage': '',
-
         'lastMessageAt': DateTime.now(),
       };
-
       await _chatRepository.createChatRoom(
         chatId: chatRoomId,
-
         data: chatRoomData,
       );
-
       await _userRepository.addPrivateChatId(myUid, chatRoomId);
-
       await _userRepository.addPrivateChatId(targetUserUid, chatRoomId);
-
       navigateToChatRoomId.value = chatRoomId;
-
       return chatRoomId;
     } catch (e) {
       navigateToChatRoomId.value = null;
-
       return null;
     } finally {
       isChatRoomLoading.value = false;

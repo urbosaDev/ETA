@@ -7,6 +7,7 @@ import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/notification_api_repository.dart';
 import 'package:what_is_your_eta/data/repository/group_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/domain/usecase/get_friends_with_status_usecase.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/create_group/create_group_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/create_group/create_group_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/group_view.dart';
@@ -118,6 +119,10 @@ class HomeView extends GetView<HomeViewModel> {
                       authRepository: Get.find(),
                       promiseRepository: Get.find(),
                       chatRepository: Get.find(),
+                      getFriendsWithStatusUsecase:
+                          Get.find<GetFriendsWithStatusUsecase>(),
+                      notificationApiRepository:
+                          Get.find<NotificationApiRepository>(),
                     ),
                     tag: tag,
                     permanent: true,
@@ -203,6 +208,8 @@ class HomeView extends GetView<HomeViewModel> {
                           groupRepository: Get.find<GroupRepository>(),
                           notificationApiRepository:
                               Get.find<NotificationApiRepository>(),
+                          getFriendsWithStatusUsecase:
+                              Get.find<GetFriendsWithStatusUsecase>(),
                         ),
                       );
                     }),
