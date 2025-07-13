@@ -274,7 +274,7 @@ class PrivateChatView extends GetView<PrivateChatViewModel> {
                                 chatRoomId,
                                 opponent.uid,
                               );
-                              Get.offAllNamed('/main');
+                              Get.offNamed('/main');
                             },
                           );
                         },

@@ -145,6 +145,8 @@ class UserProfileViewModel extends GetxController {
 
       if (exists) {
         await _chatRepository.getChatRoom(chatRoomId);
+        await _userRepository.addPrivateChatId(myUid, chatRoomId);
+        await _userRepository.addPrivateChatId(targetUserUid, chatRoomId);
         navigateToChatRoomId.value = chatRoomId;
         isChatRoomLoading.value = false;
         return chatRoomId;

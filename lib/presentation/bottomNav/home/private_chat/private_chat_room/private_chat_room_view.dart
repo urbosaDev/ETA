@@ -67,7 +67,7 @@ class PrivateChatRoomView extends GetView<PrivateChatRoomViewModel> {
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () {
-                  Get.offAllNamed('/main');
+                  Get.offNamed('/main');
                 },
               ),
               const SizedBox(width: 8),

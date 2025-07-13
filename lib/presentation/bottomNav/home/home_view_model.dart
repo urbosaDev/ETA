@@ -31,6 +31,8 @@ class HomeViewModel extends GetxController {
   final RxnString groupIdToOpen = RxnString();
   @override
   void onInit() {
+    print('init홈뷰모델');
+
     super.onInit();
     _initUser();
     final bottomNavController = Get.find<BottomNavViewModel>();
@@ -65,22 +67,39 @@ class HomeViewModel extends GetxController {
 
   void _startUserStream(String uid) {
     _userSub = _userRepository.streamUser(uid).listen((userModel) async {
-      final oldGroupIds = _groupList.map((g) => g.id).toList();
-      final newGroupIds = userModel.groupIds;
+      final newGroupIds = userModel.groupIds; // 스트림으로 받은 최신 groupIds
 
+      // 1. 그룹 목록을 먼저 최신 상태로 패치합니다.
+      if (newGroupIds.isNotEmpty) {
+        await _fetchGroups(newGroupIds);
+      } else {
+        _groupList.clear(); // 그룹이 없으면 목록 비움
+      }
+
+      // 2. 그룹 목록이 업데이트된 후, selectedIndex 유효성 검사 및 조정
+      // 이 로직은 `_groupList` (업데이트된)를 기반으로 합니다.
       final selectedGroupIndex = selectedIndex.value;
       if (selectedGroupIndex >= 2) {
-        final selectedGroupId = oldGroupIds[selectedGroupIndex - 2];
+        // 현재 선택된 탭이 그룹 탭이라면
+        // _groupList가 이미 업데이트되었으므로, 여기서 해당 그룹이 여전히 존재하는지 확인
+        // selectedGroupId를 찾기 위해 oldGroupIds 대신 _groupList를 사용
+        final String? currentSelectedGroupId =
+            (selectedGroupIndex - 2) <
+                    _groupList
+                        .length // 인덱스 유효성 먼저 확인
+                ? _groupList[selectedGroupIndex - 2].id
+                : null;
 
-        if (!newGroupIds.contains(selectedGroupId)) {
-          selectedIndex.value = 0;
+        if (currentSelectedGroupId == null ||
+            !newGroupIds.contains(currentSelectedGroupId)) {
+          // 선택된 그룹 ID가 null이거나 (그룹이 사라졌거나)
+          // newGroupIds에 현재 선택된 그룹 ID가 없으면 (내가 나갔거나 그룹이 삭제됨)
+          selectedIndex.value = 0; // '메시지' 탭으로 초기화
+          print(
+            'DEBUG: Selected group no longer exists or is invalid. Resetting index to 0.',
+          );
         }
       }
-      await _fetchGroups(newGroupIds);
-      // if (newGroupIds.isNotEmpty) {
-      // } else {
-      //   _groupList.clear();
-      // }
     });
   }
 

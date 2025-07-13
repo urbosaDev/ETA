@@ -31,7 +31,7 @@ class CreateGroupView extends GetView<CreateGroupViewModel> {
       }
       if (isGroupCreated) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          Get.offAllNamed('/main');
+          Get.offNamed('/main');
           controller.isGroupCreated.value = false;
         });
       }

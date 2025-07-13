@@ -17,7 +17,6 @@ import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/pr
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise_log/promise_log_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise_log/promise_log_view_model.dart';
-import 'package:what_is_your_eta/presentation/bottomNav/%08home/home_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/promise/create_promise/create_promise_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/loading/common_loading_lottie.dart';
@@ -50,7 +49,7 @@ class GroupView extends GetView<GroupViewModel> {
         }
         if (controller.isDeleteAndLeaveGroup.value) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            Get.find<HomeViewModel>().changeSideTabIndex(0);
+            Get.offNamed('/main');
           });
         }
 
