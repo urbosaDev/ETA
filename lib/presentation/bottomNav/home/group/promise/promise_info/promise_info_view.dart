@@ -269,7 +269,7 @@ class PromiseInfoView extends GetView<PromiseInfoViewModel> {
     PromiseMemberStatus memberStatus,
   ) {
     return UserTile(
-      user: memberStatus.user,
+      user: memberStatus.user.userModel,
       textTheme: textTheme,
       isSelected: false,
       onTap:

@@ -4,6 +4,7 @@ import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/domain/usecase/calculate_distance_usecase.dart';
+import 'package:what_is_your_eta/domain/usecase/get_friends_with_status_usecase.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_info/promise_info_view.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/promise_info/promise_info_view_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/late/late_view.dart';
@@ -29,9 +30,10 @@ class PromiseView extends GetView<PromiseViewModel> {
                   init: PromiseInfoViewModel(
                     promiseId: controller.promiseId,
                     promiseRepository: Get.find<PromiseRepository>(),
-                    userRepository: Get.find<UserRepository>(),
                     calculateDistanceUseCase:
                         Get.find<CalculateDistanceUseCase>(),
+                    getFriendsWithStatusUsecase:
+                        Get.find<GetFriendsWithStatusUsecase>(),
                   ),
                   autoRemove: true,
                   builder: (c) => PromiseInfoView(),
@@ -42,6 +44,8 @@ class PromiseView extends GetView<PromiseViewModel> {
                     promiseRepository: Get.find<PromiseRepository>(),
                     userRepository: Get.find<UserRepository>(),
                     authRepository: Get.find<AuthRepository>(),
+                    getFriendsWithStatusUsecase:
+                        Get.find<GetFriendsWithStatusUsecase>(),
                   ),
                   autoRemove: true,
                   builder: (c) => LateView(),

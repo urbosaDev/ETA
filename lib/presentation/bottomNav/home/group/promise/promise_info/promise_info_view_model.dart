@@ -5,30 +5,33 @@ import 'package:get/get.dart';
 import 'package:what_is_your_eta/data/model/location_model/promise_location_model.dart';
 import 'package:what_is_your_eta/data/model/location_model/user_location_model.dart';
 import 'package:what_is_your_eta/data/model/promise_model.dart';
-import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
-import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
 import 'package:what_is_your_eta/domain/usecase/calculate_distance_usecase.dart';
+import 'package:what_is_your_eta/domain/usecase/get_friends_with_status_usecase.dart';
+import 'package:what_is_your_eta/presentation/models/friend_info_model.dart';
 import 'package:what_is_your_eta/presentation/models/promise_member_status.dart';
 
 class PromiseInfoViewModel extends GetxController {
   final String promiseId;
   final PromiseRepository _promiseRepository;
-  final UserRepository _userRepository;
+
   final CalculateDistanceUseCase _calculateDistanceUseCase;
+  final GetFriendsWithStatusUsecase _getFriendsWithStatusUsecase;
   PromiseInfoViewModel({
     required this.promiseId,
     required PromiseRepository promiseRepository,
-    required UserRepository userRepository,
+
     required CalculateDistanceUseCase calculateDistanceUseCase,
+    required GetFriendsWithStatusUsecase getFriendsWithStatusUsecase,
   }) : _promiseRepository = promiseRepository,
-       _userRepository = userRepository,
-       _calculateDistanceUseCase = calculateDistanceUseCase;
+
+       _calculateDistanceUseCase = calculateDistanceUseCase,
+       _getFriendsWithStatusUsecase = getFriendsWithStatusUsecase;
 
   final Rxn<PromiseModel> promise = Rxn<PromiseModel>();
   StreamSubscription<PromiseModel>? _promiseSub;
   final RxBool isLoading = true.obs;
-  final RxList<UserModel> memberList = <UserModel>[].obs;
+  final RxList<FriendInfoModel> memberList = <FriendInfoModel>[].obs;
   final Rxn<PromiseLocationModel> location = Rxn();
 
   final Rx<NLatLng?> currentPosition = Rx<NLatLng?>(null);
@@ -44,9 +47,10 @@ class PromiseInfoViewModel extends GetxController {
 
   @override
   void onClose() {
-    super.onClose();
     _promiseSub?.cancel();
     mapController.value?.dispose();
+    super.onClose();
+    print('약속아웃');
   }
 
   Future<void> _initialize() async {
@@ -83,7 +87,9 @@ class PromiseInfoViewModel extends GetxController {
   }
 
   Future<void> _fetchMembers(List<String> memberIds) async {
-    final users = await _userRepository.getUsersByUids(memberIds);
+    final users = await _getFriendsWithStatusUsecase.getFriendWithStatus(
+      uids: memberIds,
+    );
     memberList.value = users;
   }
 
@@ -92,7 +98,7 @@ class PromiseInfoViewModel extends GetxController {
     final targetLng = location.value?.longitude;
 
     return memberList.map((user) {
-      final loc = userLocations[user.uid];
+      final loc = userLocations[user.userModel.uid];
 
       double? distance;
       if (loc != null && targetLat != null && targetLng != null) {

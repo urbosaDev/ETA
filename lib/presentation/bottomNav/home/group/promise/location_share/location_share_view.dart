@@ -22,6 +22,7 @@ class LocationShareView extends GetView<LocationShareViewModel> {
             color: Colors.white,
           ),
         ),
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.close, color: Colors.white),

@@ -6,30 +6,35 @@ import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/data/repository/auth_repository.dart';
 import 'package:what_is_your_eta/data/repository/promise_repository.dart';
 import 'package:what_is_your_eta/data/repository/user_%08repository.dart';
+import 'package:what_is_your_eta/domain/usecase/get_friends_with_status_usecase.dart';
+import 'package:what_is_your_eta/presentation/models/friend_info_model.dart';
 
 class LateViewModel extends GetxController {
   final String promiseId;
   final PromiseRepository _promiseRepository;
   final UserRepository _userRepository;
   final AuthRepository _authRepository;
+  final GetFriendsWithStatusUsecase _getFriendsWithStatusUsecase;
 
   LateViewModel({
     required this.promiseId,
     required PromiseRepository promiseRepository,
     required UserRepository userRepository,
     required AuthRepository authRepository,
+    required GetFriendsWithStatusUsecase getFriendsWithStatusUsecase,
   }) : _promiseRepository = promiseRepository,
        _userRepository = userRepository,
-       _authRepository = authRepository;
+       _authRepository = authRepository,
+       _getFriendsWithStatusUsecase = getFriendsWithStatusUsecase;
 
   final Rxn<PromiseModel> promise = Rxn<PromiseModel>();
   StreamSubscription<PromiseModel>? _promiseSub;
-  final RxList<UserModel> memberList = <UserModel>[].obs;
+  final RxList<FriendInfoModel> memberList = <FriendInfoModel>[].obs;
   final Rx<UserModel?> userModel = Rx<UserModel?>(null);
 
   final RxBool isAfterPromiseTime = false.obs;
-  final RxList<UserModel> arrivedUsers = <UserModel>[].obs;
-  final RxList<UserModel> lateUsers = <UserModel>[].obs;
+  final RxList<FriendInfoModel> arrivedUsers = <FriendInfoModel>[].obs;
+  final RxList<FriendInfoModel> lateUsers = <FriendInfoModel>[].obs;
 
   final RxBool isLoading = true.obs;
   @override
@@ -87,14 +92,15 @@ class LateViewModel extends GetxController {
     final allMembers = memberList;
 
     arrivedUsers.value =
-        allMembers.where((u) => arrivedIds.contains(u.uid)).toList();
+        allMembers.where((u) => arrivedIds.contains(u.userModel.uid)).toList();
     lateUsers.value =
-        allMembers.where((u) => !arrivedIds.contains(u.uid)).toList();
+        allMembers.where((u) => !arrivedIds.contains(u.userModel.uid)).toList();
   }
 
   Future<void> _fetchMembers(List<String> memberIds) async {
-    final users = await _userRepository.getUsersByUids(memberIds);
-
+    final users = await _getFriendsWithStatusUsecase.getFriendWithStatus(
+      uids: memberIds,
+    );
     memberList.value = users;
   }
 }

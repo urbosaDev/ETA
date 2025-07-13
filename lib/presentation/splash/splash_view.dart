@@ -51,7 +51,7 @@ class SplashView extends GetView<SplashViewModel> {
                         fit: BoxFit.contain,
                       ),
                     ),
-                    SizedBox(height: height * 0.09),
+                    SizedBox(height: height * 0.12),
 
                     const Text(
                       '어딧삼',

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:what_is_your_eta/data/model/user_model.dart';
 import 'package:what_is_your_eta/presentation/bottomNav/%08home/group/promise/late/late_view_model.dart';
 import 'package:what_is_your_eta/presentation/core/loading/common_loading_lottie.dart';
 import 'package:what_is_your_eta/presentation/core/widget/user_tile.dart';
+import 'package:what_is_your_eta/presentation/models/friend_info_model.dart';
 
 class LateView extends GetView<LateViewModel> {
   const LateView({super.key});
@@ -46,7 +46,6 @@ class LateView extends GetView<LateViewModel> {
                   _buildUserSection(
                     context,
                     textTheme,
-
                     controller.arrivedUsers,
                   ),
                   const SizedBox(height: 16),
@@ -77,7 +76,7 @@ class LateView extends GetView<LateViewModel> {
     BuildContext context,
     TextTheme textTheme,
 
-    List<UserModel> users,
+    List<FriendInfoModel> users,
   ) {
     return Container(
       width: double.infinity,
@@ -116,7 +115,7 @@ class LateView extends GetView<LateViewModel> {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4.0),
                   child: UserTile(
-                    user: user,
+                    user: user.userModel,
                     textTheme: textTheme,
                     isSelected: false,
                   ),
