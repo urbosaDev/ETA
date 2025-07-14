@@ -2,7 +2,7 @@
 
 | Splash | Login | Input |
 |:--:|:--:|:--:|
-| <img width="199" height="372" alt="input" src="https://github.com/user-attachments/assets/b6300c1f-053c-4ce4-9283-a8b9736ff512" /> | <img width="199" height="372" alt="login" src="https://github.com/user-attachments/assets/0b2fe9ca-e237-4ae2-9f63-3a8b973d71fb" /> | <img width="199" height="372" alt="input" src="https://github.com/user-attachments/assets/5a34288f-3ec2-4691-a3d3-9b1408fa2535" /> |
+| <img width="199" height="372" alt="splash" src="https://github.com/user-attachments/assets/e4b7bebe-5c12-4237-bf45-2605a68f9ae3" /> | <img width="199" height="372" alt="login" src="https://github.com/user-attachments/assets/0b2fe9ca-e237-4ae2-9f63-3a8b973d71fb" /> | <img width="199" height="372" alt="input" src="https://github.com/user-attachments/assets/5a34288f-3ec2-4691-a3d3-9b1408fa2535" /> |
 
 | PrivateChat | AddFriend | Chat | AfterChat |
 |:--:|:--:|:--:|:--:|
@@ -26,6 +26,7 @@
 | EndPromise | Notification | Setting |
 |:--:|:--:|:--:|
 |<img width="198" height="430" alt="endPromise" src="https://github.com/user-attachments/assets/6479ad3d-a7df-4193-9605-55103406752e" />| <img width="198" height="430" alt="notification" src="https://github.com/user-attachments/assets/c2625c3b-3b9b-4282-9a48-c25b35c17498" />|<img width="198" height="430" alt="setting" src="https://github.com/user-attachments/assets/a8b9919a-c7da-4b5a-a8c6-6912658b6f6e" />|
+
 
 
 
