@@ -111,6 +111,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'What is your ETA',
       themeMode: ThemeMode.dark,
       theme: ThemeData(

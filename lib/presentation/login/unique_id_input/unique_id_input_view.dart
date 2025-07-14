@@ -169,7 +169,7 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
         );
       } else {
         return Text(
-          '❌ 아이디는 영문 소문자로 시작하고, \n숫자 포함가능 8~12자여야 합니다.',
+          '❌ 아이디는 영어소문자와 숫자로 구성된 8~12자여야 합니다.',
           style: textTheme.bodySmall?.copyWith(color: Colors.redAccent),
         );
       }

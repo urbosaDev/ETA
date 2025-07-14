@@ -253,6 +253,7 @@ class CreateGroupView extends GetView<CreateGroupViewModel> {
             controller.onTitleChanged(value);
           },
           maxLength: 10,
+          onSubmitted: null,
         ),
         Obx(() {
           if (controller.containsBlockedWordInTitle.value) {

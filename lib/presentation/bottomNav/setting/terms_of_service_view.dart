@@ -9,8 +9,8 @@ class TermsOfServiceView extends StatelessWidget {
       appBar: AppBar(title: const Text('서비스 이용약관')),
       body: const SingleChildScrollView(
         padding: EdgeInsets.all(16),
-        child: SelectableText('''ETA 서비스 이용약관
-본 약관은 'ETA' 앱 (이하 "저희" 또는 "서비스")을 이용함에 있어 서비스와 사용자 간의 권리, 의무 및 책임 사항을 규정함을 목적으로 합니다.
+        child: SelectableText('''어딧삼 서비스 이용약관
+본 약관은 '어딧삼' 앱 (이하 "저희" 또는 "서비스")을 이용함에 있어 서비스와 사용자 간의 권리, 의무 및 책임 사항을 규정함을 목적으로 합니다.
 
 1. 약관의 효력 발생 및 변경
 본 약관은 사용자가 본 서비스에 가입하거나 서비스를 이용하는 시점부터 효력이 발생합니다.
