@@ -25,6 +25,7 @@ import 'package:what_is_your_eta/data/service/user_service.dart';
 import 'package:what_is_your_eta/domain/usecase/calculate_distance_usecase.dart';
 import 'package:what_is_your_eta/domain/usecase/get_friends_with_status_usecase.dart';
 import 'package:what_is_your_eta/domain/usecase/get_single_with_status_usecase.dart';
+import 'package:what_is_your_eta/presentation/network_controller.dart';
 
 class DependencyInjection {
   static Future<void> init() async {
@@ -116,5 +117,6 @@ class DependencyInjection {
       ),
       permanent: true,
     );
+    Get.put<NetworkController>(NetworkController(), permanent: true);
   }
 }
