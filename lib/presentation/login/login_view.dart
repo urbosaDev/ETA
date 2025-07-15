@@ -2,6 +2,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sign_in_button/sign_in_button.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/setting/privacy_policy_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/setting/terms_of_service_view.dart';
 
 import 'package:what_is_your_eta/presentation/core/loading/common_loading_lottie.dart';
 import 'package:what_is_your_eta/presentation/login/login_view_model.dart';
@@ -126,11 +128,30 @@ class LoginView extends GetView<LoginViewModel> {
             recognizer:
                 TapGestureRecognizer()
                   ..onTap = () {
-                    Get.toNamed('/privacy-policy');
+                    Get.to(
+                      () => const PrivacyPolicyView(),
+                      transition: Transition.rightToLeft,
+                    );
+                  },
+          ),
+          const TextSpan(text: ' 및 '),
+          TextSpan(
+            text: '이용 약관',
+            style: textTheme.bodySmall?.copyWith(
+              color: Colors.white38,
+              fontWeight: FontWeight.bold,
+            ),
+            recognizer:
+                TapGestureRecognizer()
+                  ..onTap = () {
+                    Get.to(
+                      () => const TermsOfServiceView(),
+                      transition: Transition.rightToLeft,
+                    );
                   },
           ),
           TextSpan(
-            text: '에 동의하게 됩니다.',
+            text: '에 동의하는 것으로 간주됩니다.',
             style: textTheme.bodySmall?.copyWith(color: Colors.white38),
           ),
         ],

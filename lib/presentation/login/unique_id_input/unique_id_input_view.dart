@@ -1,5 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/setting/privacy_policy_view.dart';
+import 'package:what_is_your_eta/presentation/bottomNav/setting/terms_of_service_view.dart';
 import 'package:what_is_your_eta/presentation/core/loading/common_loading_lottie.dart';
 import 'package:what_is_your_eta/presentation/core/widget/common_text_field.dart';
 
@@ -87,10 +90,10 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
                     _buildNameInput(),
                     _buildNameStatusText(textTheme),
                     Center(child: _buildNameCheckButtons()),
-                    const SizedBox(height: 24),
+                    _buildTermsAgreement(textTheme),
                     Center(child: _buildSubmitButton()),
                     Text(
-                      '⚠️ 이름 또는 아이디에 부적절한 단어(욕설, 사회적으로 부적절한 표현 등)가 포함될 경우 제재를 받을 수 있습니다.',
+                      '⚠️  부적절한 단어(욕설, 사회적으로 부적절한 표현 등)가 포함될 경우 제재를 받을 수 있습니다.',
                       style: textTheme.bodySmall?.copyWith(
                         color: Colors.white70,
                       ),
@@ -114,14 +117,14 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
   }
 
   Widget _buildHeader(TextTheme textTheme) {
-    return Text('아이디와 이름을 입력해주세요', style: textTheme.titleLarge);
+    return Text('아이디와 별명을 입력해주세요', style: textTheme.titleLarge);
   }
 
   Widget _buildIdHeader(TextTheme textTheme) {
     return Row(
       children: [
         Text(
-          '아이디를 입력해주세요',
+          '앱에서 사용할 아이디를 입력해주세요',
           style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
         ),
         Obx(() {
@@ -139,7 +142,7 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
     return Row(
       children: [
         Text(
-          '이름을 입력해주세요',
+          '앱에서 사용할 별명을 입력해주세요',
           style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
         ),
         Obx(() {
@@ -237,7 +240,7 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
   Widget _buildNameInput() {
     return CommonTextField(
       controller: textNameController,
-      hintText: '이름 입력',
+      hintText: '별명 입력',
       maxLength: 10,
       keyboardType: TextInputType.name,
       onChanged: (value) {
@@ -252,17 +255,17 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
       final trimmed = controller.name.value.trim();
       if (trimmed.isEmpty)
         return Text(
-          '⚠ 이름을 입력해주세요.',
+          '⚠ 별명을 입력해주세요.',
           style: textTheme.bodySmall?.copyWith(color: Colors.orange),
         );
       if (trimmed.length < 2)
         return Text(
-          '⚠ 이름은 최소 2자 이상입니다.',
+          '⚠ 별명은 최소 2자 이상입니다.',
           style: textTheme.bodySmall?.copyWith(color: Colors.orange),
         );
       if (trimmed.length > 10)
         return Text(
-          '⚠ 이름은 최대 10자까지 입력 가능합니다.',
+          '⚠ 별명은 최대 10자까지 입력 가능합니다.',
           style: textTheme.bodySmall?.copyWith(color: Colors.orange),
         );
       return const SizedBox.shrink();
@@ -291,9 +294,67 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
           foregroundColor:
               isLengthValid && !isAlreadySelected ? null : Colors.black38,
         ),
-        child: const Text('이름 확인'),
+        child: const Text('별명 확인'),
       );
     });
+  }
+
+  Widget _buildTermsAgreement(TextTheme textTheme) {
+    return Row(
+      children: [
+        Checkbox(
+          value: controller.isChecked.value,
+          onChanged: (value) {
+            controller.isChecked.value = value ?? false;
+          },
+        ),
+
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: textTheme.bodySmall?.copyWith(color: Colors.white70),
+              children: [
+                const TextSpan(text: '(필수) '),
+                TextSpan(
+                  text: '이용약관[보기]',
+                  style: const TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                  ),
+                  recognizer:
+                      TapGestureRecognizer()
+                        ..onTap = () {
+                          Get.to(
+                            () => const TermsOfServiceView(),
+                            transition: Transition.rightToLeft,
+                          );
+                        },
+                ),
+                const TextSpan(text: ' 및 '),
+                TextSpan(
+                  text: '개인정보처리방침[보기]',
+                  style: const TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                  ),
+                  recognizer:
+                      TapGestureRecognizer()
+                        ..onTap = () {
+                          Get.to(
+                            () => const PrivacyPolicyView(),
+                            transition: Transition.rightToLeft,
+                          );
+                        },
+                ),
+                const TextSpan(text: '에 모두 동의합니다.'),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildSubmitButton() {
@@ -302,7 +363,8 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
         onPressed:
             controller.isUniqueIdValid.value &&
                     controller.uniqueIdCheck.value == UniqueIdCheck.available &&
-                    controller.isNameValid.value
+                    controller.isNameValid.value &&
+                    controller.isChecked.value
                 ? () async {
                   await controller.createUser();
                 }
@@ -312,7 +374,8 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
               controller.isUniqueIdValid.value &&
                       controller.uniqueIdCheck.value ==
                           UniqueIdCheck.available &&
-                      controller.isNameValid.value
+                      controller.isNameValid.value &&
+                      controller.isChecked.value
                   ? null
                   : Colors.grey.withOpacity(0.4),
         ),

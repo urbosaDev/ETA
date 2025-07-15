@@ -35,6 +35,8 @@ class UniqueIdInputViewModel extends GetxController {
     uniqueIdCheck.value = UniqueIdCheck.none;
   }
 
+  final RxBool isChecked = false.obs;
+
   void resetName() {
     name.value = '';
     selectedName.value = '';
@@ -125,7 +127,7 @@ class UniqueIdInputViewModel extends GetxController {
     final trimmedName = nameInput.trim();
 
     if (trimmedName.length < 2 || trimmedName.length > 10) {
-      systemMessage.value = '⚠️ 이름은 2자 이상 10자 이하로 입력해주세요.';
+      systemMessage.value = '⚠️ 별명은 2자 이상 10자 이하로 입력해주세요.';
       isNameValid.value = false;
       shouldClearNameInput.value = true;
       resetName();
@@ -134,7 +136,7 @@ class UniqueIdInputViewModel extends GetxController {
 
     final lower = trimmedName.toLowerCase();
     if (FilterWords.containsBlockedWord(lower)) {
-      systemMessage.value = '⚠️ 이름에 부적절한 단어가 포함되어 있습니다.';
+      systemMessage.value = '⚠️ 별명에 부적절한 단어가 포함되어 있습니다.';
       isNameValid.value = false;
       shouldClearNameInput.value = true;
       resetName();
