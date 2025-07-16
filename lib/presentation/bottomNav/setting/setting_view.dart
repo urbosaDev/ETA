@@ -94,7 +94,7 @@ class SettingView extends GetView<SettingViewModel> {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              "- 프로필 정보 (이름, 사진, 고유 ID 등)",
+                              "- 프로필 정보 (별명, 사진, 고유 ID 등)",
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             SizedBox(height: 8),

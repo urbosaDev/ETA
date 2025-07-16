@@ -73,7 +73,7 @@ class PrivateChatViewModel extends GetxController {
     final friendUids = user.friendsUids;
 
     final processedFriendList = await _getFriendsWithStatusUsecase
-        .getFriendWithStatus(uids: friendUids);
+        .assignStatusToUsers(uids: friendUids);
     friendList.value = processedFriendList;
 
     await getChatRoomIds(chatIds: user.privateChatIds, myUid: user.uid);
@@ -106,7 +106,7 @@ class PrivateChatViewModel extends GetxController {
     }
 
     final List<FriendInfoModel> processedOpponentList =
-        await _getFriendsWithStatusUsecase.getFriendWithStatus(
+        await _getFriendsWithStatusUsecase.assignStatusToUsers(
           uids: opponentUids,
         );
 

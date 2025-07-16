@@ -103,7 +103,7 @@ class CreateGroupViewModel extends GetxController {
     if (uids == null) return;
 
     final processedList = await _getFriendsWithStatusUsecase
-        .getFriendWithStatus(uids: uids);
+        .assignStatusToUsers(uids: uids);
     friendList.value = processedList;
   }
 

@@ -125,7 +125,7 @@ class GroupViewModel extends GetxController {
       return;
     }
 
-    friendList.value = await _getFriendsWithStatusUsecase.getFriendWithStatus(
+    friendList.value = await _getFriendsWithStatusUsecase.assignStatusToUsers(
       uids: myFriendsUids,
     );
   }
@@ -149,7 +149,7 @@ class GroupViewModel extends GetxController {
       return;
     }
     // UseCase를 사용하여 상태가 반영된 멤버 목록을 가져옴
-    memberList.value = await _getFriendsWithStatusUsecase.getFriendWithStatus(
+    memberList.value = await _getFriendsWithStatusUsecase.assignStatusToUsers(
       uids: memberUids,
     );
   }

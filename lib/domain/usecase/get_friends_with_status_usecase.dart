@@ -14,7 +14,7 @@ class GetFriendsWithStatusUsecase {
   }) : _authRepository = authRepository,
        _userRepository = userRepository;
 
-  Future<List<FriendInfoModel>> getFriendWithStatus({
+  Future<List<FriendInfoModel>> assignStatusToUsers({
     required List<String> uids,
   }) async {
     final currentUser = _authRepository.getCurrentUser();

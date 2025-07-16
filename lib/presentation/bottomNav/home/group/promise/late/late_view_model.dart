@@ -98,7 +98,7 @@ class LateViewModel extends GetxController {
   }
 
   Future<void> _fetchMembers(List<String> memberIds) async {
-    final users = await _getFriendsWithStatusUsecase.getFriendWithStatus(
+    final users = await _getFriendsWithStatusUsecase.assignStatusToUsers(
       uids: memberIds,
     );
     memberList.value = users;
