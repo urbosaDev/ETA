@@ -291,8 +291,8 @@ class CreatePromiseView extends GetView<CreatePromiseViewModel> {
                   size: 24,
                 ),
                 onTap: () => controller.toggleMember(member),
-                selected: isSelected,
-                selectedTileColor: Colors.white.withOpacity(0.05),
+                // selected: isSelected,
+                // selectedTileColor: Colors.white.withOpacity(0.05),
               );
             },
           );
