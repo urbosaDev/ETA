@@ -61,7 +61,7 @@
 ## 0. 프로젝트 시연 영상 
 > 해당 링크를 참고해주시면 감사하겠습니다 ;)
 링크 : 
-[https://www.youtube.com/watch?v=0ksjm3zotwA ](https://youtu.be/L5sbEdbAX6M)
+[https://www.youtube.com/watch?v=84TcM15TTFc ](https://www.youtube.com/watch?v=84TcM15TTFc)
 ---
 
 ##  1. 프로젝트 소개
