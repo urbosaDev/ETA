@@ -179,7 +179,7 @@ class CreateGroupViewModel extends GetxController {
           finalSelectedUid.where((uid) => uid != currentUser).toList();
 
       if (targetUserIds.isNotEmpty) {
-        await _notificationApiRepository.sendGroupNotification(
+        _notificationApiRepository.sendGroupNotification(
           targetUserIds: targetUserIds,
           groupName: "'${groupTitle.value}' 그룹에 초대되셨습니다! 💌",
           message: '${userModel.value?.name ?? '새 친구'}님이 당신을 그룹에 초대했습니다.',
@@ -193,7 +193,7 @@ class CreateGroupViewModel extends GetxController {
       isGroupCreated.value = false;
     } finally {
       isLoading.value = false;
-      isCreating.value = false; // 중복 호출 플래그 해제
+      isCreating.value = false;
     }
   }
 }

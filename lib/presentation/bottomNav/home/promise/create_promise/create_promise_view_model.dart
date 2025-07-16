@@ -173,7 +173,7 @@ class CreatePromiseViewModel extends GetxController {
         final memberUids = selectedMemberIds.toList();
 
         if (memberUids.isNotEmpty) {
-          await _fcmRepository.sendPromiseNotification(
+          _fcmRepository.sendPromiseNotification(
             targetUserIds: memberUids,
             title: '${groupModel.value?.title ?? '그룹'} 약속 생성',
             body: '${promiseName.value} 약속이 생성되었습니다!',
