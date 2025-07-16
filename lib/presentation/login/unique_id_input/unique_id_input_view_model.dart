@@ -148,6 +148,10 @@ class UniqueIdInputViewModel extends GetxController {
     return;
   }
 
+  void onCreationHandled() {
+    isCreated.value = false;
+  }
+
   Future<void> createUser() async {
     isLoading.value = true;
 

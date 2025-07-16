@@ -186,6 +186,7 @@ class CreateGroupViewModel extends GetxController {
           groupId: groupId,
         );
       }
+
       isGroupCreated.value = true;
       systemMessage.value = '그룹이 성공적으로 생성되었습니다.';
     } catch (e) {

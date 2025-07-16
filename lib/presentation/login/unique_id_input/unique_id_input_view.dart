@@ -56,7 +56,7 @@ class UniqueIdInputView extends GetView<UniqueIdInputViewModel> {
       if (toNavigate) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Get.offNamed('/main');
-          controller.isCreated.value = false;
+          controller.onCreationHandled();
         });
       }
 
