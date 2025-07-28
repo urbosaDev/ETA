@@ -1,0 +1,25 @@
+name: iOS CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy_ios:
+    runs-on: self-hosted
+
+    env:
+      FASTLANE_API_KEY_ID: ${{ secrets.FASTLANE_API_KEY_ID }}
+      FASTLANE_API_ISSUER_ID: ${{ secrets.FASTLANE_API_ISSUER_ID }}
+      FASTLANE_API_KEY_CONTENTS_BASE64: ${{ secrets.FASTLANE_API_KEY_CONTENTS_BASE64 }}
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install fastlane
+        run: brew install fastlane
+
+      - name: Deploy Product to Store
+        run: fastlane build_deploy_prod
+        working-directory: ios

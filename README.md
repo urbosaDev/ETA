@@ -3,9 +3,7 @@
 # 🦍어딧삼 
 ### " 약속하고 모이고 소통해요 "
 그룹을 생성하고 그룹 안에 약속을 만들어서 친구들과 위치를 공유하는 채팅앱입니다. 
-
---- 
-<img width="220" height="478" alt="Group 4" src="https://github.com/user-attachments/assets/59575d38-ed89-41bb-b6cb-e7bf95451806" /><img  width="220" height="478" alt="Group 6" src="https://github.com/user-attachments/assets/f2864762-b74f-41e6-9e0b-76dac29945ab" /><img width="220"  height="478" alt="Group 7" src="https://github.com/user-attachments/assets/5d00e60f-96f9-4c98-93ef-9dee9987fdd2" /><img width="220" height="478"  alt="Group 8" src="https://github.com/user-attachments/assets/167d2f4e-b2f2-4204-bf19-2bbd6b11b078" />
+<img width="220" height="478" alt="Group 4" src="https://github.com/user-attachments/assets/59575d38-ed89-41bb-b6cb-e7bf95451806" /><img  width="220" height="478" alt="Group 6" src="https://github.com/user-attachments/assets/f2864762-b74f-41e6-9e0b-76dac29945ab" /><img width="220"  height="478" alt="Group 7" src="https://github.com/user-attachments/assets/5d00e60f-96f9-4c98-93ef-9dee9987fdd2" />
 
 ---
 
@@ -589,8 +587,8 @@ class GetFriendsWithStatusUsecase {
 #### **배운점**
 초기에는 관리 포인트가 늘어난다는 생각에 UseCase의 도입을 주저했습니다. 하지만 개발 막바지에 '사용자 차단'이라는 복잡한 요구사항이 추가되었을 때, 미리 계층을 분리해 둔 덕분에 새로운 비즈니스 로직을 기존 코드에 최소한의 영향만으로 유연하게 통합하고 확장할 수 있었습니다.
 
-복잡한 비즈니스 로직은 Domain Layer를 적용하면 ViewModel의 상태관리가 편해진다는 것을
- 깊게 체감했습니다.
+사실은 글로만 알던 지식이지만, 
+복잡한 비즈니스 로직은 Domain Layer를 적용하면 ViewModel의 상태관리가 편해진다는 것을 깊게 체감했습니다.
 
 ---
 
