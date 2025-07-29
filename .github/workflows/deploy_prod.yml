@@ -20,6 +20,14 @@ jobs:
       - name: Install fastlane
         run: brew install fastlane
 
+      - name: Restore firebase_options.dart
+        run: |
+          echo "${{ secrets.FIREBASE_OPTION }}" | base64 --decode > lib/firebase_options.dart
+
+      - name: Restore GoogleService-Info.plist
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICE_INFO }}" | base64 --decode > ios/Runner/GoogleService-Info.plist
+
       - name: Deploy Product to Store
         run: fastlane build_deploy_prod
         working-directory: ios
