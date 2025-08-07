@@ -3,6 +3,7 @@
 # 🦍어딧삼 
 ### " 약속하고 모이고 소통해요 "
 그룹을 생성하고 그룹 안에 약속을 만들어서 친구들과 위치를 공유하는 채팅앱입니다. 
+
 <img width="220" height="478" alt="Group 4" src="https://github.com/user-attachments/assets/59575d38-ed89-41bb-b6cb-e7bf95451806" /><img  width="220" height="478" alt="Group 6" src="https://github.com/user-attachments/assets/f2864762-b74f-41e6-9e0b-76dac29945ab" /><img width="220"  height="478" alt="Group 7" src="https://github.com/user-attachments/assets/5d00e60f-96f9-4c98-93ef-9dee9987fdd2" />
 
 ---
